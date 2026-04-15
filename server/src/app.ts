@@ -4,6 +4,7 @@ import cors from 'cors'
 import express from 'express'
 import path from 'path'
 import authRoutes from './routes/auth.routes'
+import dashboardRoutes from './routes/dashboard.routes'
 
 const app = express()
 
@@ -20,6 +21,7 @@ app.use(cookieParser())
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')))
 
 app.use('/api/auth', authRoutes)
+app.use('/api/dashboard', dashboardRoutes)
 
 app.get('/api/health', (_req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() })
@@ -30,4 +32,3 @@ app.use((req, res) => {
 })
 
 export default app
-

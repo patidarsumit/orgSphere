@@ -15,8 +15,10 @@ import {
   UsersRound,
 } from 'lucide-react'
 import api from '@/lib/axios'
+import { Avatar } from '@/components/shared/Avatar'
 import { RootState } from '@/store'
 import { clearAuth } from '@/store/slices/authSlice'
+import { setSidebarOpen } from '@/store/slices/uiSlice'
 
 const organizationItems = [
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
@@ -31,26 +33,22 @@ const workspaceItems = [
   { href: '/my/notes', label: 'My Notes', icon: FileText },
 ]
 
-const initialsFor = (name?: string) =>
-  name
-    ?.split(' ')
-    .map((part) => part[0])
-    .join('')
-    .slice(0, 2)
-    .toUpperCase() || 'OS'
-
 function NavSection({
   label,
   items,
+  onNavigate,
 }: {
   label: string
   items: Array<{ href: string; label: string; icon: typeof LayoutDashboard }>
+  onNavigate: () => void
 }) {
   const pathname = usePathname()
 
   return (
     <div className="space-y-2">
-      <p className="px-3 text-[11px] font-semibold uppercase text-gray-400">{label}</p>
+      <p className="px-3 text-[10px] font-semibold uppercase tracking-wide text-gray-400">
+        {label}
+      </p>
       <nav className="space-y-1">
         {items.map((item) => {
           const Icon = item.icon
@@ -61,6 +59,7 @@ function NavSection({
             <Link
               key={item.href}
               href={item.href}
+              onClick={onNavigate}
               className={`relative flex h-9 items-center gap-3 rounded-lg px-3 text-sm font-medium transition-colors ${
                 isActive
                   ? 'bg-indigo-50 text-indigo-600'
@@ -84,6 +83,7 @@ export function Sidebar() {
   const dispatch = useDispatch()
   const router = useRouter()
   const user = useSelector((state: RootState) => state.auth.user)
+  const sidebarOpen = useSelector((state: RootState) => state.ui.sidebarOpen)
 
   const handleLogout = async () => {
     try {
@@ -94,39 +94,45 @@ export function Sidebar() {
     }
   }
 
-  return (
+  const closeSidebar = () => dispatch(setSidebarOpen(false))
+
+  const sidebarContent = (
     <aside className="flex h-screen w-[240px] shrink-0 flex-col border-r border-gray-100 bg-white">
-      <div className="flex h-16 items-center gap-3 px-5">
-        <span className="h-3 w-3 rounded-full bg-indigo-600" />
-        <span className="text-lg font-semibold text-gray-900">OrgSphere</span>
+      <div className="border-b border-gray-100 px-5 py-5">
+        <div className="flex items-center gap-3">
+          <span className="h-6 w-6 rounded-full bg-indigo-600" />
+          <span className="text-lg font-semibold text-gray-900">OrgSphere</span>
+        </div>
+        <p className="ml-9 mt-1 text-[10px] font-semibold uppercase tracking-wide text-gray-400">
+          Enterprise Space
+        </p>
       </div>
 
-      <div className="flex-1 space-y-8 px-4 py-4">
-        <NavSection label="Organization" items={organizationItems} />
-        <NavSection label="My Workspace" items={workspaceItems} />
+      <div className="flex-1 space-y-8 px-4 py-5">
+        <NavSection label="Organization" items={organizationItems} onNavigate={closeSidebar} />
+        <NavSection label="My Workspace" items={workspaceItems} onNavigate={closeSidebar} />
         {user?.role === 'admin' ? (
           <NavSection
             label="Admin"
             items={[{ href: '/settings', label: 'Settings', icon: Settings }]}
+            onNavigate={closeSidebar}
           />
         ) : null}
       </div>
 
-      <div className="p-4">
-        <div className="flex items-center gap-3 rounded-xl bg-gray-50 p-3">
-          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-indigo-100 text-sm font-semibold text-indigo-700">
-            {initialsFor(user?.name)}
-          </div>
+      <div className="border-t border-gray-100 p-4">
+        <div className="flex items-center gap-3">
+          <Avatar name={user?.name || 'OrgSphere User'} avatarPath={user?.avatar_path} size="sm" />
           <div className="min-w-0 flex-1">
-            <p className="truncate text-sm font-medium text-gray-900">{user?.name}</p>
-            <p className="truncate text-xs capitalize text-gray-500">
+            <p className="truncate text-[13px] font-medium text-gray-900">{user?.name}</p>
+            <p className="truncate text-[11px] capitalize text-gray-400">
               {user?.role?.replace('_', ' ')}
             </p>
           </div>
           <button
             type="button"
             onClick={handleLogout}
-            className="rounded-lg p-2 text-gray-500 hover:bg-white hover:text-gray-900"
+            className="rounded-lg p-2 text-gray-400 hover:bg-red-50 hover:text-red-500"
             aria-label="Log out"
           >
             <LogOut size={16} />
@@ -135,5 +141,23 @@ export function Sidebar() {
       </div>
     </aside>
   )
-}
 
+  return (
+    <>
+      <div className="hidden md:block">{sidebarContent}</div>
+      {sidebarOpen ? (
+        <div className="fixed inset-0 z-40 md:hidden">
+          <button
+            type="button"
+            aria-label="Close sidebar"
+            className="absolute inset-0 bg-gray-900/40"
+            onClick={closeSidebar}
+          />
+          <div className="absolute inset-y-0 left-0 shadow-[var(--shadow-modal)]">
+            {sidebarContent}
+          </div>
+        </div>
+      ) : null}
+    </>
+  )
+}

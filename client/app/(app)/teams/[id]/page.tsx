@@ -4,18 +4,19 @@ import { EmptyState } from '@/components/shared/EmptyState'
 import { PageHeader } from '@/components/shared/PageHeader'
 
 export const metadata: Metadata = {
-  title: 'Teams | OrgSphere',
+  title: 'Team Detail | OrgSphere',
 }
 
-export default function TeamsPage() {
+export default function TeamDetailPage() {
   return (
     <div>
-      <PageHeader title="Teams" subtitle="Manage teams and membership" />
+      <PageHeader title="Team Detail" subtitle="Team membership and ownership" />
       <EmptyState
         icon={UsersRound}
-        title="Teams coming in Phase 4"
-        description="Team creation, membership, and team detail pages will arrive after the employee module."
+        title="Team details coming in Phase 4"
+        description="Team membership, linked projects, and ownership history will arrive in the teams phase."
       />
     </div>
   )
 }
+
