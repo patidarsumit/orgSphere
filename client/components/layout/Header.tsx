@@ -1,8 +1,8 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import { useDispatch, useSelector } from 'react-redux'
 import { Bell, ChevronDown, PanelLeft, Search } from 'lucide-react'
 import api from '@/lib/axios'
@@ -22,27 +22,29 @@ const pageNames: Record<string, string> = {
   '/settings': 'Settings',
 }
 
+const pageNameFor = (pathname: string) => {
+  if (pageNames[pathname]) {
+    return pageNames[pathname]
+  }
+
+  const segment = pathname.split('/').filter(Boolean).at(-1)
+  return segment ? segment.replaceAll('-', ' ') : 'Dashboard'
+}
+
 export function Header() {
   const dispatch = useDispatch()
   const pathname = usePathname()
+  const router = useRouter()
   const user = useSelector((state: RootState) => state.auth.user)
   const [menuOpen, setMenuOpen] = useState(false)
-
-  const pageName = useMemo(() => {
-    if (pageNames[pathname]) {
-      return pageNames[pathname]
-    }
-
-    const segment = pathname.split('/').filter(Boolean).at(-1)
-    return segment ? segment.replaceAll('-', ' ') : 'Dashboard'
-  }, [pathname])
+  const pageName = pageNameFor(pathname)
 
   const handleLogout = async () => {
     try {
       await api.post('/auth/logout')
     } finally {
       dispatch(clearAuth())
-      window.location.href = '/login'
+      router.push('/login')
     }
   }
 

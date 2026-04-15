@@ -4,6 +4,7 @@ import jwt, { SignOptions } from 'jsonwebtoken'
 import { AppDataSource } from '../data-source'
 import { User } from '../entities/User'
 import { AuthRequest } from '../middleware/auth'
+import { env } from '../config/env'
 
 type TokenPayload = {
   id: string
@@ -28,13 +29,13 @@ const generateTokens = (user: User) => {
   return {
     accessToken: signToken(
       payload,
-      process.env.JWT_SECRET || '',
-      process.env.JWT_ACCESS_EXPIRES || '15m'
+      env.jwtSecret(),
+      env.jwtAccessExpires()
     ),
     refreshToken: signToken(
       payload,
-      process.env.JWT_REFRESH_SECRET || '',
-      process.env.JWT_REFRESH_EXPIRES || '7d'
+      env.jwtRefreshSecret(),
+      env.jwtRefreshExpires()
     ),
   }
 }
@@ -124,7 +125,7 @@ export const refresh = async (req: Request, res: Response): Promise<void> => {
       return
     }
 
-    const decoded = jwt.verify(token, process.env.JWT_REFRESH_SECRET || '') as TokenPayload
+    const decoded = jwt.verify(token, env.jwtRefreshSecret()) as TokenPayload
     const repo = userRepo()
     const user = await repo.findOne({ where: { id: decoded.id, is_active: true } })
 
@@ -167,4 +168,3 @@ export const me = async (req: AuthRequest, res: Response): Promise<void> => {
     res.status(500).json({ message: 'Server error' })
   }
 }
-

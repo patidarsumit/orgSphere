@@ -14,20 +14,27 @@ import {
   Users,
   UsersRound,
 } from 'lucide-react'
+import { UserResponse } from '@orgsphere/schemas'
 import api from '@/lib/axios'
 import { Avatar } from '@/components/shared/Avatar'
 import { RootState } from '@/store'
 import { clearAuth } from '@/store/slices/authSlice'
 import { setSidebarOpen } from '@/store/slices/uiSlice'
 
-const organizationItems = [
+type NavItem = {
+  href: string
+  label: string
+  icon: typeof LayoutDashboard
+}
+
+const organizationItems: NavItem[] = [
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { href: '/projects', label: 'Projects', icon: FolderKanban },
   { href: '/employees', label: 'Employees', icon: Users },
   { href: '/teams', label: 'Teams', icon: UsersRound },
 ]
 
-const workspaceItems = [
+const workspaceItems: NavItem[] = [
   { href: '/my/dashboard', label: 'My Dashboard', icon: House },
   { href: '/my/tasks', label: 'My Tasks', icon: CheckSquare },
   { href: '/my/notes', label: 'My Notes', icon: FileText },
@@ -39,7 +46,7 @@ function NavSection({
   onNavigate,
 }: {
   label: string
-  items: Array<{ href: string; label: string; icon: typeof LayoutDashboard }>
+  items: NavItem[]
   onNavigate: () => void
 }) {
   const pathname = usePathname()
@@ -79,6 +86,62 @@ function NavSection({
   )
 }
 
+function SidebarPanel({
+  user,
+  onLogout,
+  onNavigate,
+}: {
+  user: UserResponse | null
+  onLogout: () => void
+  onNavigate: () => void
+}) {
+  return (
+    <aside className="flex h-screen w-[240px] shrink-0 flex-col border-r border-gray-100 bg-white">
+      <div className="border-b border-gray-100 px-5 py-5">
+        <div className="flex items-center gap-3">
+          <span className="h-6 w-6 rounded-full bg-indigo-600" />
+          <span className="text-lg font-semibold text-gray-900">OrgSphere</span>
+        </div>
+        <p className="ml-9 mt-1 text-[10px] font-semibold uppercase tracking-wide text-gray-400">
+          Enterprise Space
+        </p>
+      </div>
+
+      <div className="flex-1 space-y-8 px-4 py-5">
+        <NavSection label="Organization" items={organizationItems} onNavigate={onNavigate} />
+        <NavSection label="My Workspace" items={workspaceItems} onNavigate={onNavigate} />
+        {user?.role === 'admin' ? (
+          <NavSection
+            label="Admin"
+            items={[{ href: '/settings', label: 'Settings', icon: Settings }]}
+            onNavigate={onNavigate}
+          />
+        ) : null}
+      </div>
+
+      <div className="border-t border-gray-100 p-4">
+        <div className="flex items-center gap-3">
+          <Avatar name={user?.name || 'OrgSphere User'} avatarPath={user?.avatar_path} size="sm" />
+          <div className="min-w-0 flex-1">
+            <p className="truncate text-[13px] font-medium text-gray-900">{user?.name}</p>
+            <p className="truncate text-[11px] capitalize text-gray-400">
+              {user?.role?.replace('_', ' ')}
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={onLogout}
+            className="rounded-lg p-2 text-gray-400 hover:bg-red-50 hover:text-red-500"
+            aria-label="Log out"
+          >
+            <LogOut size={16} />
+          </button>
+        </div>
+      </div>
+    </aside>
+  )
+}
+
 export function Sidebar() {
   const dispatch = useDispatch()
   const router = useRouter()
@@ -96,55 +159,11 @@ export function Sidebar() {
 
   const closeSidebar = () => dispatch(setSidebarOpen(false))
 
-  const sidebarContent = (
-    <aside className="flex h-screen w-[240px] shrink-0 flex-col border-r border-gray-100 bg-white">
-      <div className="border-b border-gray-100 px-5 py-5">
-        <div className="flex items-center gap-3">
-          <span className="h-6 w-6 rounded-full bg-indigo-600" />
-          <span className="text-lg font-semibold text-gray-900">OrgSphere</span>
-        </div>
-        <p className="ml-9 mt-1 text-[10px] font-semibold uppercase tracking-wide text-gray-400">
-          Enterprise Space
-        </p>
-      </div>
-
-      <div className="flex-1 space-y-8 px-4 py-5">
-        <NavSection label="Organization" items={organizationItems} onNavigate={closeSidebar} />
-        <NavSection label="My Workspace" items={workspaceItems} onNavigate={closeSidebar} />
-        {user?.role === 'admin' ? (
-          <NavSection
-            label="Admin"
-            items={[{ href: '/settings', label: 'Settings', icon: Settings }]}
-            onNavigate={closeSidebar}
-          />
-        ) : null}
-      </div>
-
-      <div className="border-t border-gray-100 p-4">
-        <div className="flex items-center gap-3">
-          <Avatar name={user?.name || 'OrgSphere User'} avatarPath={user?.avatar_path} size="sm" />
-          <div className="min-w-0 flex-1">
-            <p className="truncate text-[13px] font-medium text-gray-900">{user?.name}</p>
-            <p className="truncate text-[11px] capitalize text-gray-400">
-              {user?.role?.replace('_', ' ')}
-            </p>
-          </div>
-          <button
-            type="button"
-            onClick={handleLogout}
-            className="rounded-lg p-2 text-gray-400 hover:bg-red-50 hover:text-red-500"
-            aria-label="Log out"
-          >
-            <LogOut size={16} />
-          </button>
-        </div>
-      </div>
-    </aside>
-  )
-
   return (
     <>
-      <div className="hidden md:block">{sidebarContent}</div>
+      <div className="hidden md:block">
+        <SidebarPanel user={user} onLogout={handleLogout} onNavigate={closeSidebar} />
+      </div>
       {sidebarOpen ? (
         <div className="fixed inset-0 z-40 md:hidden">
           <button
@@ -154,7 +173,7 @@ export function Sidebar() {
             onClick={closeSidebar}
           />
           <div className="absolute inset-y-0 left-0 shadow-[var(--shadow-modal)]">
-            {sidebarContent}
+            <SidebarPanel user={user} onLogout={handleLogout} onNavigate={closeSidebar} />
           </div>
         </div>
       ) : null}
