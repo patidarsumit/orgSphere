@@ -49,7 +49,7 @@ export function Header() {
   }
 
   return (
-    <header className="flex h-14 shrink-0 items-center border-b border-gray-100 bg-white px-4 md:px-8">
+    <header className="flex h-16 shrink-0 items-center border-b border-gray-100 bg-white px-4 md:px-8">
       <div className="flex min-w-0 flex-1 items-center gap-3">
         <button
           type="button"
