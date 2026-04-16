@@ -19,6 +19,26 @@ export interface Employee extends User {
   direct_reports?: User[]
 }
 
+export interface TeamMember {
+  id: string
+  name: string
+  email: string
+  role: UserRole
+  avatar_path: string | null
+  department: string | null
+}
+
+export interface Team {
+  id: string
+  name: string
+  description: string | null
+  created_by: string | null
+  created_at: string
+  updated_at: string
+  members: TeamMember[]
+  creator?: User | null
+}
+
 export type ProjectStatus = 'active' | 'completed' | 'on_hold' | 'planned' | 'archived'
 export type TaskStatus = 'todo' | 'in_progress' | 'review' | 'done'
 export type TaskPriority = 'low' | 'medium' | 'high'
