@@ -1,19 +1,28 @@
 @import "tailwindcss";
 
 :root {
-  --background: #f9fafb;
-  --foreground: #111827;
-  --color-primary: #4F46E5;
-  --color-primary-hover: #4338CA;
-  --color-primary-light: #EEF2FF;
-  --color-surface: #F9FAFB;
-  --color-surface-card: #FFFFFF;
-  --color-border: #F3F4F6;
-  --color-border-strong: #E5E7EB;
-  --color-text-primary: #111827;
-  --color-text-secondary: #6B7280;
-  --color-text-tertiary: #9CA3AF;
-  --shadow-card: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
+  --background: #f9f9ff;
+  --foreground: #151c27;
+  --color-primary: #3525cd;
+  --color-primary-hover: #3323cc;
+  --color-primary-container: #4f46e5;
+  --color-primary-light: #e2dfff;
+  --color-on-primary-container: #dad7ff;
+  --color-tertiary: #7e3000;
+  --color-tertiary-container: #a44100;
+  --color-tertiary-light: #ffdbcc;
+  --color-surface: #f9f9ff;
+  --color-surface-container: #e7eefe;
+  --color-surface-low: #f0f3ff;
+  --color-surface-high: #e2e8f8;
+  --color-surface-highest: #dce2f3;
+  --color-surface-card: #ffffff;
+  --color-border: rgba(199,196,216,0.15);
+  --color-border-strong: rgba(199,196,216,0.3);
+  --color-text-primary: #151c27;
+  --color-text-secondary: #464555;
+  --color-text-tertiary: #777587;
+  --shadow-card: 0 12px 32px -4px rgba(21,28,39,0.08);
   --shadow-modal: 0 12px 32px -4px rgba(21,28,39,0.12);
   --radius-card: 12px;
   --radius-btn: 8px;
@@ -36,4 +45,8 @@ body {
 button,
 input {
   font: inherit;
+}
+
+.primary-gradient {
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-container) 100%);
 }
