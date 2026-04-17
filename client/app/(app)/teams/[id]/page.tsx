@@ -3,7 +3,6 @@
 import Link from 'next/link'
 import { useParams, useRouter } from 'next/navigation'
 import { useState } from 'react'
-import { useSelector } from 'react-redux'
 import {
   ArrowLeft,
   Briefcase,
@@ -24,10 +23,10 @@ import { ConfirmDialog } from '@/components/shared/ConfirmDialog'
 import { EmptyState } from '@/components/shared/EmptyState'
 import { StatusBadge } from '@/components/shared/StatusBadge'
 import { TechStackChip } from '@/components/shared/TechStackChip'
+import { usePermissions } from '@/hooks/usePermissions'
 import { useTeamProjects } from '@/hooks/useProjects'
 import { useDeleteTeam, useRemoveTeamMember, useTeam } from '@/hooks/useTeams'
 import { appToast, getToastErrorMessage } from '@/lib/toast'
-import { RootState } from '@/store'
 import { TeamMember } from '@/types'
 
 interface RemoveTarget {
@@ -119,7 +118,7 @@ function MemberRow({
 export default function TeamDetailPage() {
   const params = useParams<{ id: string }>()
   const router = useRouter()
-  const currentUser = useSelector((state: RootState) => state.auth.user)
+  const { can, user } = usePermissions()
   const { data: team, isLoading, isError } = useTeam(params.id)
   const { data: teamProjects = [], isLoading: projectsLoading } = useTeamProjects(params.id)
   const removeMember = useRemoveTeamMember(params.id)
@@ -145,8 +144,8 @@ export default function TeamDetailPage() {
     )
   }
 
-  const canEdit = currentUser?.role === 'admin' || currentUser?.id === team.created_by
-  const canDelete = currentUser?.role === 'admin'
+  const canEdit = can.manageTeam(team)
+  const canDelete = can.deleteTeam
   const existingMemberIds = team.members.map((member) => member.id)
   const onConfirmRemove = async () => {
     if (!removeTarget) {
@@ -231,14 +230,14 @@ export default function TeamDetailPage() {
                   {team.members.length}
                 </span>
               </div>
-              <AddMemberSearch teamId={team.id} existingMemberIds={existingMemberIds} />
+              {canEdit ? <AddMemberSearch teamId={team.id} existingMemberIds={existingMemberIds} /> : null}
             </div>
 
             <div className="space-y-3">
               {team.members.map((member) => {
                 const isCreator = member.id === team.created_by
                 const canRemove =
-                  canEdit && !isCreator && currentUser?.id !== member.id && team.members.length > 1
+                  canEdit && !isCreator && user?.id !== member.id && team.members.length > 1
 
                 return (
                   <MemberRow

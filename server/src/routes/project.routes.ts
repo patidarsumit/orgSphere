@@ -13,7 +13,8 @@ import {
   updateMemberRole,
 } from '../controllers/project.controller'
 import { addProjectMemberSchema, createProjectSchema, updateProjectSchema } from '@orgsphere/schemas'
-import { adminOnly, authMiddleware } from '../middleware/auth'
+import { authMiddleware } from '../middleware/auth'
+import { adminOnly, canCreateProject, canManageProject } from '../middleware/permissions'
 import { validate } from '../middleware/validate'
 
 const router = Router()
@@ -26,11 +27,11 @@ router.get('/team/:teamId', getByTeam)
 
 router.get('/', getAll)
 router.get('/:id', getOne)
-router.post('/', validate(createProjectSchema), create)
-router.put('/:id', validate(updateProjectSchema), update)
+router.post('/', canCreateProject, validate(createProjectSchema), create)
+router.put('/:id', canManageProject, validate(updateProjectSchema), update)
 router.delete('/:id', adminOnly, remove)
-router.post('/:id/members', validate(addProjectMemberSchema), addMember)
-router.put('/:id/members/:userId', updateMemberRole)
-router.delete('/:id/members/:userId', removeMember)
+router.post('/:id/members', canManageProject, validate(addProjectMemberSchema), addMember)
+router.put('/:id/members/:userId', canManageProject, updateMemberRole)
+router.delete('/:id/members/:userId', canManageProject, removeMember)
 
 export default router

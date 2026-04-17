@@ -13,6 +13,7 @@ import {
   useUpdateEmployee,
   useUploadEmployeeAvatar,
 } from '@/hooks/useEmployees'
+import { usePermissions } from '@/hooks/usePermissions'
 import { appToast } from '@/lib/toast'
 import { Employee } from '@/types'
 import { employeeRoles, roleLabels } from './constants'
@@ -75,6 +76,7 @@ export function EmployeeFormModal({ open, employee, onClose }: EmployeeFormModal
 }
 
 function EmployeeFormModalContent({ employee, onClose }: Omit<EmployeeFormModalProps, 'open'>) {
+  const { isAdmin } = usePermissions()
   const [skills, setSkills] = useState<string[]>(() => employee?.skills || [])
   const [skillInput, setSkillInput] = useState('')
   const [formError, setFormError] = useState<string | null>(null)
@@ -86,6 +88,8 @@ function EmployeeFormModalContent({ employee, onClose }: Omit<EmployeeFormModalP
   const uploadAvatar = useUploadEmployeeAvatar(employee?.id || '')
   const { data: managers } = useEmployees({ limit: 100, is_active: true })
   const isEdit = Boolean(employee)
+  const canEditPrivilegedFields = isAdmin || !isEdit
+  const roleOptions = isAdmin ? employeeRoles : employeeRoles.filter((role) => role !== 'admin')
 
   const {
     formState: { errors },
@@ -145,9 +149,9 @@ function EmployeeFormModalContent({ employee, onClose }: Omit<EmployeeFormModalP
       if (isEdit && employee) {
         const payload = updateEmployeeSchema.parse({
           name: values.name,
-          role: values.role,
+          role: canEditPrivilegedFields ? values.role : undefined,
           department: values.department || null,
-          manager_id: values.manager_id || null,
+          manager_id: canEditPrivilegedFields ? values.manager_id || null : undefined,
           skills,
         })
         await updateEmployee.mutateAsync(payload)
@@ -292,19 +296,21 @@ function EmployeeFormModalContent({ employee, onClose }: Omit<EmployeeFormModalP
               </label>
             ) : null}
 
-            <label className="block">
-              <span className="text-sm font-medium text-[color:var(--color-text-secondary)]">Role</span>
-              <select
-                {...register('role')}
-                className="mt-1 h-10 w-full rounded-xl border border-[color:var(--color-border-strong)] bg-white px-3 text-sm outline-none focus:border-[color:var(--color-primary)] focus:ring-2 focus:ring-[color:var(--color-primary)]/10"
-              >
-                {employeeRoles.map((role) => (
-                  <option key={role} value={role}>
-                    {roleLabels[role]}
-                  </option>
-                ))}
-              </select>
-            </label>
+            {canEditPrivilegedFields ? (
+              <label className="block">
+                <span className="text-sm font-medium text-[color:var(--color-text-secondary)]">Role</span>
+                <select
+                  {...register('role')}
+                  className="mt-1 h-10 w-full rounded-xl border border-[color:var(--color-border-strong)] bg-white px-3 text-sm outline-none focus:border-[color:var(--color-primary)] focus:ring-2 focus:ring-[color:var(--color-primary)]/10"
+                >
+                  {roleOptions.map((role) => (
+                    <option key={role} value={role}>
+                      {roleLabels[role]}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            ) : null}
 
             <label className="block">
               <span className="text-sm font-medium text-[color:var(--color-text-secondary)]">Department</span>
@@ -314,10 +320,11 @@ function EmployeeFormModalContent({ employee, onClose }: Omit<EmployeeFormModalP
               />
             </label>
 
-            <label className="block">
-              <span className="text-sm font-medium text-[color:var(--color-text-secondary)]">Manager</span>
-              <input type="hidden" {...register('manager_id')} />
-              <div className="mt-1 rounded-xl border border-[color:var(--color-border-strong)] bg-white p-2">
+            {canEditPrivilegedFields ? (
+              <label className="block">
+                <span className="text-sm font-medium text-[color:var(--color-text-secondary)]">Manager</span>
+                <input type="hidden" {...register('manager_id')} />
+                <div className="mt-1 rounded-xl border border-[color:var(--color-border-strong)] bg-white p-2">
                 <div className="relative">
                   <Search
                     size={14}
@@ -375,8 +382,9 @@ function EmployeeFormModalContent({ employee, onClose }: Omit<EmployeeFormModalP
                     </button>
                   ))}
                 </div>
-              </div>
-            </label>
+                </div>
+              </label>
+            ) : null}
           </div>
 
           <div>

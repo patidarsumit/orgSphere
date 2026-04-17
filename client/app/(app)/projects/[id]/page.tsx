@@ -3,7 +3,6 @@
 import Link from 'next/link'
 import { useParams, useRouter } from 'next/navigation'
 import { useState } from 'react'
-import { useSelector } from 'react-redux'
 import {
   ArrowLeft,
   CalendarDays,
@@ -31,6 +30,7 @@ import { TaskFormModal } from '@/components/tasks/TaskFormModal'
 import { formatTaskDueDate } from '@/components/tasks/taskUtils'
 import { useEntityActivity } from '@/hooks/useActivity'
 import { useCreateNote, useNotes } from '@/hooks/useNotes'
+import { usePermissions } from '@/hooks/usePermissions'
 import {
   useProject,
   useRemoveProjectMember,
@@ -38,7 +38,6 @@ import {
 } from '@/hooks/useProjects'
 import { useProjectTasks, useUpdateTask } from '@/hooks/useTasks'
 import { appToast, getToastErrorMessage } from '@/lib/toast'
-import { RootState } from '@/store'
 import { Project, ProjectMember, TaskStatus } from '@/types'
 
 type ProjectTab = 'overview' | 'team' | 'tasks' | 'notes' | 'activity'
@@ -421,6 +420,7 @@ function TeamTab({ project, canEdit }: { project: Project; canEdit: boolean }) {
 }
 
 function ProjectTasksTab({ projectId }: { projectId: string }) {
+  const { can } = usePermissions()
   const [filter, setFilter] = useState<TaskStatus | ''>('')
   const [modalOpen, setModalOpen] = useState(false)
   const { data, isLoading } = useProjectTasks(projectId, { status: filter, limit: 100 })
@@ -490,12 +490,18 @@ function ProjectTasksTab({ projectId }: { projectId: string }) {
         <div className="divide-y divide-[color:var(--color-border)] rounded-xl border border-[color:var(--color-border)]">
           {tasks.map((task) => (
             <div key={task.id} className="flex flex-wrap items-center gap-3 px-4 py-3 hover:bg-[color:var(--color-surface-low)]">
-              <button
-                type="button"
-                onClick={() => void toggleTaskStatus(task.id, task.status === 'done')}
-                className={`h-5 w-5 rounded-full border ${task.status === 'done' ? 'border-green-600 bg-green-600' : 'border-[color:var(--color-border-strong)] bg-white'}`}
-                aria-label="Toggle task"
-              />
+              {can.manageTask(task) ? (
+                <button
+                  type="button"
+                  onClick={() => void toggleTaskStatus(task.id, task.status === 'done')}
+                  className={`h-5 w-5 rounded-full border ${task.status === 'done' ? 'border-green-600 bg-green-600' : 'border-[color:var(--color-border-strong)] bg-white'}`}
+                  aria-label="Toggle task"
+                />
+              ) : (
+                <span
+                  className={`h-5 w-5 rounded-full border ${task.status === 'done' ? 'border-green-600 bg-green-600' : 'border-[color:var(--color-border-strong)] bg-white'}`}
+                />
+              )}
               <div className="min-w-[220px] flex-1">
                 <p className={`text-sm font-semibold text-[color:var(--color-text-primary)] ${task.status === 'done' ? 'line-through opacity-60' : ''}`}>
                   {task.title}
@@ -634,7 +640,7 @@ function ProjectActivityTab({ project }: { project: Project }) {
 export default function ProjectDetailPage() {
   const params = useParams<{ id: string }>()
   const router = useRouter()
-  const currentUser = useSelector((state: RootState) => state.auth.user)
+  const { can } = usePermissions()
   const { data: project, isLoading, isError } = useProject(params.id)
   const [activeTab, setActiveTab] = useState<ProjectTab>('overview')
   const [editOpen, setEditOpen] = useState(false)
@@ -656,10 +662,7 @@ export default function ProjectDetailPage() {
     )
   }
 
-  const canEdit =
-    currentUser?.role === 'admin' ||
-    currentUser?.id === project.manager_id ||
-    currentUser?.id === project.tech_lead_id
+  const canEdit = can.manageProject(project)
 
   return (
     <div className="-m-8 min-h-full bg-[color:var(--color-surface-low)] p-5 sm:p-8">

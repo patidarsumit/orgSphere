@@ -13,7 +13,6 @@ import {
   Search,
   Users,
 } from 'lucide-react'
-import { useSelector } from 'react-redux'
 import { EmployeeCard } from '@/components/employees/EmployeeCard'
 import { EmployeeFormModal } from '@/components/employees/EmployeeFormModal'
 import { EmployeeTable } from '@/components/employees/EmployeeTable'
@@ -22,8 +21,8 @@ import { SkillsFilter } from '@/components/employees/SkillsFilter'
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog'
 import { EmptyState } from '@/components/shared/EmptyState'
 import { useDeactivateEmployee, useEmployees } from '@/hooks/useEmployees'
+import { usePermissions } from '@/hooks/usePermissions'
 import { appToast, getToastErrorMessage } from '@/lib/toast'
-import { RootState } from '@/store'
 import { Employee, UserRole } from '@/types'
 
 const isUserRole = (value: string): value is UserRole =>
@@ -84,7 +83,7 @@ function TableSkeleton() {
 }
 
 export default function EmployeesPage() {
-  const currentUser = useSelector((state: RootState) => state.auth.user)
+  const { can } = usePermissions()
   const [isPending, startTransition] = useTransition()
   const [modalOpen, setModalOpen] = useState(false)
   const [editingEmployee, setEditingEmployee] = useState<Employee | undefined>()
@@ -139,7 +138,6 @@ export default function EmployeesPage() {
   const pageNumbers = pageNumbersFor(page, totalPages)
   const firstItem = totalEmployees === 0 ? 0 : (page - 1) * 12 + 1
   const lastItem = Math.min(page * 12, totalEmployees)
-  const isAdmin = currentUser?.role === 'admin'
 
   const resetPageAndSetRole = (nextRole: string) => {
     setPage(1)
@@ -231,14 +229,16 @@ export default function EmployeesPage() {
               )
             })}
           </div>
-          <button
-            type="button"
-            onClick={openCreateModal}
-            className="primary-gradient inline-flex items-center gap-2 rounded-xl px-6 py-2.5 text-sm font-semibold text-white shadow-[0_14px_30px_-16px_rgba(53,37,205,0.8)] transition-all active:scale-95"
-          >
-            <Plus size={16} />
-            Add Employee
-          </button>
+          {can.createEmployee ? (
+            <button
+              type="button"
+              onClick={openCreateModal}
+              className="primary-gradient inline-flex items-center gap-2 rounded-xl px-6 py-2.5 text-sm font-semibold text-white shadow-[0_14px_30px_-16px_rgba(53,37,205,0.8)] transition-all active:scale-95"
+            >
+              <Plus size={16} />
+              Add Employee
+            </button>
+          ) : null}
         </div>
       </div>
 
@@ -313,7 +313,7 @@ export default function EmployeesPage() {
               ? 'Try a different search, role, or skill filter.'
               : 'Add the first employee profile to start the directory.'
           }
-          action={{ label: 'Add Employee', onClick: openCreateModal }}
+          action={can.createEmployee ? { label: 'Add Employee', onClick: openCreateModal } : undefined}
         />
       ) : null}
 
@@ -336,7 +336,8 @@ export default function EmployeesPage() {
               employees={employees}
               onEdit={openEditModal}
               onDeactivate={setDeactivateTarget}
-              canDeactivate={isAdmin}
+              canEditEmployee={can.editEmployee}
+              canDeactivateEmployee={can.deactivateEmployee}
             />
           )}
 

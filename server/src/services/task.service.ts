@@ -95,12 +95,22 @@ export const findByProject = async (projectId: string, query: TaskQuery) => {
   }
 }
 
-export const findById = async (id: string, userId: string) => {
-  return repo()
+const taskByActorQuery = (id: string, userId: string, actorRole?: string) => {
+  const qb = repo()
     .createQueryBuilder('task')
     .leftJoinAndSelect('task.project', 'project')
     .leftJoinAndSelect('task.assignee', 'assignee')
-    .where('task.id = :id AND task.assigned_to = :userId', { id, userId })
+    .where('task.id = :id', { id })
+
+  if (actorRole !== 'admin') {
+    qb.andWhere('task.assigned_to = :userId', { userId })
+  }
+
+  return qb
+}
+
+export const findById = async (id: string, userId: string, actorRole?: string) => {
+  return taskByActorQuery(id, userId, actorRole)
     .getOne()
 }
 
@@ -124,10 +134,16 @@ export const create = async (input: CreateTaskInput, userId: string) => {
   return findById(saved.id, userId)
 }
 
-export const update = async (id: string, userId: string, input: UpdateTaskInput) => {
-  const task = await repo().findOne({
-    where: { id, assigned_to: userId },
-  })
+export const update = async (
+  id: string,
+  userId: string,
+  input: UpdateTaskInput,
+  actorRole?: string
+) => {
+  const task =
+    actorRole === 'admin'
+      ? await repo().findOne({ where: { id } })
+      : await repo().findOne({ where: { id, assigned_to: userId } })
   if (!task) throw new Error('NOT_FOUND')
 
   const oldStatus = task.status
@@ -164,13 +180,14 @@ export const update = async (id: string, userId: string, input: UpdateTaskInput)
       actor_id: userId,
     })
   }
-  return findById(id, userId)
+  return findById(id, userId, actorRole)
 }
 
-export const remove = async (id: string, userId: string) => {
-  const task = await repo().findOne({
-    where: { id, assigned_to: userId },
-  })
+export const remove = async (id: string, userId: string, actorRole?: string) => {
+  const task =
+    actorRole === 'admin'
+      ? await repo().findOne({ where: { id } })
+      : await repo().findOne({ where: { id, assigned_to: userId } })
   if (!task) throw new Error('NOT_FOUND')
 
   await repo().remove(task)

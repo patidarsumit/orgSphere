@@ -68,20 +68,28 @@ export const getRecent = async (_req: Request, res: Response): Promise<void> => 
 
 export const create = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    const project = await ProjectService.create(req.body, req.user?.id)
+    const project = await ProjectService.create(req.body, req.user?.id, req.user?.role)
     res.status(201).json(project)
-  } catch {
+  } catch (error) {
+    if (error instanceof Error && error.message === 'FORBIDDEN') {
+      res.status(403).json({ message: 'Insufficient permissions', action: 'projects.create' })
+      return
+    }
     sendServerError(res, 'Failed to create project')
   }
 }
 
 export const update = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    const project = await ProjectService.update(req.params.id, req.body, req.user?.id)
+    const project = await ProjectService.update(req.params.id, req.body, req.user?.id, req.user?.role)
     res.json(project)
   } catch (error) {
     if (error instanceof Error && error.message === 'NOT_FOUND') {
       res.status(404).json({ message: 'Project not found' })
+      return
+    }
+    if (error instanceof Error && error.message === 'FORBIDDEN') {
+      res.status(403).json({ message: 'Insufficient permissions', action: 'projects.manage' })
       return
     }
     sendServerError(res, 'Failed to update project')
@@ -90,11 +98,15 @@ export const update = async (req: AuthRequest, res: Response): Promise<void> => 
 
 export const remove = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    await ProjectService.remove(req.params.id, req.user?.id)
+    await ProjectService.remove(req.params.id, req.user?.id, req.user?.role)
     res.json({ message: 'Project deleted successfully' })
   } catch (error) {
     if (error instanceof Error && error.message === 'NOT_FOUND') {
       res.status(404).json({ message: 'Project not found' })
+      return
+    }
+    if (error instanceof Error && error.message === 'FORBIDDEN') {
+      res.status(403).json({ message: 'Insufficient permissions', action: 'projects.delete' })
       return
     }
     sendServerError(res, 'Failed to delete project')
@@ -103,7 +115,7 @@ export const remove = async (req: AuthRequest, res: Response): Promise<void> => 
 
 export const addMember = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    const project = await ProjectService.addMember(req.params.id, req.body, req.user?.id)
+    const project = await ProjectService.addMember(req.params.id, req.body, req.user?.id, req.user?.role)
     res.status(201).json(project)
   } catch (error) {
     const message = error instanceof Error ? error.message : 'UNKNOWN_ERROR'
@@ -111,28 +123,46 @@ export const addMember = async (req: AuthRequest, res: Response): Promise<void> 
       PROJECT_NOT_FOUND: 404,
       USER_NOT_FOUND: 404,
       ALREADY_MEMBER: 409,
+      FORBIDDEN: 403,
     }
-    res.status(statusByMessage[message] || 500).json({ message })
+    res.status(statusByMessage[message] || 500).json({
+      message: message === 'FORBIDDEN' ? 'Insufficient permissions' : message,
+      action: message === 'FORBIDDEN' ? 'projects.manage' : undefined,
+    })
   }
 }
 
 export const removeMember = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    await ProjectService.removeMember(req.params.id, req.params.userId, req.user?.id)
+    await ProjectService.removeMember(req.params.id, req.params.userId, req.user?.id, req.user?.role)
     res.json({ message: 'Member removed successfully' })
   } catch (error) {
+    if (error instanceof Error && error.message === 'PROJECT_NOT_FOUND') {
+      res.status(404).json({ message: 'Project not found' })
+      return
+    }
     if (error instanceof Error && error.message === 'NOT_FOUND') {
       res.status(404).json({ message: 'Member not found' })
+      return
+    }
+    if (error instanceof Error && error.message === 'FORBIDDEN') {
+      res.status(403).json({ message: 'Insufficient permissions', action: 'projects.manage' })
       return
     }
     sendServerError(res, 'Failed to remove member')
   }
 }
 
-export const updateMemberRole = async (req: Request, res: Response): Promise<void> => {
+export const updateMemberRole = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const payload = memberRoleSchema.parse(req.body)
-    const project = await ProjectService.updateMemberRole(req.params.id, req.params.userId, payload.role)
+    const project = await ProjectService.updateMemberRole(
+      req.params.id,
+      req.params.userId,
+      payload.role,
+      req.user?.id,
+      req.user?.role
+    )
     res.json(project)
   } catch (error) {
     if (error instanceof ZodError) {
@@ -141,6 +171,14 @@ export const updateMemberRole = async (req: Request, res: Response): Promise<voi
     }
     if (error instanceof Error && error.message === 'NOT_FOUND') {
       res.status(404).json({ message: 'Member not found' })
+      return
+    }
+    if (error instanceof Error && error.message === 'PROJECT_NOT_FOUND') {
+      res.status(404).json({ message: 'Project not found' })
+      return
+    }
+    if (error instanceof Error && error.message === 'FORBIDDEN') {
+      res.status(403).json({ message: 'Insufficient permissions', action: 'projects.manage' })
       return
     }
     sendServerError(res, 'Failed to update member role')

@@ -43,20 +43,28 @@ export const create = async (req: AuthRequest, res: Response): Promise<void> => 
       return
     }
 
-    const team = await TeamService.create(req.body, creatorId)
+    const team = await TeamService.create(req.body, creatorId, req.user?.role)
     res.status(201).json(team)
-  } catch {
+  } catch (error) {
+    if (error instanceof Error && error.message === 'FORBIDDEN') {
+      res.status(403).json({ message: 'Insufficient permissions', action: 'teams.create' })
+      return
+    }
     sendServerError(res, 'Failed to create team')
   }
 }
 
 export const update = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    const team = await TeamService.update(req.params.id, req.body, req.user?.id)
+    const team = await TeamService.update(req.params.id, req.body, req.user?.id, req.user?.role)
     res.json(team)
   } catch (error) {
     if (error instanceof Error && error.message === 'NOT_FOUND') {
       res.status(404).json({ message: 'Team not found' })
+      return
+    }
+    if (error instanceof Error && error.message === 'FORBIDDEN') {
+      res.status(403).json({ message: 'Insufficient permissions', action: 'teams.manage' })
       return
     }
     sendServerError(res, 'Failed to update team')
@@ -65,11 +73,15 @@ export const update = async (req: AuthRequest, res: Response): Promise<void> => 
 
 export const remove = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    await TeamService.remove(req.params.id, req.user?.id)
+    await TeamService.remove(req.params.id, req.user?.id, req.user?.role)
     res.json({ message: 'Team deleted successfully' })
   } catch (error) {
     if (error instanceof Error && error.message === 'NOT_FOUND') {
       res.status(404).json({ message: 'Team not found' })
+      return
+    }
+    if (error instanceof Error && error.message === 'FORBIDDEN') {
+      res.status(403).json({ message: 'Insufficient permissions', action: 'teams.delete' })
       return
     }
     sendServerError(res, 'Failed to delete team')
@@ -78,7 +90,7 @@ export const remove = async (req: AuthRequest, res: Response): Promise<void> => 
 
 export const addMember = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    const team = await TeamService.addMember(req.params.id, req.body.user_id, req.user?.id)
+    const team = await TeamService.addMember(req.params.id, req.body.user_id, req.user?.id, req.user?.role)
     res.json(team)
   } catch (error) {
     const message = error instanceof Error ? error.message : 'UNKNOWN_ERROR'
@@ -86,18 +98,26 @@ export const addMember = async (req: AuthRequest, res: Response): Promise<void> 
       TEAM_NOT_FOUND: 404,
       USER_NOT_FOUND: 404,
       ALREADY_MEMBER: 409,
+      FORBIDDEN: 403,
     }
-    res.status(statusByMessage[message] || 500).json({ message })
+    res.status(statusByMessage[message] || 500).json({
+      message: message === 'FORBIDDEN' ? 'Insufficient permissions' : message,
+      action: message === 'FORBIDDEN' ? 'teams.manage' : undefined,
+    })
   }
 }
 
 export const removeMember = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    await TeamService.removeMember(req.params.id, req.params.userId, req.user?.id)
+    await TeamService.removeMember(req.params.id, req.params.userId, req.user?.id, req.user?.role)
     res.json({ message: 'Member removed successfully' })
   } catch (error) {
     if (error instanceof Error && error.message === 'TEAM_NOT_FOUND') {
       res.status(404).json({ message: 'Team not found' })
+      return
+    }
+    if (error instanceof Error && error.message === 'FORBIDDEN') {
+      res.status(403).json({ message: 'Insufficient permissions', action: 'teams.manage' })
       return
     }
     sendServerError(res, 'Failed to remove member')

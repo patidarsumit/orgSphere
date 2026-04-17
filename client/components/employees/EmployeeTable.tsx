@@ -9,7 +9,8 @@ interface EmployeeTableProps {
   employees: Employee[]
   onEdit: (employee: Employee) => void
   onDeactivate: (employee: Employee) => void
-  canDeactivate: boolean
+  canEditEmployee: (employee: Employee) => boolean
+  canDeactivateEmployee: (employee: Employee) => boolean
 }
 
 const visibleSkills = (skills: string[]) => ({
@@ -21,7 +22,8 @@ export function EmployeeTable({
   employees,
   onEdit,
   onDeactivate,
-  canDeactivate,
+  canEditEmployee,
+  canDeactivateEmployee,
 }: EmployeeTableProps) {
   return (
     <div className="overflow-hidden rounded-2xl bg-[color:var(--color-surface-card)] p-3 shadow-sm">
@@ -52,6 +54,9 @@ export function EmployeeTable({
           <tbody>
             {employees.map((employee) => {
               const skills = visibleSkills(employee.skills)
+              const canEdit = canEditEmployee(employee)
+              const canDeactivate = canDeactivateEmployee(employee)
+              const hasMenuActions = canEdit || canDeactivate
 
               return (
                 <tr
@@ -111,18 +116,21 @@ export function EmployeeTable({
                       >
                         View
                       </Link>
-                      <details className="relative">
-                        <summary className="flex h-8 w-8 cursor-pointer list-none items-center justify-center rounded-lg text-[color:var(--color-text-tertiary)] hover:bg-[color:var(--color-surface-card)]">
-                          <MoreHorizontal size={16} />
-                        </summary>
-                        <div className="absolute right-0 z-10 mt-2 w-36 rounded-xl bg-white/90 p-1 text-left shadow-[var(--shadow-modal)] backdrop-blur-md">
-                          <button
-                            type="button"
-                            onClick={() => onEdit(employee)}
-                            className="block w-full rounded-lg px-3 py-2 text-left text-sm text-[color:var(--color-text-secondary)] hover:bg-[color:var(--color-surface-low)]"
-                          >
-                            Edit
-                          </button>
+                      {hasMenuActions ? (
+                        <details className="relative">
+                          <summary className="flex h-8 w-8 cursor-pointer list-none items-center justify-center rounded-lg text-[color:var(--color-text-tertiary)] hover:bg-[color:var(--color-surface-card)]">
+                            <MoreHorizontal size={16} />
+                          </summary>
+                          <div className="absolute right-0 z-10 mt-2 w-36 rounded-xl bg-white/90 p-1 text-left shadow-[var(--shadow-modal)] backdrop-blur-md">
+                            {canEdit ? (
+                              <button
+                                type="button"
+                                onClick={() => onEdit(employee)}
+                                className="block w-full rounded-lg px-3 py-2 text-left text-sm text-[color:var(--color-text-secondary)] hover:bg-[color:var(--color-surface-low)]"
+                              >
+                                Edit
+                              </button>
+                            ) : null}
                           {canDeactivate ? (
                             <button
                               type="button"
@@ -132,8 +140,9 @@ export function EmployeeTable({
                               Deactivate
                             </button>
                           ) : null}
-                        </div>
-                      </details>
+                          </div>
+                        </details>
+                      ) : null}
                     </div>
                   </td>
                 </tr>

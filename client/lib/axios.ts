@@ -1,6 +1,7 @@
 import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios'
 import { store } from '@/store'
 import { clearAuth, setCredentials } from '@/store/slices/authSlice'
+import { appToast } from '@/lib/toast'
 import { UserResponse } from '@orgsphere/schemas'
 
 interface AuthResponse {
@@ -47,6 +48,15 @@ api.interceptors.response.use(
   (response) => response,
   async (error: AxiosError) => {
     const originalRequest = error.config as RetriableRequestConfig | undefined
+    if (error.response?.status === 403) {
+      const message =
+        typeof error.response.data === 'object' &&
+        error.response.data &&
+        'message' in error.response.data
+          ? String(error.response.data.message)
+          : 'You do not have permission to do that'
+      appToast.warning(message)
+    }
 
     const isRefreshRequest = originalRequest?.url?.includes('/auth/refresh')
 

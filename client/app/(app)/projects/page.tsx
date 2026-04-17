@@ -20,6 +20,7 @@ import {
 } from '@/components/projects/projectUtils'
 import { Avatar } from '@/components/shared/Avatar'
 import { EmptyState } from '@/components/shared/EmptyState'
+import { usePermissions } from '@/hooks/usePermissions'
 import { StatusBadge } from '@/components/shared/StatusBadge'
 import { TechStackChip } from '@/components/shared/TechStackChip'
 import { useDeleteProject, useProjects } from '@/hooks/useProjects'
@@ -109,11 +110,17 @@ function ProjectActions({
   project,
   onEdit,
   onDelete,
+  canEdit,
+  canDelete,
 }: {
   project: Project
   onEdit: (project: Project) => void
   onDelete: (project: Project) => void
+  canEdit: boolean
+  canDelete: boolean
 }) {
+  const hasMenuActions = canEdit || canDelete
+
   return (
     <div className="flex items-center justify-end gap-2">
       <Link
@@ -122,27 +129,33 @@ function ProjectActions({
       >
         View
       </Link>
-      <details className="relative">
-        <summary className="flex h-8 w-8 cursor-pointer list-none items-center justify-center rounded-lg text-[color:var(--color-text-tertiary)] hover:bg-[color:var(--color-surface-card)]">
-          <MoreHorizontal size={16} />
-        </summary>
-        <div className="absolute right-0 z-10 mt-2 w-36 rounded-xl bg-white/90 p-1 text-left shadow-[var(--shadow-modal)] backdrop-blur-md">
-          <button
-            type="button"
-            onClick={() => onEdit(project)}
-            className="block w-full rounded-lg px-3 py-2 text-left text-sm text-[color:var(--color-text-secondary)] hover:bg-[color:var(--color-surface-low)]"
-          >
-            Edit
-          </button>
-          <button
-            type="button"
-            onClick={() => onDelete(project)}
-            className="block w-full rounded-lg px-3 py-2 text-left text-sm text-red-600 hover:bg-red-50"
-          >
-            Delete
-          </button>
-        </div>
-      </details>
+      {hasMenuActions ? (
+        <details className="relative">
+          <summary className="flex h-8 w-8 cursor-pointer list-none items-center justify-center rounded-lg text-[color:var(--color-text-tertiary)] hover:bg-[color:var(--color-surface-card)]">
+            <MoreHorizontal size={16} />
+          </summary>
+          <div className="absolute right-0 z-10 mt-2 w-36 rounded-xl bg-white/90 p-1 text-left shadow-[var(--shadow-modal)] backdrop-blur-md">
+            {canEdit ? (
+              <button
+                type="button"
+                onClick={() => onEdit(project)}
+                className="block w-full rounded-lg px-3 py-2 text-left text-sm text-[color:var(--color-text-secondary)] hover:bg-[color:var(--color-surface-low)]"
+              >
+                Edit
+              </button>
+            ) : null}
+            {canDelete ? (
+              <button
+                type="button"
+                onClick={() => onDelete(project)}
+                className="block w-full rounded-lg px-3 py-2 text-left text-sm text-red-600 hover:bg-red-50"
+              >
+                Delete
+              </button>
+            ) : null}
+          </div>
+        </details>
+      ) : null}
     </div>
   )
 }
@@ -151,10 +164,14 @@ function ProjectRow({
   project,
   onEdit,
   onDelete,
+  canEdit,
+  canDelete,
 }: {
   project: Project
   onEdit: (project: Project) => void
   onDelete: (project: Project) => void
+  canEdit: boolean
+  canDelete: boolean
 }) {
   return (
     <tr className="h-[52px] rounded-xl bg-[color:var(--color-surface-low)] transition-colors hover:bg-[color:var(--color-surface-high)]">
@@ -207,13 +224,20 @@ function ProjectRow({
         </div>
       </td>
       <td className="rounded-r-xl px-5 py-3 text-right">
-        <ProjectActions project={project} onEdit={onEdit} onDelete={onDelete} />
+        <ProjectActions
+          project={project}
+          onEdit={onEdit}
+          onDelete={onDelete}
+          canEdit={canEdit}
+          canDelete={canDelete}
+        />
       </td>
     </tr>
   )
 }
 
 export default function ProjectsPage() {
+  const { can } = usePermissions()
   const [isPending, startTransition] = useTransition()
   const [modalOpen, setModalOpen] = useState(false)
   const [editingProject, setEditingProject] = useState<Project | undefined>()
@@ -312,17 +336,19 @@ export default function ProjectsPage() {
               Track delivery, owners, teams, and technology choices across {totalProjects} projects.
             </p>
           </div>
-          <button
-            type="button"
-            onClick={() => {
-              setEditingProject(undefined)
-              setModalOpen(true)
-            }}
-            className="primary-gradient inline-flex items-center justify-center gap-2 rounded-xl px-6 py-3 text-sm font-bold text-white shadow-[0_14px_30px_-16px_rgba(53,37,205,0.8)] active:scale-95"
-          >
-            <Plus size={18} />
-            Add Project
-          </button>
+          {can.createProject ? (
+            <button
+              type="button"
+              onClick={() => {
+                setEditingProject(undefined)
+                setModalOpen(true)
+              }}
+              className="primary-gradient inline-flex items-center justify-center gap-2 rounded-xl px-6 py-3 text-sm font-bold text-white shadow-[0_14px_30px_-16px_rgba(53,37,205,0.8)] active:scale-95"
+            >
+              <Plus size={18} />
+              Add Project
+            </button>
+          ) : null}
         </header>
 
         <section className="rounded-3xl bg-[color:var(--color-surface-card)] p-4 shadow-[var(--shadow-card)]">
@@ -404,7 +430,11 @@ export default function ProjectsPage() {
             icon={FolderKanban}
             title={hasFilters ? 'No projects match your filters' : 'No projects yet'}
             description={hasFilters ? 'Try clearing filters or changing your search.' : 'Create your first project workspace.'}
-            action={{ label: 'Create your first project', onClick: () => setModalOpen(true) }}
+            action={
+              can.createProject
+                ? { label: 'Create your first project', onClick: () => setModalOpen(true) }
+                : undefined
+            }
           />
         ) : null}
 
@@ -442,6 +472,8 @@ export default function ProjectsPage() {
                         project={project}
                         onEdit={onEdit}
                         onDelete={onDelete}
+                        canEdit={can.manageProject(project)}
+                        canDelete={can.deleteProject}
                       />
                     ))}
                   </tbody>

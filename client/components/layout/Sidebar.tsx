@@ -20,6 +20,7 @@ import {
 import { UserResponse } from '@orgsphere/schemas'
 import api from '@/lib/axios'
 import { Avatar } from '@/components/shared/Avatar'
+import { usePermissions } from '@/hooks/usePermissions'
 import { RootState } from '@/store'
 import { clearAuth } from '@/store/slices/authSlice'
 import { setSidebarCollapsed, setSidebarOpen } from '@/store/slices/uiSlice'
@@ -129,6 +130,7 @@ function SidebarPanel({
   onToggleCollapsed?: () => void
 }) {
   const CollapseIcon = collapsed ? ChevronRight : ChevronLeft
+  const { can } = usePermissions()
 
   return (
     <aside
@@ -177,7 +179,7 @@ function SidebarPanel({
           onNavigate={onNavigate}
           collapsed={collapsed}
         />
-        {user?.role === 'admin' ? (
+        {can.accessSettings ? (
           <NavSection
             label="Admin"
             items={[{ href: '/settings', label: 'Settings', icon: Settings }]}

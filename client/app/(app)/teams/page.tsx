@@ -15,6 +15,7 @@ import { TeamFormModal } from '@/components/teams/TeamFormModal'
 import { iconClassForTeam, initialsForTeam } from '@/components/teams/teamUtils'
 import { AvatarStack } from '@/components/shared/AvatarStack'
 import { EmptyState } from '@/components/shared/EmptyState'
+import { usePermissions } from '@/hooks/usePermissions'
 import { useTeams } from '@/hooks/useTeams'
 import { Team } from '@/types'
 
@@ -133,6 +134,7 @@ function TeamGridSkeleton() {
 }
 
 export default function TeamsPage() {
+  const { can } = usePermissions()
   const [isPending, startTransition] = useTransition()
   const [modalOpen, setModalOpen] = useState(false)
   const [page, setPage] = useQueryState(
@@ -176,14 +178,16 @@ export default function TeamsPage() {
               Coordinate collaboration across your enterprise units.
             </p>
           </div>
-          <button
-            type="button"
-            onClick={() => setModalOpen(true)}
-            className="primary-gradient inline-flex items-center justify-center gap-2 rounded-xl px-6 py-3 text-sm font-bold text-white shadow-[0_14px_30px_-16px_rgba(53,37,205,0.8)] transition-transform active:scale-95"
-          >
-            <Plus size={18} />
-            Create Team
-          </button>
+          {can.createTeam ? (
+            <button
+              type="button"
+              onClick={() => setModalOpen(true)}
+              className="primary-gradient inline-flex items-center justify-center gap-2 rounded-xl px-6 py-3 text-sm font-bold text-white shadow-[0_14px_30px_-16px_rgba(53,37,205,0.8)] transition-transform active:scale-95"
+            >
+              <Plus size={18} />
+              Create Team
+            </button>
+          ) : null}
         </header>
 
         <div className="relative max-w-sm">
@@ -218,7 +222,7 @@ export default function TeamsPage() {
             icon={UsersRound}
             title="No teams found"
             description="Try a different search or create a new team."
-            action={{ label: 'Create Team', onClick: () => setModalOpen(true) }}
+            action={can.createTeam ? { label: 'Create Team', onClick: () => setModalOpen(true) } : undefined}
           />
         ) : null}
 
@@ -228,7 +232,7 @@ export default function TeamsPage() {
               {teams.map((team) => (
                 <TeamCard key={team.id} team={team} />
               ))}
-              <BuildTeamCard onClick={() => setModalOpen(true)} />
+              {can.createTeam ? <BuildTeamCard onClick={() => setModalOpen(true)} /> : null}
             </div>
 
             {totalPages > 1 ? (

@@ -4,7 +4,6 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
-import { useSelector } from 'react-redux'
 import {
   Activity,
   ArrowLeft,
@@ -26,10 +25,10 @@ import { StatusBadge } from '@/components/shared/StatusBadge'
 import { TechStackChip } from '@/components/shared/TechStackChip'
 import { iconClassForTeam } from '@/components/teams/teamUtils'
 import { useDeactivateEmployee, useEmployee } from '@/hooks/useEmployees'
+import { usePermissions } from '@/hooks/usePermissions'
 import { useUserProjects } from '@/hooks/useProjects'
 import { useUserTeams } from '@/hooks/useTeams'
 import { appToast, getToastErrorMessage } from '@/lib/toast'
-import { RootState } from '@/store'
 import { Employee } from '@/types'
 
 function ProfileSkeleton() {
@@ -110,15 +109,15 @@ function SectionTitle({ eyebrow, title }: { eyebrow: string; title?: string }) {
 export default function EmployeeDetailPage() {
   const router = useRouter()
   const params = useParams<{ id: string }>()
-  const currentUser = useSelector((state: RootState) => state.auth.user)
+  const { can } = usePermissions()
   const [editOpen, setEditOpen] = useState(false)
   const [confirmOpen, setConfirmOpen] = useState(false)
   const deactivateEmployee = useDeactivateEmployee()
   const { data: employee, isLoading, isError } = useEmployee(params.id)
   const { data: userTeams = [], isLoading: teamsLoading } = useUserTeams(params.id)
   const { data: userProjects = [], isLoading: projectsLoading } = useUserProjects(params.id)
-  const canEdit = currentUser?.role === 'admin' || currentUser?.id === params.id
-  const canDeactivate = currentUser?.role === 'admin' && currentUser?.id !== params.id
+  const canEdit = can.editEmployee(params.id)
+  const canDeactivate = can.deactivateEmployee(params.id)
 
   useEffect(() => {
     if (isError) {

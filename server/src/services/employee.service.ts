@@ -96,9 +96,10 @@ export const findById = async (id: string) => {
     .getOne()
 }
 
-export const create = async (input: CreateEmployeeInput, actorId?: string) => {
+export const create = async (input: CreateEmployeeInput, actorId?: string, actorRole?: string) => {
   const existing = await repo().findOne({ where: { email: input.email } })
   if (existing) throw new Error('EMAIL_EXISTS')
+  if (actorRole !== 'admin' && input.role === 'admin') throw new Error('FORBIDDEN')
 
   const password_hash = await bcrypt.hash(input.password, 12)
   const user = repo().create({
@@ -122,7 +123,23 @@ export const update = async (id: string, input: UpdateEmployeeInput, actorId?: s
   const user = await repo().findOne({ where: { id } })
   if (!user) throw new Error('NOT_FOUND')
 
-  Object.assign(user, input)
+  if (!actorId) throw new Error('FORBIDDEN')
+
+  const actor = await repo().findOne({ where: { id: actorId } })
+  if (!actor) throw new Error('FORBIDDEN')
+
+  if (actor.role !== 'admin' && id !== actorId) throw new Error('FORBIDDEN')
+
+  const safeInput =
+    actor.role === 'admin'
+      ? input
+      : {
+          name: input.name,
+          department: input.department,
+          skills: input.skills,
+        }
+
+  Object.assign(user, safeInput)
   const saved = await repo().save(user)
   await ActivityService.log({
     action: 'updated',
@@ -137,6 +154,11 @@ export const update = async (id: string, input: UpdateEmployeeInput, actorId?: s
 export const updateAvatar = async (id: string, avatarPath: string, actorId?: string) => {
   const user = await repo().findOne({ where: { id } })
   if (!user) throw new Error('NOT_FOUND')
+  if (!actorId) throw new Error('FORBIDDEN')
+
+  const actor = await repo().findOne({ where: { id: actorId } })
+  if (!actor) throw new Error('FORBIDDEN')
+  if (actor.role !== 'admin' && id !== actorId) throw new Error('FORBIDDEN')
 
   const result = await repo().update(id, { avatar_path: avatarPath })
   if (!result.affected) throw new Error('NOT_FOUND')

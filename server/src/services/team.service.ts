@@ -9,6 +9,15 @@ const repo = () => AppDataSource.getRepository(Team)
 const userRepo = () => AppDataSource.getRepository(User)
 const projectRepo = () => AppDataSource.getRepository(Project)
 
+const canCreateTeam = (actorRole?: string) => actorRole === 'admin' || actorRole === 'manager'
+
+const ensureCanManageTeam = (team: Team, actorId?: string, actorRole?: string) => {
+  if (!actorId) throw new Error('FORBIDDEN')
+  if (actorRole === 'admin') return
+  if (team.created_by === actorId) return
+  throw new Error('FORBIDDEN')
+}
+
 const attachProjectCounts = async <T extends Team>(teams: T[]) => {
   const teamIds = teams.map((team) => team.id)
 
@@ -110,7 +119,9 @@ export const findById = async (id: string) => {
   return team
 }
 
-export const create = async (input: CreateTeamInput, creatorId: string) => {
+export const create = async (input: CreateTeamInput, creatorId: string, actorRole?: string) => {
+  if (!canCreateTeam(actorRole)) throw new Error('FORBIDDEN')
+
   const team = repo().create({
     name: input.name,
     description: input.description || null,
@@ -134,9 +145,15 @@ export const create = async (input: CreateTeamInput, creatorId: string) => {
   return findById(saved.id)
 }
 
-export const update = async (id: string, input: UpdateTeamInput, actorId?: string) => {
+export const update = async (
+  id: string,
+  input: UpdateTeamInput,
+  actorId?: string,
+  actorRole?: string
+) => {
   const team = await repo().findOne({ where: { id } })
   if (!team) throw new Error('NOT_FOUND')
+  ensureCanManageTeam(team, actorId, actorRole)
 
   Object.assign(team, input)
   const saved = await repo().save(team)
@@ -150,9 +167,10 @@ export const update = async (id: string, input: UpdateTeamInput, actorId?: strin
   return saved
 }
 
-export const remove = async (id: string, actorId?: string) => {
+export const remove = async (id: string, actorId?: string, actorRole?: string) => {
   const team = await repo().findOne({ where: { id } })
   if (!team) throw new Error('NOT_FOUND')
+  if (actorRole !== 'admin') throw new Error('FORBIDDEN')
 
   await repo().remove(team)
   await ActivityService.log({
@@ -164,7 +182,12 @@ export const remove = async (id: string, actorId?: string) => {
   })
 }
 
-export const addMember = async (teamId: string, userId: string, actorId?: string) => {
+export const addMember = async (
+  teamId: string,
+  userId: string,
+  actorId?: string,
+  actorRole?: string
+) => {
   const team = await repo()
     .createQueryBuilder('team')
     .leftJoinAndSelect('team.members', 'member')
@@ -172,6 +195,7 @@ export const addMember = async (teamId: string, userId: string, actorId?: string
     .getOne()
 
   if (!team) throw new Error('TEAM_NOT_FOUND')
+  ensureCanManageTeam(team, actorId, actorRole)
 
   const user = await userRepo().findOne({ where: { id: userId, is_active: true } })
   if (!user) throw new Error('USER_NOT_FOUND')
@@ -193,7 +217,12 @@ export const addMember = async (teamId: string, userId: string, actorId?: string
   return findById(teamId)
 }
 
-export const removeMember = async (teamId: string, userId: string, actorId?: string) => {
+export const removeMember = async (
+  teamId: string,
+  userId: string,
+  actorId?: string,
+  actorRole?: string
+) => {
   const team = await repo()
     .createQueryBuilder('team')
     .leftJoinAndSelect('team.members', 'member')
@@ -201,6 +230,7 @@ export const removeMember = async (teamId: string, userId: string, actorId?: str
     .getOne()
 
   if (!team) throw new Error('TEAM_NOT_FOUND')
+  ensureCanManageTeam(team, actorId, actorRole)
 
   const removedUser = team.members.find((member) => member.id === userId)
   team.members = team.members.filter((member) => member.id !== userId)

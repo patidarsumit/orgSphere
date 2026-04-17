@@ -47,7 +47,7 @@ export const getToday = async (req: AuthRequest, res: Response): Promise<void> =
 
 export const getOne = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    const task = await TaskService.findById(req.params.id, req.user!.id)
+    const task = await TaskService.findById(req.params.id, req.user!.id, req.user!.role)
     if (!task) {
       res.status(404).json({ message: 'Task not found' })
       return
@@ -69,7 +69,7 @@ export const create = async (req: AuthRequest, res: Response): Promise<void> => 
 
 export const update = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    const task = await TaskService.update(req.params.id, req.user!.id, req.body)
+    const task = await TaskService.update(req.params.id, req.user!.id, req.body, req.user!.role)
     res.json(task)
   } catch (error) {
     if (error instanceof Error && error.message === 'NOT_FOUND') {
@@ -82,7 +82,7 @@ export const update = async (req: AuthRequest, res: Response): Promise<void> => 
 
 export const remove = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    await TaskService.remove(req.params.id, req.user!.id)
+    await TaskService.remove(req.params.id, req.user!.id, req.user!.role)
     res.json({ message: 'Task deleted' })
   } catch (error) {
     if (error instanceof Error && error.message === 'NOT_FOUND') {

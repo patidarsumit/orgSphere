@@ -24,6 +24,7 @@ import {
   useUpdateProfileSettings,
   useUpdateSettingsRole,
 } from '@/hooks/useSettings'
+import { usePermissions } from '@/hooks/usePermissions'
 import { appToast, getToastErrorMessage } from '@/lib/toast'
 import { RootState } from '@/store'
 import { setCredentials } from '@/store/slices/authSlice'
@@ -342,11 +343,12 @@ function AccountTab() {
 export default function SettingsPage() {
   const router = useRouter()
   const user = useSelector((state: RootState) => state.auth.user)
+  const { can } = usePermissions()
   const [activeTab, setActiveTab] = useState<SettingsTab>('general')
 
   useEffect(() => {
-    if (user && user.role !== 'admin') router.push('/dashboard')
-  }, [router, user])
+    if (user && !can.accessSettings) router.push('/dashboard')
+  }, [can.accessSettings, router, user])
 
   const content = useMemo(() => {
     if (activeTab === 'general') return <GeneralTab />
@@ -354,7 +356,7 @@ export default function SettingsPage() {
     return <AccountTab />
   }, [activeTab])
 
-  if (user && user.role !== 'admin') return null
+  if (user && !can.accessSettings) return null
 
   return (
     <div className="-m-8 min-h-full bg-[#f7f8ff] p-5 sm:p-8">

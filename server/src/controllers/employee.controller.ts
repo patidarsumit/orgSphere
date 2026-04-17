@@ -39,11 +39,15 @@ export const getOne = async (req: Request, res: Response): Promise<void> => {
 
 export const create = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    const user = await EmployeeService.create(req.body, req.user?.id)
+    const user = await EmployeeService.create(req.body, req.user?.id, req.user?.role)
     res.status(201).json(EmployeeService.sanitize(user))
   } catch (error) {
     if (error instanceof Error && error.message === 'EMAIL_EXISTS') {
       res.status(409).json({ message: 'Email already registered' })
+      return
+    }
+    if (error instanceof Error && error.message === 'FORBIDDEN') {
+      res.status(403).json({ message: 'Insufficient permissions', action: 'employees.create' })
       return
     }
     sendServerError(res, 'Failed to create employee')
@@ -57,6 +61,10 @@ export const update = async (req: AuthRequest, res: Response): Promise<void> => 
   } catch (error) {
     if (error instanceof Error && error.message === 'NOT_FOUND') {
       res.status(404).json({ message: 'Employee not found' })
+      return
+    }
+    if (error instanceof Error && error.message === 'FORBIDDEN') {
+      res.status(403).json({ message: 'Insufficient permissions', action: 'employees.edit_own' })
       return
     }
     sendServerError(res, 'Failed to update employee')
@@ -76,6 +84,10 @@ export const uploadAvatar = async (req: AuthRequest, res: Response): Promise<voi
   } catch (error) {
     if (error instanceof Error && error.message === 'NOT_FOUND') {
       res.status(404).json({ message: 'Employee not found' })
+      return
+    }
+    if (error instanceof Error && error.message === 'FORBIDDEN') {
+      res.status(403).json({ message: 'Insufficient permissions', action: 'employees.edit_own' })
       return
     }
     sendServerError(res, 'Failed to upload avatar')

@@ -14,6 +14,15 @@ const repo = () => AppDataSource.getRepository(Project)
 const pmRepo = () => AppDataSource.getRepository(ProjectMember)
 const userRepo = () => AppDataSource.getRepository(User)
 
+const canCreateProject = (actorRole?: string) => actorRole === 'admin' || actorRole === 'manager'
+
+const ensureCanManageProject = (project: Project, actorId?: string, actorRole?: string) => {
+  if (!actorId) throw new Error('FORBIDDEN')
+  if (actorRole === 'admin') return
+  if (project.manager_id === actorId || project.tech_lead_id === actorId) return
+  throw new Error('FORBIDDEN')
+}
+
 const projectFields = [
   'project.id',
   'project.name',
@@ -181,7 +190,9 @@ export const findByTeamId = async (teamId: string) => {
     .getMany()
 }
 
-export const create = async (input: CreateProjectInput, actorId?: string) => {
+export const create = async (input: CreateProjectInput, actorId?: string, actorRole?: string) => {
+  if (!canCreateProject(actorRole)) throw new Error('FORBIDDEN')
+
   const project = repo().create({
     ...input,
     description: input.description || null,
@@ -201,9 +212,15 @@ export const create = async (input: CreateProjectInput, actorId?: string) => {
   return findById(saved.id)
 }
 
-export const update = async (id: string, input: UpdateProjectInput, actorId?: string) => {
+export const update = async (
+  id: string,
+  input: UpdateProjectInput,
+  actorId?: string,
+  actorRole?: string
+) => {
   const project = await repo().findOne({ where: { id } })
   if (!project) throw new Error('NOT_FOUND')
+  ensureCanManageProject(project, actorId, actorRole)
 
   const oldStatus = project.status
   Object.assign(project, input)
@@ -222,9 +239,10 @@ export const update = async (id: string, input: UpdateProjectInput, actorId?: st
   return findById(saved.id)
 }
 
-export const remove = async (id: string, actorId?: string) => {
+export const remove = async (id: string, actorId?: string, actorRole?: string) => {
   const project = await repo().findOne({ where: { id } })
   if (!project) throw new Error('NOT_FOUND')
+  if (actorRole !== 'admin') throw new Error('FORBIDDEN')
 
   await repo().remove(project)
   await ActivityService.log({
@@ -239,10 +257,12 @@ export const remove = async (id: string, actorId?: string) => {
 export const addMember = async (
   projectId: string,
   input: AddProjectMemberInput,
-  actorId?: string
+  actorId?: string,
+  actorRole?: string
 ) => {
   const project = await repo().findOne({ where: { id: projectId } })
   if (!project) throw new Error('PROJECT_NOT_FOUND')
+  ensureCanManageProject(project, actorId, actorRole)
 
   const user = await userRepo().findOne({ where: { id: input.user_id, is_active: true } })
   if (!user) throw new Error('USER_NOT_FOUND')
@@ -271,8 +291,15 @@ export const addMember = async (
   return findById(projectId)
 }
 
-export const removeMember = async (projectId: string, userId: string, actorId?: string) => {
+export const removeMember = async (
+  projectId: string,
+  userId: string,
+  actorId?: string,
+  actorRole?: string
+) => {
   const project = await repo().findOne({ where: { id: projectId } })
+  if (!project) throw new Error('PROJECT_NOT_FOUND')
+  ensureCanManageProject(project, actorId, actorRole)
   const user = await userRepo().findOne({ where: { id: userId } })
   const projectMember = await pmRepo().findOne({
     where: { project_id: projectId, user_id: userId },
@@ -290,7 +317,17 @@ export const removeMember = async (projectId: string, userId: string, actorId?: 
   })
 }
 
-export const updateMemberRole = async (projectId: string, userId: string, role: string) => {
+export const updateMemberRole = async (
+  projectId: string,
+  userId: string,
+  role: string,
+  actorId?: string,
+  actorRole?: string
+) => {
+  const project = await repo().findOne({ where: { id: projectId } })
+  if (!project) throw new Error('PROJECT_NOT_FOUND')
+  ensureCanManageProject(project, actorId, actorRole)
+
   const projectMember = await pmRepo().findOne({
     where: { project_id: projectId, user_id: userId },
   })
