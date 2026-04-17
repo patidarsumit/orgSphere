@@ -219,7 +219,7 @@ export const update = async (id: string, input: UpdateProjectInput, actorId?: st
         ? { old_status: oldStatus, new_status: input.status }
         : {},
   })
-  return saved
+  return findById(saved.id)
 }
 
 export const remove = async (id: string, actorId?: string) => {
