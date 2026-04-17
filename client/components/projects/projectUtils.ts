@@ -23,11 +23,17 @@ export const formatProjectDate = (date?: string | null) => {
     return '-'
   }
 
+  const parsedDate = date.includes('T') ? new Date(date) : new Date(`${date}T00:00:00`)
+
+  if (Number.isNaN(parsedDate.getTime())) {
+    return '-'
+  }
+
   return new Intl.DateTimeFormat('en-US', {
     month: 'short',
     day: 'numeric',
     year: 'numeric',
-  }).format(new Date(`${date}T00:00:00`))
+  }).format(parsedDate)
 }
 
 export const truncateText = (value: string | null | undefined, maxLength: number) => {

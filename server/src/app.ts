@@ -9,6 +9,8 @@ import dashboardRoutes from './routes/dashboard.routes'
 import employeeRoutes from './routes/employee.routes'
 import noteRoutes from './routes/note.routes'
 import projectRoutes from './routes/project.routes'
+import searchRoutes from './routes/search.routes'
+import settingsRoutes from './routes/settings.routes'
 import taskRoutes from './routes/task.routes'
 import teamRoutes from './routes/team.routes'
 
@@ -31,6 +33,8 @@ app.use('/api/activity', activityRoutes)
 app.use('/api/dashboard', dashboardRoutes)
 app.use('/api/employees', employeeRoutes)
 app.use('/api/projects', projectRoutes)
+app.use('/api/search', searchRoutes)
+app.use('/api/settings', settingsRoutes)
 app.use('/api/teams', teamRoutes)
 app.use('/api/tasks', taskRoutes)
 app.use('/api/notes', noteRoutes)

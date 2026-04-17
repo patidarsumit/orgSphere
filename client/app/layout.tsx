@@ -8,6 +8,9 @@ const inter = Inter({ subsets: ['latin'] })
 export const metadata: Metadata = {
   title: 'OrgSphere',
   description: 'Know your organization from every angle',
+  icons: {
+    icon: '/icon.svg',
+  },
 }
 
 export default function RootLayout({

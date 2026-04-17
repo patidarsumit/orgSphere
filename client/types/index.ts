@@ -153,3 +153,32 @@ export interface PaginatedResponse<T> {
   limit: number
   totalPages: number
 }
+
+export interface SearchResult {
+  id: string
+  name: string
+  type: 'project' | 'employee' | 'team'
+  status?: ProjectStatus
+  tech_stack?: string[]
+  manager_name?: string | null
+  email?: string
+  role?: UserRole
+  avatar_path?: string | null
+  department?: string | null
+  description?: string | null
+  member_count?: number
+}
+
+export interface SearchResponse {
+  query: string
+  projects: SearchResult[]
+  employees: SearchResult[]
+  teams: SearchResult[]
+  total: number
+}
+
+export interface SettingsOverview {
+  totalUsers: number
+  totalProjects: number
+  totalTeams: number
+}

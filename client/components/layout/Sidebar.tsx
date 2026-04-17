@@ -253,6 +253,18 @@ export function Sidebar() {
     }
   }, [dispatch])
 
+  useEffect(() => {
+    const syncMobileSidebar = () => {
+      if (window.innerWidth < 768) {
+        dispatch(setSidebarOpen(false))
+      }
+    }
+
+    syncMobileSidebar()
+    window.addEventListener('resize', syncMobileSidebar)
+    return () => window.removeEventListener('resize', syncMobileSidebar)
+  }, [dispatch])
+
   return (
     <>
       <div className="hidden md:block">
@@ -272,7 +284,7 @@ export function Sidebar() {
             className="absolute inset-0 bg-gray-900/40"
             onClick={closeSidebar}
           />
-          <div className="absolute inset-y-0 left-0 shadow-[var(--shadow-modal)]">
+          <div className="absolute inset-y-0 left-0 translate-x-0 shadow-[var(--shadow-modal)] transition-transform duration-200 ease-in-out">
             <SidebarPanel user={user} onLogout={handleLogout} onNavigate={closeSidebar} />
           </div>
         </div>

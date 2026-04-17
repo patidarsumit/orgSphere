@@ -4,8 +4,11 @@ import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useDispatch, useSelector } from 'react-redux'
 import api from '@/lib/axios'
+import { DocumentTitle } from '@/components/layout/DocumentTitle'
 import { Header } from '@/components/layout/Header'
 import { Sidebar } from '@/components/layout/Sidebar'
+import { ErrorBoundary } from '@/components/shared/ErrorBoundary'
+import { LoadingBar } from '@/components/shared/LoadingBar'
 import { RootState } from '@/store'
 import { setCredentials, setLoading } from '@/store/slices/authSlice'
 
@@ -49,10 +52,14 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="flex h-screen overflow-hidden bg-gray-50">
+      <DocumentTitle />
+      <LoadingBar />
       <Sidebar />
       <div className="flex min-w-0 flex-1 flex-col">
         <Header />
-        <main className="flex-1 overflow-y-auto p-8">{children}</main>
+        <main className="flex-1 overflow-y-auto p-8">
+          <ErrorBoundary>{children}</ErrorBoundary>
+        </main>
       </div>
     </div>
   )
