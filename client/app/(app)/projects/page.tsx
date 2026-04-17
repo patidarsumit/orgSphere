@@ -7,6 +7,7 @@ import { parseAsInteger, parseAsString, useQueryState } from 'nuqs'
 import {
   ChevronLeft,
   ChevronRight,
+  ChevronsUpDown,
   FolderKanban,
   MoreHorizontal,
   Pencil,
@@ -24,9 +25,7 @@ import {
 import { Avatar } from '@/components/shared/Avatar'
 import { EmptyState } from '@/components/shared/EmptyState'
 import { StatusBadge } from '@/components/shared/StatusBadge'
-import { TechStackChip } from '@/components/shared/TechStackChip'
 import { useDeleteProject, useProjects } from '@/hooks/useProjects'
-import { useTeams } from '@/hooks/useTeams'
 import { Project, ProjectStatus } from '@/types'
 
 const pageNumbersFor = (currentPage: number, totalPages: number) => {
@@ -37,7 +36,7 @@ const pageNumbersFor = (currentPage: number, totalPages: number) => {
 
 function ProjectsTableSkeleton() {
   return (
-    <div className="overflow-hidden rounded-2xl bg-[color:var(--color-surface-card)] shadow-[var(--shadow-card)]">
+    <div className="overflow-hidden rounded-3xl bg-[color:var(--color-surface-card)] shadow-[var(--shadow-card)]">
       {Array.from({ length: 5 }, (_, index) => (
         <div key={index} className="grid grid-cols-12 gap-4 border-b border-[color:var(--color-border)] p-4">
           <div className="col-span-3 h-5 animate-pulse rounded bg-[color:var(--color-surface-low)]" />
@@ -47,6 +46,69 @@ function ProjectsTableSkeleton() {
           <div className="col-span-2 h-5 animate-pulse rounded bg-[color:var(--color-surface-low)]" />
         </div>
       ))}
+    </div>
+  )
+}
+
+function TechInitials({ technologies }: { technologies: string[] }) {
+  const visibleTech = technologies.slice(0, 2)
+  const hiddenTechCount = Math.max(technologies.length - visibleTech.length, 0)
+
+  if (technologies.length === 0) {
+    return <span className="text-sm text-[color:var(--color-text-tertiary)]">-</span>
+  }
+
+  return (
+    <div className="flex gap-1.5">
+      {visibleTech.map((tech) => (
+        <span
+          key={tech}
+          title={tech}
+          className="flex h-7 w-7 items-center justify-center rounded-md bg-[color:var(--color-surface-low)] text-[10px] font-black text-[color:var(--color-text-secondary)]"
+        >
+          {tech
+            .split(/[\s.-]+/)
+            .map((part) => part[0])
+            .join('')
+            .slice(0, 2)
+            .toUpperCase()}
+        </span>
+      ))}
+      {hiddenTechCount > 0 ? (
+        <span className="flex h-7 w-7 items-center justify-center rounded-md bg-[color:var(--color-surface-low)] text-[10px] font-black text-[color:var(--color-text-secondary)]">
+          +{hiddenTechCount}
+        </span>
+      ) : null}
+    </div>
+  )
+}
+
+function ProjectAvatarStack({ project }: { project: Project }) {
+  const people = project.project_members.map((member) => member.user).slice(0, 3)
+  const hiddenCount = Math.max(project.project_members.length - people.length, 0)
+
+  if (people.length === 0) {
+    return <span className="text-sm text-[color:var(--color-text-tertiary)]">-</span>
+  }
+
+  return (
+    <div className="flex -space-x-2">
+      {people.map((person) => (
+        <Link
+          key={person.id}
+          href={`/employees/${person.id}`}
+          onClick={(event) => event.stopPropagation()}
+          className="rounded-full ring-2 ring-white transition-transform hover:z-10 hover:-translate-y-0.5"
+          title={person.name}
+        >
+          <Avatar name={person.name} avatarPath={person.avatar_path} size="sm" />
+        </Link>
+      ))}
+      {hiddenCount > 0 ? (
+        <span className="flex h-8 w-8 items-center justify-center rounded-full border-2 border-white bg-[color:var(--color-primary-light)] text-[10px] font-black text-[color:var(--color-primary)]">
+          +{hiddenCount}
+        </span>
+      ) : null}
     </div>
   )
 }
@@ -119,66 +181,44 @@ function ProjectRow({
   onDelete: (project: Project) => void
 }) {
   const router = useRouter()
-  const visibleTech = project.tech_stack.slice(0, 2)
-  const hiddenTechCount = Math.max(project.tech_stack.length - visibleTech.length, 0)
 
   return (
     <tr
       onClick={() => router.push(`/projects/${project.id}`)}
-      className="h-16 cursor-pointer border-b border-[color:var(--color-border)] transition-colors hover:bg-[color:var(--color-surface-low)]"
+      className="group h-[60px] cursor-pointer border-b border-indigo-50/70 transition-colors hover:bg-indigo-50/40"
     >
-      <td className="px-5 py-3">
+      <td className="px-8 py-4">
         <div className="flex items-center gap-3">
-          <span className={`h-2 w-2 rounded-full ${statusDotClassName[project.status]}`} />
+          <span className={`h-2.5 w-2.5 rounded-full ring-4 ring-white ${statusDotClassName[project.status]}`} />
           <Link
             href={`/projects/${project.id}`}
             onClick={(event) => event.stopPropagation()}
-            className="font-semibold text-[color:var(--color-text-primary)] hover:text-[color:var(--color-primary)]"
+            className="font-bold text-[color:var(--color-text-primary)] transition-colors group-hover:text-[color:var(--color-primary)]"
           >
             {project.name}
           </Link>
         </div>
       </td>
-      <td className="px-5 py-3 text-sm text-[color:var(--color-text-secondary)]">
-        {truncateText(project.description, 55)}
+      <td className="px-6 py-4 text-sm text-[color:var(--color-text-secondary)]">
+        {truncateText(project.description, 48)}
       </td>
-      <td className="px-5 py-3">
+      <td className="px-6 py-4 text-center">
         <StatusBadge status={project.status} />
       </td>
-      <td className="px-5 py-3">
-        <div className="flex flex-wrap gap-1.5">
-          {visibleTech.map((tech) => (
-            <TechStackChip key={tech} tech={tech} size="sm" />
-          ))}
-          {hiddenTechCount > 0 ? (
-            <span className="rounded-full bg-gray-100 px-2 py-0.5 text-[11px] font-semibold text-gray-600">
-              +{hiddenTechCount}
-            </span>
-          ) : null}
-        </div>
+      <td className="px-6 py-4">
+        <TechInitials technologies={project.tech_stack} />
       </td>
-      <td className="px-5 py-3">
-        {project.team ? (
-          <Link
-            href={`/teams/${project.team.id}`}
-            onClick={(event) => event.stopPropagation()}
-            className="rounded-full bg-[color:var(--color-surface-low)] px-3 py-1 text-xs font-semibold text-[color:var(--color-text-secondary)] hover:text-[color:var(--color-primary)]"
-          >
-            {project.team.name}
-          </Link>
-        ) : (
-          <span className="text-sm text-[color:var(--color-text-tertiary)]">-</span>
-        )}
+      <td className="px-6 py-4">
+        <ProjectAvatarStack project={project} />
       </td>
-      <td className="px-5 py-3">
+      <td className="px-6 py-4">
         <div className="space-y-1">
           {project.tech_lead ? (
             <Link
               href={`/employees/${project.tech_lead.id}`}
               onClick={(event) => event.stopPropagation()}
-              className="flex items-center gap-2 text-xs font-semibold text-[color:var(--color-text-primary)] hover:text-[color:var(--color-primary)]"
+              className="block text-xs font-bold text-[color:var(--color-text-primary)] hover:text-[color:var(--color-primary)]"
             >
-              <Avatar name={project.tech_lead.name} avatarPath={project.tech_lead.avatar_path} size="sm" />
               {project.tech_lead.name}
             </Link>
           ) : null}
@@ -186,9 +226,8 @@ function ProjectRow({
             <Link
               href={`/employees/${project.manager.id}`}
               onClick={(event) => event.stopPropagation()}
-              className="flex items-center gap-2 text-xs text-[color:var(--color-text-tertiary)] hover:text-[color:var(--color-primary)]"
+              className="block text-[10px] font-medium text-[color:var(--color-text-tertiary)] hover:text-[color:var(--color-primary)]"
             >
-              <Avatar name={project.manager.name} avatarPath={project.manager.avatar_path} size="sm" />
               {project.manager.name}
             </Link>
           ) : null}
@@ -197,7 +236,7 @@ function ProjectRow({
           ) : null}
         </div>
       </td>
-      <td className="px-5 py-3">
+      <td className="px-8 py-4">
         <ProjectActions project={project} onEdit={onEdit} onDelete={onDelete} />
       </td>
     </tr>
@@ -233,7 +272,6 @@ export default function ProjectsPage() {
     status: status as ProjectStatus | '',
     tech,
   })
-  const { data: teams } = useTeams({ limit: 100 })
 
   useEffect(() => {
     setSearchInput(search)
@@ -255,7 +293,6 @@ export default function ProjectsPage() {
   const totalPages = data?.totalPages || 1
   const pageNumbers = pageNumbersFor(page, totalPages)
   const hasFilters = Boolean(search || status || tech)
-  const teamCount = teams?.total || 0
   const showingStart = totalProjects === 0 ? 0 : (page - 1) * 10 + 1
   const showingEnd = Math.min(page * 10, totalProjects)
 
@@ -285,12 +322,19 @@ export default function ProjectsPage() {
 
   return (
     <div className="-m-8 min-h-full bg-[color:var(--color-surface-low)] p-5 sm:p-8">
-      <div className="w-full space-y-6">
+      <div className="w-full space-y-8">
         <header className="flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
           <div>
-            <h1 className="text-4xl font-bold text-[color:var(--color-text-primary)]">Projects</h1>
-            <p className="mt-2 font-medium text-[color:var(--color-text-tertiary)]">
-              {totalProjects} projects across {teamCount} teams
+            <div className="flex flex-wrap items-center gap-3">
+              <h1 className="text-4xl font-black tracking-tight text-[color:var(--color-text-primary)]">
+                Projects
+              </h1>
+              <span className="rounded-full bg-[color:var(--color-primary-light)] px-3 py-1 text-xs font-black uppercase tracking-widest text-[color:var(--color-primary)]">
+                Active Workspace
+              </span>
+            </div>
+            <p className="mt-2 max-w-2xl font-medium text-[color:var(--color-text-tertiary)]">
+              Track delivery, owners, teams, and technology choices across {totalProjects} projects.
             </p>
           </div>
           <button
@@ -306,7 +350,7 @@ export default function ProjectsPage() {
           </button>
         </header>
 
-        <section className="rounded-2xl bg-[color:var(--color-surface-card)] p-4 shadow-[var(--shadow-card)]">
+        <section className="rounded-3xl bg-[color:var(--color-surface-card)] p-4 shadow-[var(--shadow-card)]">
           <div className="grid grid-cols-1 gap-4 lg:grid-cols-[1fr_190px_auto] lg:items-center">
             <label className="relative block">
               <Search
@@ -345,7 +389,10 @@ export default function ProjectsPage() {
               </button>
             ) : null}
           </div>
-          <div className="mt-4 flex flex-wrap gap-2">
+          <div className="mt-4 flex flex-wrap items-center gap-2">
+            <span className="mr-2 text-xs font-black uppercase tracking-widest text-[color:var(--color-text-tertiary)]">
+              Tech Stack:
+            </span>
             {availableTech.map((item) => (
               <button
                 key={item}
@@ -387,18 +434,23 @@ export default function ProjectsPage() {
         ) : null}
 
         {!isLoading && !isError && projects.length > 0 ? (
-          <section className="overflow-hidden rounded-2xl bg-[color:var(--color-surface-card)] shadow-[var(--shadow-card)]">
+          <section className="overflow-hidden rounded-3xl bg-[color:var(--color-surface-card)] shadow-[var(--shadow-card)]">
             <div className="overflow-x-auto">
               <table className="min-w-[1100px] w-full text-left">
-                <thead className="bg-[color:var(--color-surface-low)] text-[11px] font-black uppercase text-[color:var(--color-text-tertiary)]">
+                <thead className="bg-[color:var(--color-surface-low)] text-xs font-black uppercase tracking-widest text-[color:var(--color-text-tertiary)]">
                   <tr>
-                    <th className="px-5 py-4">Project Name</th>
-                    <th className="px-5 py-4">Description</th>
-                    <th className="px-5 py-4">Status</th>
-                    <th className="px-5 py-4">Tech Stack</th>
-                    <th className="px-5 py-4">Team</th>
-                    <th className="px-5 py-4">Lead/Mgr</th>
-                    <th className="px-5 py-4 text-right">Actions</th>
+                    <th className="px-8 py-5">Project Name</th>
+                    <th className="px-6 py-5">Description</th>
+                    <th className="px-6 py-5 text-center">Status</th>
+                    <th className="px-6 py-5">Tech Stack</th>
+                    <th className="px-6 py-5">Team</th>
+                    <th className="px-6 py-5">Lead / Mgr</th>
+                    <th className="px-8 py-5 text-right">
+                      <span className="inline-flex items-center gap-1">
+                        Actions
+                        <ChevronsUpDown size={14} />
+                      </span>
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
