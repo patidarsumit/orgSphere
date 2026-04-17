@@ -7,10 +7,13 @@ import { useSelector } from 'react-redux'
 import {
   ArrowLeft,
   CalendarDays,
+  CheckSquare,
+  FileText,
   FolderKanban,
   Mail,
   MessageSquareText,
   Pencil,
+  Plus,
   Share2,
   StickyNote,
   UserPlus,
@@ -24,13 +27,17 @@ import { Avatar } from '@/components/shared/Avatar'
 import { EmptyState } from '@/components/shared/EmptyState'
 import { StatusBadge } from '@/components/shared/StatusBadge'
 import { TechStackChip } from '@/components/shared/TechStackChip'
+import { TaskFormModal } from '@/components/tasks/TaskFormModal'
+import { formatTaskDueDate } from '@/components/tasks/taskUtils'
+import { useCreateNote, useNotes } from '@/hooks/useNotes'
 import {
   useProject,
   useRemoveProjectMember,
   useUpdateProjectMemberRole,
 } from '@/hooks/useProjects'
+import { useProjectTasks, useUpdateTask } from '@/hooks/useTasks'
 import { RootState } from '@/store'
-import { Project, ProjectMember } from '@/types'
+import { Project, ProjectMember, TaskStatus } from '@/types'
 
 type ProjectTab = 'overview' | 'team' | 'tasks' | 'notes' | 'activity'
 
@@ -409,6 +416,189 @@ function ComingSoon({ icon: Icon, title, description }: { icon: typeof FolderKan
   )
 }
 
+function ProjectTasksTab({ projectId }: { projectId: string }) {
+  const [filter, setFilter] = useState<TaskStatus | ''>('')
+  const [modalOpen, setModalOpen] = useState(false)
+  const { data, isLoading } = useProjectTasks(projectId, { status: filter, limit: 100 })
+  const updateTask = useUpdateTask()
+  const tasks = data?.data || []
+
+  return (
+    <section className="rounded-3xl bg-white p-6 shadow-[var(--shadow-card)]">
+      <div className="mb-5 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h2 className="text-2xl font-black tracking-tight text-[color:var(--color-text-primary)]">
+            Project Tasks
+          </h2>
+          <p className="text-sm text-[color:var(--color-text-tertiary)]">
+            Work linked to this project workspace.
+          </p>
+        </div>
+        <button
+          type="button"
+          onClick={() => setModalOpen(true)}
+          className="primary-gradient inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-bold text-white"
+        >
+          <Plus size={16} />
+          Add Task
+        </button>
+      </div>
+
+      <div className="mb-4 flex flex-wrap gap-2">
+        {[
+          ['' as const, 'All'],
+          ['todo' as const, 'Todo'],
+          ['in_progress' as const, 'In Progress'],
+          ['review' as const, 'Review'],
+          ['done' as const, 'Done'],
+        ].map(([value, label]) => (
+          <button
+            key={label}
+            type="button"
+            onClick={() => setFilter(value as TaskStatus | '')}
+            className={`rounded-full px-3 py-1.5 text-sm font-bold ${
+              filter === value
+                ? 'bg-[color:var(--color-primary)] text-white'
+                : 'bg-[color:var(--color-surface-low)] text-[color:var(--color-text-secondary)] hover:text-[color:var(--color-primary)]'
+            }`}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+
+      {isLoading ? (
+        <div className="space-y-3">
+          {Array.from({ length: 4 }, (_, index) => (
+            <div key={index} className="h-14 animate-pulse rounded-xl bg-[color:var(--color-surface-low)]" />
+          ))}
+        </div>
+      ) : tasks.length > 0 ? (
+        <div className="divide-y divide-[color:var(--color-border)] rounded-xl border border-[color:var(--color-border)]">
+          {tasks.map((task) => (
+            <div key={task.id} className="flex flex-wrap items-center gap-3 px-4 py-3 hover:bg-[color:var(--color-surface-low)]">
+              <button
+                type="button"
+                onClick={() => void updateTask.mutateAsync({ id: task.id, status: task.status === 'done' ? 'todo' : 'done' })}
+                className={`h-5 w-5 rounded-full border ${task.status === 'done' ? 'border-green-600 bg-green-600' : 'border-[color:var(--color-border-strong)] bg-white'}`}
+                aria-label="Toggle task"
+              />
+              <div className="min-w-[220px] flex-1">
+                <p className={`text-sm font-semibold text-[color:var(--color-text-primary)] ${task.status === 'done' ? 'line-through opacity-60' : ''}`}>
+                  {task.title}
+                </p>
+                <p className="text-xs text-[color:var(--color-text-tertiary)]">
+                  {task.assignee?.name || 'Assigned member'}
+                </p>
+              </div>
+              {task.assignee ? (
+                <Avatar name={task.assignee.name} avatarPath={task.assignee.avatar_path} size="sm" />
+              ) : null}
+              <StatusBadge status={task.status} />
+              <span className="text-xs font-semibold text-[color:var(--color-text-tertiary)]">
+                {formatTaskDueDate(task.due_date)}
+              </span>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <EmptyState
+          icon={CheckSquare}
+          title="No tasks linked yet"
+          description="Add a project task to connect execution with this workspace."
+          action={{ label: '+ Add Task', onClick: () => setModalOpen(true) }}
+        />
+      )}
+
+      <TaskFormModal
+        open={modalOpen}
+        onClose={() => setModalOpen(false)}
+        defaults={{ project_id: projectId }}
+      />
+    </section>
+  )
+}
+
+function ProjectNotesTab({ projectId }: { projectId: string }) {
+  const router = useRouter()
+  const { data, isLoading } = useNotes({ project_id: projectId, limit: 100 })
+  const createNote = useCreateNote()
+  const notes = data?.data || []
+
+  const addNote = async () => {
+    const note = await createNote.mutateAsync({
+      title: 'Untitled project note',
+      content: { type: 'doc', content: [{ type: 'paragraph' }] },
+      tags: ['Project'],
+      project_id: projectId,
+    })
+    router.push(`/my/notes?note=${note.id}`)
+  }
+
+  return (
+    <section className="rounded-3xl bg-white p-6 shadow-[var(--shadow-card)]">
+      <div className="mb-5 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h2 className="text-2xl font-black tracking-tight text-[color:var(--color-text-primary)]">
+            Project Notes
+          </h2>
+          <p className="text-sm text-[color:var(--color-text-tertiary)]">
+            Your notes linked to this project.
+          </p>
+        </div>
+        <button
+          type="button"
+          onClick={() => void addNote()}
+          className="primary-gradient inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-bold text-white"
+        >
+          <Plus size={16} />
+          Add Note
+        </button>
+      </div>
+
+      {isLoading ? (
+        <div className="space-y-3">
+          {Array.from({ length: 3 }, (_, index) => (
+            <div key={index} className="h-16 animate-pulse rounded-xl bg-[color:var(--color-surface-low)]" />
+          ))}
+        </div>
+      ) : notes.length > 0 ? (
+        <div className="divide-y divide-[color:var(--color-border)] rounded-xl border border-[color:var(--color-border)]">
+          {notes.map((note) => (
+            <Link
+              key={note.id}
+              href={`/my/notes?note=${note.id}`}
+              className="flex flex-wrap items-center gap-3 px-4 py-3 hover:bg-[color:var(--color-surface-low)]"
+            >
+              <FileText size={18} className="text-[color:var(--color-primary)]" />
+              <div className="min-w-[220px] flex-1">
+                <p className="text-sm font-semibold text-[color:var(--color-text-primary)]">{note.title}</p>
+                <p className="text-xs text-[color:var(--color-text-tertiary)]">
+                  Updated {new Intl.DateTimeFormat('en', { month: 'short', day: 'numeric' }).format(new Date(note.updated_at))}
+                </p>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {note.tags.slice(0, 3).map((tag) => (
+                  <span key={tag} className="rounded-full bg-[color:var(--color-primary-light)] px-2 py-0.5 text-xs font-bold text-[color:var(--color-primary)]">
+                    {tag}
+                  </span>
+                ))}
+              </div>
+            </Link>
+          ))}
+        </div>
+      ) : (
+        <EmptyState
+          icon={StickyNote}
+          title="No notes linked yet"
+          description="Create a project note to keep decisions close to the work."
+          action={{ label: '+ Add Note', onClick: () => void addNote() }}
+        />
+      )}
+    </section>
+  )
+}
+
 export default function ProjectDetailPage() {
   const params = useParams<{ id: string }>()
   const router = useRouter()
@@ -504,12 +694,8 @@ export default function ProjectDetailPage() {
           <OverviewTab project={project} onTeamTab={() => setActiveTab('team')} />
         ) : null}
         {activeTab === 'team' ? <TeamTab project={project} canEdit={canEdit} /> : null}
-        {activeTab === 'tasks' ? (
-          <ComingSoon icon={UsersRound} title="Tasks arrive in Phase 6" description="Project tasks and sprint execution will connect here in the next phase." />
-        ) : null}
-        {activeTab === 'notes' ? (
-          <ComingSoon icon={StickyNote} title="Notes arrive in Phase 6" description="Project notes and decision logs will live here soon." />
-        ) : null}
+        {activeTab === 'tasks' ? <ProjectTasksTab projectId={project.id} /> : null}
+        {activeTab === 'notes' ? <ProjectNotesTab projectId={project.id} /> : null}
         {activeTab === 'activity' ? (
           <ComingSoon icon={MessageSquareText} title="Activity arrives in Phase 7" description="Audit history and collaboration events will appear here later." />
         ) : null}

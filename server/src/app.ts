@@ -6,7 +6,9 @@ import path from 'path'
 import authRoutes from './routes/auth.routes'
 import dashboardRoutes from './routes/dashboard.routes'
 import employeeRoutes from './routes/employee.routes'
+import noteRoutes from './routes/note.routes'
 import projectRoutes from './routes/project.routes'
+import taskRoutes from './routes/task.routes'
 import teamRoutes from './routes/team.routes'
 
 const app = express()
@@ -28,6 +30,8 @@ app.use('/api/dashboard', dashboardRoutes)
 app.use('/api/employees', employeeRoutes)
 app.use('/api/projects', projectRoutes)
 app.use('/api/teams', teamRoutes)
+app.use('/api/tasks', taskRoutes)
+app.use('/api/notes', noteRoutes)
 
 app.get('/api/health', (_req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() })

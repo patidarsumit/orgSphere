@@ -88,6 +88,34 @@ export interface UserProject {
   }
 }
 
+export interface Task {
+  id: string
+  title: string
+  description: string | null
+  status: TaskStatus
+  priority: TaskPriority
+  due_date: string | null
+  assigned_to: string
+  assignee?: User
+  project_id: string | null
+  project: { id: string; name: string } | null
+  created_by: string
+  created_at: string
+  updated_at: string
+}
+
+export interface Note {
+  id: string
+  title: string
+  content: Record<string, unknown>
+  tags: string[]
+  user_id: string
+  project_id: string | null
+  project: { id: string; name: string } | null
+  created_at: string
+  updated_at: string
+}
+
 export interface ApiError {
   message: string
   errors?: Record<string, string[]>
