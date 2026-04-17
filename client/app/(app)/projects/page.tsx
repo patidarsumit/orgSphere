@@ -15,11 +15,13 @@ import { ProjectFormModal } from '@/components/projects/ProjectFormModal'
 import {
   commonTech,
   projectStatusOptions,
+  statusDotClassName,
   truncateText,
 } from '@/components/projects/projectUtils'
 import { Avatar } from '@/components/shared/Avatar'
 import { EmptyState } from '@/components/shared/EmptyState'
 import { StatusBadge } from '@/components/shared/StatusBadge'
+import { TechStackChip } from '@/components/shared/TechStackChip'
 import { useDeleteProject, useProjects } from '@/hooks/useProjects'
 import { Project, ProjectStatus } from '@/types'
 
@@ -59,9 +61,8 @@ function ProjectTechStack({ technologies }: { technologies: string[] }) {
         <span
           key={tech}
           title={tech}
-          className="rounded-full bg-[color:var(--color-surface-card)] px-2 py-0.5 text-xs font-medium text-[color:var(--color-text-secondary)]"
         >
-          {tech}
+          <TechStackChip tech={tech} size="sm" />
         </span>
       ))}
       {hiddenTechCount > 0 ? (
@@ -170,7 +171,10 @@ function ProjectRow({
         </div>
       </td>
       <td className="px-5 py-3">
-        <StatusBadge status={project.status} />
+        <div className="flex items-center gap-2">
+          <span className={`h-2.5 w-2.5 rounded-full ${statusDotClassName[project.status]}`} />
+          <StatusBadge status={project.status} />
+        </div>
       </td>
       <td className="px-5 py-3">
         <ProjectTechStack technologies={project.tech_stack} />

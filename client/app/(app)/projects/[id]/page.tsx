@@ -483,7 +483,7 @@ export default function ProjectDetailPage() {
           </div>
         </header>
 
-        <nav className="sticky top-16 z-20 flex gap-2 overflow-x-auto rounded-2xl bg-white p-2 shadow-[var(--shadow-card)]">
+        <nav className="sticky top-0 z-20 flex gap-2 overflow-x-auto rounded-2xl bg-white p-2 shadow-[var(--shadow-card)]">
           {tabs.map((tab) => (
             <button
               key={tab.id}
