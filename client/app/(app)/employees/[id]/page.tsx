@@ -22,8 +22,11 @@ import { roleLabels } from '@/components/employees/constants'
 import { Avatar } from '@/components/shared/Avatar'
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog'
 import { EmptyState } from '@/components/shared/EmptyState'
+import { StatusBadge } from '@/components/shared/StatusBadge'
+import { TechStackChip } from '@/components/shared/TechStackChip'
 import { iconClassForTeam } from '@/components/teams/teamUtils'
 import { useDeactivateEmployee, useEmployee } from '@/hooks/useEmployees'
+import { useUserProjects } from '@/hooks/useProjects'
 import { useUserTeams } from '@/hooks/useTeams'
 import { RootState } from '@/store'
 import { Employee } from '@/types'
@@ -112,6 +115,7 @@ export default function EmployeeDetailPage() {
   const deactivateEmployee = useDeactivateEmployee()
   const { data: employee, isLoading, isError } = useEmployee(params.id)
   const { data: userTeams = [], isLoading: teamsLoading } = useUserTeams(params.id)
+  const { data: userProjects = [], isLoading: projectsLoading } = useUserProjects(params.id)
   const canEdit = currentUser?.role === 'admin' || currentUser?.id === params.id
   const canDeactivate = currentUser?.role === 'admin' && currentUser?.id !== params.id
 
@@ -308,36 +312,70 @@ export default function EmployeeDetailPage() {
               </button>
             </div>
             <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-              <div className="rounded-xl border-b-4 border-indigo-400 bg-[color:var(--color-surface-card)] p-6 shadow-sm">
-                <div className="mb-4 flex items-start justify-between">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-50 text-[color:var(--color-primary)]">
+              {projectsLoading ? (
+                [1, 2].map((item) => (
+                  <div key={item} className="h-44 animate-pulse rounded-xl bg-[color:var(--color-surface-card)] shadow-sm" />
+                ))
+              ) : null}
+              {!projectsLoading && userProjects.length > 0
+                ? userProjects.map((membership) => (
+                    <Link
+                      key={membership.id}
+                      href={`/projects/${membership.project.id}`}
+                      className="rounded-xl border-b-4 border-indigo-400 bg-[color:var(--color-surface-card)] p-6 shadow-sm transition-transform hover:-translate-y-0.5"
+                    >
+                      <div className="mb-4 flex items-start justify-between gap-4">
+                        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-50 text-[color:var(--color-primary)]">
+                          <FolderKanban size={18} />
+                        </div>
+                        <StatusBadge status={membership.project.status} />
+                      </div>
+                      <h4 className="text-lg font-bold text-[color:var(--color-text-primary)]">
+                        {membership.project.name}
+                      </h4>
+                      <p className="mt-1 text-sm font-semibold text-[color:var(--color-primary)]">
+                        {membership.role}
+                      </p>
+                      {membership.project.team ? (
+                        <p className="mt-2 text-xs text-[color:var(--color-text-tertiary)]">
+                          {membership.project.team.name}
+                        </p>
+                      ) : null}
+                      <div className="mt-4 flex flex-wrap gap-2">
+                        {membership.project.tech_stack.slice(0, 3).map((tech) => (
+                          <TechStackChip key={tech} tech={tech} size="sm" />
+                        ))}
+                      </div>
+                    </Link>
+                  ))
+                : null}
+              {!projectsLoading && userProjects.length === 0 ? (
+                <div className="rounded-xl border-b-4 border-indigo-400 bg-[color:var(--color-surface-card)] p-6 shadow-sm">
+                  <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-50 text-[color:var(--color-primary)]">
                     <FolderKanban size={18} />
                   </div>
-                  <span className="rounded bg-green-50 px-2 py-0.5 text-[10px] font-bold uppercase text-green-700">
-                    Phase 5
-                  </span>
+                  <h4 className="text-lg font-bold text-[color:var(--color-text-primary)]">
+                    Not assigned to any projects
+                  </h4>
+                  <p className="mt-2 text-sm leading-6 text-[color:var(--color-text-secondary)]">
+                    Project memberships will appear here after assignment.
+                  </p>
                 </div>
-                <h4 className="text-lg font-bold text-[color:var(--color-text-primary)]">
-                  Project assignments
-                </h4>
-                <p className="mt-2 text-sm leading-6 text-[color:var(--color-text-secondary)]">
-                  Assigned projects will appear after the projects module is connected.
-                </p>
-              </div>
+              ) : null}
               <div className="rounded-xl border-b-4 border-[color:var(--color-tertiary)] bg-[color:var(--color-surface-card)] p-6 shadow-sm">
                 <div className="mb-4 flex items-start justify-between">
                   <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-orange-50 text-[color:var(--color-tertiary)]">
                     <Users size={18} />
                   </div>
-                  <span className="rounded bg-amber-50 px-2 py-0.5 text-[10px] font-bold uppercase text-amber-700">
-                    Phase 4
+                  <span className="rounded bg-green-50 px-2 py-0.5 text-[10px] font-bold uppercase text-green-700">
+                    Live
                   </span>
                 </div>
                 <h4 className="text-lg font-bold text-[color:var(--color-text-primary)]">
                   Team memberships
                 </h4>
                 <p className="mt-2 text-sm leading-6 text-[color:var(--color-text-secondary)]">
-                  Official team memberships will appear after the teams module is connected.
+                  Official teams are listed in the collaboration hub below.
                 </p>
               </div>
             </div>

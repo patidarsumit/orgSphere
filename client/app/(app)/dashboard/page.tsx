@@ -6,18 +6,21 @@ import { useSelector } from 'react-redux'
 import {
   AlertTriangle,
   ArrowUpRight,
-  Badge,
   CheckCircle2,
   CheckSquare,
-  Cloud,
   FolderKanban,
   PlusCircle,
   Rocket,
-  Sparkles,
   Users,
 } from 'lucide-react'
+import { AvatarStack } from '@/components/shared/AvatarStack'
+import { EmptyState } from '@/components/shared/EmptyState'
+import { StatusBadge } from '@/components/shared/StatusBadge'
+import { TechStackChip } from '@/components/shared/TechStackChip'
+import { useRecentProjects } from '@/hooks/useProjects'
 import api from '@/lib/axios'
 import { RootState } from '@/store'
+import { Project } from '@/types'
 
 interface DashboardStats {
   totalProjects: number
@@ -36,56 +39,12 @@ interface DashboardStatCardProps {
   icon: typeof FolderKanban
 }
 
-interface ProjectPreview {
-  name: string
-  status: string
-  statusClassName: string
-  skills: string[]
-  icon: typeof Cloud
-  iconClassName: string
-  teamCount: number
-  leadInitials: string
-}
-
 interface ActivityItem {
   text: string
   highlight?: string
   time: string
   markerClassName: string
 }
-
-const projectPreviews: ProjectPreview[] = [
-  {
-    name: 'CloudSync Architecture',
-    status: 'Stable',
-    statusClassName: 'bg-green-100 text-green-700',
-    skills: ['AWS', 'TypeScript', 'PostgreSQL'],
-    icon: Cloud,
-    iconClassName: 'bg-indigo-50 text-indigo-600',
-    teamCount: 6,
-    leadInitials: 'SM',
-  },
-  {
-    name: 'Neo-Banking Gateway',
-    status: 'In Testing',
-    statusClassName: 'bg-blue-100 text-blue-700',
-    skills: ['Python', 'Kafka', 'Redis'],
-    icon: Badge,
-    iconClassName: 'bg-orange-50 text-orange-600',
-    teamCount: 10,
-    leadInitials: 'JC',
-  },
-  {
-    name: 'AI Narrative Engine',
-    status: 'Discovery',
-    statusClassName: 'bg-purple-100 text-purple-700',
-    skills: ['PyTorch', 'FastAPI'],
-    icon: Sparkles,
-    iconClassName: 'bg-indigo-50 text-indigo-600',
-    teamCount: 3,
-    leadInitials: 'AR',
-  },
-]
 
 const activityItems: ActivityItem[] = [
   {
@@ -193,59 +152,39 @@ function DashboardStatCard({
   )
 }
 
-function ProjectPreviewCard({ project }: { project: ProjectPreview }) {
-  const Icon = project.icon
+function ProjectPreviewCard({ project }: { project: Project }) {
+  const members = project.project_members.map((member) => ({
+    name: member.user.name,
+    avatarPath: member.user.avatar_path,
+  }))
 
   return (
     <Link
-      href="/projects"
+      href={`/projects/${project.id}`}
       className="flex flex-col gap-4 rounded-2xl bg-[color:var(--color-surface-card)] p-5 shadow-[var(--shadow-card)] transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-[color:var(--color-primary)] focus:ring-offset-2 sm:flex-row sm:items-center"
     >
-      <div
-        className={`flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl ${project.iconClassName}`}
-      >
-        <Icon size={30} />
+      <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-[color:var(--color-primary-light)] text-[color:var(--color-primary)]">
+        <FolderKanban size={30} />
       </div>
 
       <div className="min-w-0 flex-1">
         <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
           <h3 className="font-bold text-[color:var(--color-text-primary)]">{project.name}</h3>
-          <span
-            className={`w-fit rounded-full px-3 py-1 text-[10px] font-bold uppercase ${project.statusClassName}`}
-          >
-            {project.status}
-          </span>
+          <StatusBadge status={project.status} />
         </div>
         <div className="mt-3 flex flex-wrap gap-2">
-          {project.skills.map((skill) => (
-            <span
-              key={skill}
-              className="rounded-md bg-[color:var(--color-surface-high)] px-2 py-1 text-[10px] font-medium text-[color:var(--color-text-secondary)]"
-            >
-              {skill}
-            </span>
+          {project.tech_stack.slice(0, 3).map((tech) => (
+            <TechStackChip key={tech} tech={tech} size="sm" />
           ))}
         </div>
         <div className="mt-4 flex items-center justify-between gap-4">
-          <div className="flex -space-x-2">
-            {['SD', 'MK'].map((initials) => (
-              <span
-                key={`${project.name}-${initials}`}
-                className="flex h-6 w-6 items-center justify-center rounded-full bg-[color:var(--color-primary-light)] text-[8px] font-bold text-[color:var(--color-primary)] ring-2 ring-white"
-              >
-                {initials}
-              </span>
-            ))}
-            <span className="flex h-6 w-6 items-center justify-center rounded-full bg-[color:var(--color-surface-high)] text-[8px] font-bold text-[color:var(--color-text-secondary)] ring-2 ring-white">
-              +{project.teamCount - 2}
-            </span>
-          </div>
+          <AvatarStack users={members} max={3} />
           <div className="flex items-center gap-2">
             <span className="text-[10px] font-bold uppercase text-[color:var(--color-text-tertiary)]">
               Lead
             </span>
-            <span className="flex h-7 w-7 items-center justify-center rounded-full bg-[color:var(--color-primary)] text-[9px] font-black text-white">
-              {project.leadInitials}
+            <span className="text-xs font-bold text-[color:var(--color-text-primary)]">
+              {project.tech_lead?.name || 'Unassigned'}
             </span>
           </div>
         </div>
@@ -289,6 +228,7 @@ function ActivityTimelineItem({
 
 export default function DashboardPage() {
   const user = useSelector((state: RootState) => state.auth.user)
+  const { data: recentProjects = [], isLoading: projectsLoading } = useRecentProjects()
   const { data: stats, isLoading } = useQuery<DashboardStats>({
     queryKey: ['dashboard-stats'],
     queryFn: async () => {
@@ -326,7 +266,7 @@ export default function DashboardPage() {
           <DashboardStatCard
             title="Total Projects"
             value={stats?.totalProjects}
-            label="Ready for project data"
+            label="Tracked across teams"
             href="/projects"
             tone="primary"
             isLoading={isLoading}
@@ -375,9 +315,26 @@ export default function DashboardPage() {
               </Link>
             </div>
             <div className="space-y-4">
-              {projectPreviews.map((project) => (
-                <ProjectPreviewCard key={project.name} project={project} />
-              ))}
+              {projectsLoading
+                ? [1, 2, 3].map((item) => (
+                    <div
+                      key={item}
+                      className="h-36 animate-pulse rounded-2xl bg-[color:var(--color-surface-card)] shadow-[var(--shadow-card)]"
+                    />
+                  ))
+                : null}
+              {!projectsLoading && recentProjects.length > 0
+                ? recentProjects.map((project) => (
+                    <ProjectPreviewCard key={project.id} project={project} />
+                  ))
+                : null}
+              {!projectsLoading && recentProjects.length === 0 ? (
+                <EmptyState
+                  icon={FolderKanban}
+                  title="No projects yet"
+                  description="Create a project to see recent work here."
+                />
+              ) : null}
             </div>
           </section>
 
@@ -429,8 +386,7 @@ export default function DashboardPage() {
 
         <p className="flex items-start gap-2 rounded-xl bg-[color:var(--color-surface-card)] p-4 text-xs font-medium text-[color:var(--color-text-secondary)] shadow-[var(--shadow-card)]">
           <AlertTriangle size={16} className="mt-0.5 shrink-0 text-amber-500" />
-          Recent project and activity details are UI previews until their dedicated phases add live
-          data.
+          Activity details are UI previews until the activity module is connected.
         </p>
       </section>
     </div>

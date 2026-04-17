@@ -5,7 +5,7 @@ const statusStyles: Record<string, string> = {
   in_progress: 'bg-amber-50 text-amber-700',
   'in progress': 'bg-amber-50 text-amber-700',
   blocked: 'bg-red-50 text-red-700',
-  on_hold: 'bg-red-50 text-red-700',
+  on_hold: 'bg-amber-50 text-amber-700',
   todo: 'bg-blue-50 text-blue-700',
   planned: 'bg-blue-50 text-blue-700',
   archived: 'bg-gray-100 text-gray-600',
@@ -31,4 +31,3 @@ export function StatusBadge({ status }: { status: string }) {
     </span>
   )
 }
-

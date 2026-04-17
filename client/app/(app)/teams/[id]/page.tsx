@@ -22,6 +22,9 @@ import { formatDate, iconClassForTeam, initialsForTeam } from '@/components/team
 import { Avatar } from '@/components/shared/Avatar'
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog'
 import { EmptyState } from '@/components/shared/EmptyState'
+import { StatusBadge } from '@/components/shared/StatusBadge'
+import { TechStackChip } from '@/components/shared/TechStackChip'
+import { useTeamProjects } from '@/hooks/useProjects'
 import { useDeleteTeam, useRemoveTeamMember, useTeam } from '@/hooks/useTeams'
 import { RootState } from '@/store'
 import { TeamMember } from '@/types'
@@ -117,6 +120,7 @@ export default function TeamDetailPage() {
   const router = useRouter()
   const currentUser = useSelector((state: RootState) => state.auth.user)
   const { data: team, isLoading, isError } = useTeam(params.id)
+  const { data: teamProjects = [], isLoading: projectsLoading } = useTeamProjects(params.id)
   const removeMember = useRemoveTeamMember(params.id)
   const deleteTeam = useDeleteTeam()
   const [editOpen, setEditOpen] = useState(false)
@@ -310,9 +314,45 @@ export default function TeamDetailPage() {
               <h2 className="mt-5 text-xs font-bold uppercase text-[color:var(--color-text-tertiary)]">
                 Assigned Projects
               </h2>
-              <p className="mt-3 text-sm leading-6 text-[color:var(--color-text-secondary)]">
-                Projects will appear after Phase 5 is built.
-              </p>
+              {projectsLoading ? (
+                <div className="mt-5 space-y-3">
+                  {[1, 2, 3].map((item) => (
+                    <div key={item} className="h-16 animate-pulse rounded-xl bg-[color:var(--color-surface-low)]" />
+                  ))}
+                </div>
+              ) : null}
+              {!projectsLoading && teamProjects.length > 0 ? (
+                <div className="mt-5 space-y-3">
+                  {teamProjects.map((project) => (
+                    <Link
+                      key={project.id}
+                      href={`/projects/${project.id}`}
+                      className="block rounded-xl bg-[color:var(--color-surface-low)] p-4 transition-transform hover:-translate-y-0.5 hover:bg-white"
+                    >
+                      <div className="flex items-start justify-between gap-3">
+                        <h3 className="text-sm font-bold text-[color:var(--color-text-primary)]">
+                          {project.name}
+                        </h3>
+                        <StatusBadge status={project.status} />
+                      </div>
+                      <p className="mt-2 text-xs text-[color:var(--color-text-tertiary)]">
+                        {project.start_date ? formatDate(project.start_date) : 'No start date'}
+                        {project.manager ? ` • ${project.manager.name}` : ''}
+                      </p>
+                      <div className="mt-3 flex flex-wrap gap-1.5">
+                        {project.tech_stack.slice(0, 2).map((tech) => (
+                          <TechStackChip key={tech} tech={tech} size="sm" />
+                        ))}
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              ) : null}
+              {!projectsLoading && teamProjects.length === 0 ? (
+                <p className="mt-3 text-sm leading-6 text-[color:var(--color-text-secondary)]">
+                  No projects assigned to this team.
+                </p>
+              ) : null}
             </section>
           </aside>
         </div>

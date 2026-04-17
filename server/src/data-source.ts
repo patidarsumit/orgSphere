@@ -1,6 +1,8 @@
 import 'reflect-metadata'
 import dotenv from 'dotenv'
 import { DataSource } from 'typeorm'
+import { Project } from './entities/Project'
+import { ProjectMember } from './entities/ProjectMember'
 import { Team } from './entities/Team'
 import { User } from './entities/User'
 
@@ -15,7 +17,7 @@ export const AppDataSource = new DataSource({
   database: process.env.DB_NAME || 'orgsphere_db',
   synchronize: false,
   logging: process.env.NODE_ENV === 'development',
-  entities: [User, Team],
+  entities: [User, Team, Project, ProjectMember],
   migrations: ['src/migrations/*.ts'],
   subscribers: [],
 })
