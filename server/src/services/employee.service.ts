@@ -2,6 +2,7 @@ import bcrypt from 'bcryptjs'
 import { CreateEmployeeInput, EmployeeQuery, UpdateEmployeeInput } from '@orgsphere/schemas'
 import { AppDataSource } from '../data-source'
 import { User } from '../entities/User'
+import * as ActivityService from './activity.service'
 
 const repo = () => AppDataSource.getRepository(User)
 
@@ -95,7 +96,7 @@ export const findById = async (id: string) => {
     .getOne()
 }
 
-export const create = async (input: CreateEmployeeInput) => {
+export const create = async (input: CreateEmployeeInput, actorId?: string) => {
   const existing = await repo().findOne({ where: { email: input.email } })
   if (existing) throw new Error('EMAIL_EXISTS')
 
@@ -106,28 +107,62 @@ export const create = async (input: CreateEmployeeInput) => {
     manager_id: input.manager_id || null,
     password_hash,
   })
-  return repo().save(user)
+  const saved = await repo().save(user)
+  await ActivityService.log({
+    action: 'created',
+    entity_type: 'employee',
+    entity_id: saved.id,
+    entity_name: saved.name,
+    actor_id: actorId,
+  })
+  return saved
 }
 
-export const update = async (id: string, input: UpdateEmployeeInput) => {
+export const update = async (id: string, input: UpdateEmployeeInput, actorId?: string) => {
   const user = await repo().findOne({ where: { id } })
   if (!user) throw new Error('NOT_FOUND')
 
   Object.assign(user, input)
-  return repo().save(user)
+  const saved = await repo().save(user)
+  await ActivityService.log({
+    action: 'updated',
+    entity_type: 'employee',
+    entity_id: id,
+    entity_name: saved.name,
+    actor_id: actorId,
+  })
+  return saved
 }
 
-export const updateAvatar = async (id: string, avatarPath: string) => {
+export const updateAvatar = async (id: string, avatarPath: string, actorId?: string) => {
+  const user = await repo().findOne({ where: { id } })
+  if (!user) throw new Error('NOT_FOUND')
+
   const result = await repo().update(id, { avatar_path: avatarPath })
   if (!result.affected) throw new Error('NOT_FOUND')
+  await ActivityService.log({
+    action: 'uploaded',
+    entity_type: 'employee',
+    entity_id: id,
+    entity_name: user.name,
+    actor_id: actorId,
+  })
 }
 
-export const remove = async (id: string) => {
+export const remove = async (id: string, actorId?: string) => {
   const user = await repo().findOne({ where: { id } })
   if (!user) throw new Error('NOT_FOUND')
 
   user.is_active = false
-  return repo().save(user)
+  const saved = await repo().save(user)
+  await ActivityService.log({
+    action: 'deleted',
+    entity_type: 'employee',
+    entity_id: id,
+    entity_name: saved.name,
+    actor_id: actorId,
+  })
+  return saved
 }
 
 export const getDirectReports = async (managerId: string) => {
@@ -148,4 +183,3 @@ export const getUniqueSkills = async () => {
     a.localeCompare(b)
   )
 }
-

@@ -116,6 +116,31 @@ export interface Note {
   updated_at: string
 }
 
+export type ActivityColor = 'blue' | 'green' | 'red' | 'purple' | 'amber' | 'teal'
+
+export interface ActivityItem {
+  id: string
+  actor_name: string
+  actor_avatar: string | null
+  actor_id: string | null
+  message: string
+  entity_type: string
+  entity_id: string
+  entity_name: string | null
+  action: string
+  color: ActivityColor
+  created_at: string
+  time_ago: string
+}
+
+export interface ActivityFeed {
+  data: ActivityItem[]
+  total: number
+  page: number
+  limit: number
+  totalPages: number
+}
+
 export interface ApiError {
   message: string
   errors?: Record<string, string[]>

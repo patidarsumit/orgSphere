@@ -4,7 +4,6 @@ import Link from 'next/link'
 import { useQuery } from '@tanstack/react-query'
 import { useSelector } from 'react-redux'
 import {
-  AlertTriangle,
   ArrowUpRight,
   CheckCircle2,
   CheckSquare,
@@ -13,20 +12,23 @@ import {
   Rocket,
   Users,
 } from 'lucide-react'
+import { ActivityFeed } from '@/components/activity/ActivityFeed'
 import { AvatarStack } from '@/components/shared/AvatarStack'
 import { EmptyState } from '@/components/shared/EmptyState'
 import { StatusBadge } from '@/components/shared/StatusBadge'
 import { TechStackChip } from '@/components/shared/TechStackChip'
+import { useRecentActivity } from '@/hooks/useActivity'
 import { useRecentProjects } from '@/hooks/useProjects'
 import api from '@/lib/axios'
 import { RootState } from '@/store'
-import { Project } from '@/types'
+import { ActivityItem, Project } from '@/types'
 
 interface DashboardStats {
   totalProjects: number
   totalEmployees: number
   activeTeams: number
   myOpenTasks: number
+  recentActivity?: ActivityItem[]
 }
 
 interface DashboardStatCardProps {
@@ -38,50 +40,6 @@ interface DashboardStatCardProps {
   isLoading: boolean
   icon: typeof FolderKanban
 }
-
-interface ActivityItem {
-  text: string
-  highlight?: string
-  time: string
-  markerClassName: string
-}
-
-const activityItems: ActivityItem[] = [
-  {
-    text: 'Sarah M. updated documentation',
-    highlight: 'CloudSync Architecture',
-    time: '14 minutes ago',
-    markerClassName: 'bg-[color:var(--color-primary)] ring-indigo-100',
-  },
-  {
-    text: 'Critical bug detected',
-    highlight: 'Neo-Banking Gateway',
-    time: '1 hour ago',
-    markerClassName: 'bg-red-500 ring-red-50',
-  },
-  {
-    text: 'James Chen joined the team',
-    highlight: 'Global Ops',
-    time: '3 hours ago',
-    markerClassName: 'bg-green-500 ring-green-50',
-  },
-  {
-    text: 'New milestone achieved',
-    highlight: 'Sprint 4 Complete',
-    time: '5 hours ago',
-    markerClassName: 'bg-blue-500 ring-blue-50',
-  },
-  {
-    text: 'System backup completed successfully',
-    time: 'Yesterday at 11:45 PM',
-    markerClassName: 'bg-slate-400 ring-slate-100',
-  },
-  {
-    text: 'Monthly reporting dashboard generated',
-    time: 'Yesterday at 6:00 PM',
-    markerClassName: 'bg-[color:var(--color-primary-container)] ring-indigo-100',
-  },
-]
 
 const getGreeting = () => {
   const hour = new Date().getHours()
@@ -193,42 +151,10 @@ function ProjectPreviewCard({ project }: { project: Project }) {
   )
 }
 
-function ActivityTimelineItem({
-  item,
-  isLast,
-}: {
-  item: ActivityItem
-  isLast: boolean
-}) {
-  return (
-    <li className="flex gap-4">
-      <div className="relative shrink-0">
-        <span className={`mt-1.5 block h-2.5 w-2.5 rounded-full ring-4 ${item.markerClassName}`} />
-        {!isLast ? (
-          <span className="absolute left-1/2 top-5 h-10 w-px -translate-x-1/2 bg-indigo-100" />
-        ) : null}
-      </div>
-      <div className="min-w-0 pb-1">
-        <p className="text-sm font-semibold leading-5 text-[color:var(--color-text-primary)]">
-          {item.text}
-          {item.highlight ? (
-            <>
-              {' '}
-              <span className="text-[color:var(--color-primary)]">{item.highlight}</span>
-            </>
-          ) : null}
-        </p>
-        <p className="mt-1 text-[11px] font-medium text-[color:var(--color-text-tertiary)]">
-          {item.time}
-        </p>
-      </div>
-    </li>
-  )
-}
-
 export default function DashboardPage() {
   const user = useSelector((state: RootState) => state.auth.user)
   const { data: recentProjects = [], isLoading: projectsLoading } = useRecentProjects()
+  const { data: activityData, isLoading: activityLoading } = useRecentActivity()
   const { data: stats, isLoading } = useQuery<DashboardStats>({
     queryKey: ['dashboard-stats'],
     queryFn: async () => {
@@ -236,6 +162,7 @@ export default function DashboardPage() {
       return data
     },
   })
+  const recentActivity = activityData || stats?.recentActivity || []
 
   return (
     <div className="-m-8 min-h-full bg-[color:var(--color-surface-low)] p-5 sm:p-8">
@@ -293,7 +220,7 @@ export default function DashboardPage() {
           <DashboardStatCard
             title="My Open Tasks"
             value={stats?.myOpenTasks}
-            label="Task data arrives in a later phase"
+            label="Open personal tasks"
             href="/my/tasks"
             tone="priority"
             isLoading={isLoading}
@@ -338,25 +265,14 @@ export default function DashboardPage() {
             </div>
           </section>
 
-          <section className="space-y-6 lg:col-span-4">
-            <div className="flex items-center justify-between gap-4">
-              <h2 className="text-xl font-black text-[color:var(--color-text-primary)]">
-                Activity Feed
-              </h2>
-              <span className="rounded-full bg-[color:var(--color-surface-card)] px-3 py-1 text-xs font-bold text-[color:var(--color-text-tertiary)]">
-                Preview
-              </span>
-            </div>
-            <ol className="max-h-none space-y-6 overflow-y-auto rounded-2xl bg-[color:var(--color-surface-container)] p-6 lg:max-h-[500px]">
-              {activityItems.map((item, index) => (
-                <ActivityTimelineItem
-                  key={`${item.text}-${item.time}`}
-                  item={item}
-                  isLast={index === activityItems.length - 1}
-                />
-              ))}
-            </ol>
-          </section>
+          <div className="lg:col-span-4">
+            <ActivityFeed
+              items={recentActivity}
+              isLoading={activityLoading && !stats?.recentActivity}
+              title="Activity Feed"
+              maxHeight="500px"
+            />
+          </div>
         </div>
 
         <section className="primary-gradient flex flex-col gap-6 rounded-2xl p-6 text-white shadow-2xl shadow-indigo-200 sm:p-8 md:flex-row md:items-center md:justify-between">
@@ -384,10 +300,6 @@ export default function DashboardPage() {
           </div>
         </section>
 
-        <p className="flex items-start gap-2 rounded-xl bg-[color:var(--color-surface-card)] p-4 text-xs font-medium text-[color:var(--color-text-secondary)] shadow-[var(--shadow-card)]">
-          <AlertTriangle size={16} className="mt-0.5 shrink-0 text-amber-500" />
-          Activity details are UI previews until the activity module is connected.
-        </p>
       </section>
     </div>
   )

@@ -8,6 +8,7 @@ import { AppDataSource } from '../data-source'
 import { Project } from '../entities/Project'
 import { ProjectMember } from '../entities/ProjectMember'
 import { User } from '../entities/User'
+import * as ActivityService from './activity.service'
 
 const repo = () => AppDataSource.getRepository(Project)
 const pmRepo = () => AppDataSource.getRepository(ProjectMember)
@@ -180,7 +181,7 @@ export const findByTeamId = async (teamId: string) => {
     .getMany()
 }
 
-export const create = async (input: CreateProjectInput) => {
+export const create = async (input: CreateProjectInput, actorId?: string) => {
   const project = repo().create({
     ...input,
     description: input.description || null,
@@ -190,25 +191,56 @@ export const create = async (input: CreateProjectInput) => {
     team_id: input.team_id || null,
   })
   const saved = await repo().save(project)
+  await ActivityService.log({
+    action: 'created',
+    entity_type: 'project',
+    entity_id: saved.id,
+    entity_name: saved.name,
+    actor_id: actorId,
+  })
   return findById(saved.id)
 }
 
-export const update = async (id: string, input: UpdateProjectInput) => {
+export const update = async (id: string, input: UpdateProjectInput, actorId?: string) => {
   const project = await repo().findOne({ where: { id } })
   if (!project) throw new Error('NOT_FOUND')
 
+  const oldStatus = project.status
   Object.assign(project, input)
-  return repo().save(project)
+  const saved = await repo().save(project)
+  await ActivityService.log({
+    action: input.status && input.status !== oldStatus ? 'status_changed' : 'updated',
+    entity_type: 'project',
+    entity_id: id,
+    entity_name: saved.name,
+    actor_id: actorId,
+    metadata:
+      input.status && input.status !== oldStatus
+        ? { old_status: oldStatus, new_status: input.status }
+        : {},
+  })
+  return saved
 }
 
-export const remove = async (id: string) => {
+export const remove = async (id: string, actorId?: string) => {
   const project = await repo().findOne({ where: { id } })
   if (!project) throw new Error('NOT_FOUND')
 
   await repo().remove(project)
+  await ActivityService.log({
+    action: 'deleted',
+    entity_type: 'project',
+    entity_id: id,
+    entity_name: project.name,
+    actor_id: actorId,
+  })
 }
 
-export const addMember = async (projectId: string, input: AddProjectMemberInput) => {
+export const addMember = async (
+  projectId: string,
+  input: AddProjectMemberInput,
+  actorId?: string
+) => {
   const project = await repo().findOne({ where: { id: projectId } })
   if (!project) throw new Error('PROJECT_NOT_FOUND')
 
@@ -228,16 +260,34 @@ export const addMember = async (projectId: string, input: AddProjectMemberInput)
     })
   )
 
+  await ActivityService.log({
+    action: 'member_added',
+    entity_type: 'project_member',
+    entity_id: projectId,
+    entity_name: project.name,
+    actor_id: actorId,
+    metadata: { member_name: user.name, member_id: input.user_id, role: input.role },
+  })
   return findById(projectId)
 }
 
-export const removeMember = async (projectId: string, userId: string) => {
+export const removeMember = async (projectId: string, userId: string, actorId?: string) => {
+  const project = await repo().findOne({ where: { id: projectId } })
+  const user = await userRepo().findOne({ where: { id: userId } })
   const projectMember = await pmRepo().findOne({
     where: { project_id: projectId, user_id: userId },
   })
   if (!projectMember) throw new Error('NOT_FOUND')
 
   await pmRepo().remove(projectMember)
+  await ActivityService.log({
+    action: 'member_removed',
+    entity_type: 'project_member',
+    entity_id: projectId,
+    entity_name: project?.name ?? 'project',
+    actor_id: actorId,
+    metadata: { member_name: user?.name ?? 'a member', member_id: userId },
+  })
 }
 
 export const updateMemberRole = async (projectId: string, userId: string, role: string) => {

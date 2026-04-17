@@ -1,6 +1,7 @@
 import { CreateNoteInput, NoteQuery, UpdateNoteInput } from '@orgsphere/schemas'
 import { AppDataSource } from '../data-source'
 import { Note } from '../entities/Note'
+import * as ActivityService from './activity.service'
 
 const repo = () => AppDataSource.getRepository(Note)
 
@@ -64,6 +65,13 @@ export const create = async (input: CreateNoteInput, userId: string) => {
     user_id: userId,
   })
   const saved = await repo().save(note)
+  await ActivityService.log({
+    action: 'created',
+    entity_type: 'note',
+    entity_id: saved.id,
+    entity_name: saved.title,
+    actor_id: userId,
+  })
   return findById(saved.id, userId)
 }
 
@@ -84,6 +92,13 @@ export const remove = async (id: string, userId: string) => {
   if (!note) throw new Error('NOT_FOUND')
 
   await repo().remove(note)
+  await ActivityService.log({
+    action: 'deleted',
+    entity_type: 'note',
+    entity_id: id,
+    entity_name: note.title,
+    actor_id: userId,
+  })
 }
 
 export const countByUser = async (userId: string) => {

@@ -11,9 +11,11 @@ import {
   MoreHorizontal,
   Sparkles,
 } from 'lucide-react'
+import { ActivityFeed } from '@/components/activity/ActivityFeed'
 import { extractTextFromTiptap, formatRelativeNoteDate } from '@/components/notes/noteUtils'
 import { formatTaskDueDate, getDueTone } from '@/components/tasks/taskUtils'
 import { StatusBadge } from '@/components/shared/StatusBadge'
+import { useActivityFeed } from '@/hooks/useActivity'
 import { useRecentNotes, useNotes } from '@/hooks/useNotes'
 import { useUserProjects } from '@/hooks/useProjects'
 import { useTasks, useTodayTasks, useUpdateTask } from '@/hooks/useTasks'
@@ -92,6 +94,12 @@ export default function MyDashboardPage() {
   const { data: notes } = useNotes({ limit: 100 })
   const { data: recentNotes = [] } = useRecentNotes()
   const { data: userProjects = [], isLoading: projectsLoading } = useUserProjects(currentUser?.id || '')
+  const { data: activityData, isLoading: activityLoading } = useActivityFeed(
+    1,
+    5,
+    currentUser?.id || undefined,
+    Boolean(currentUser?.id)
+  )
 
   const firstName = currentUser?.name.split(' ')[0] || 'there'
   const todayLabel = new Intl.DateTimeFormat('en', {
@@ -287,6 +295,16 @@ export default function MyDashboardPage() {
             You have not been assigned to any projects yet.
           </div>
         )}
+      </section>
+
+      <section className="mt-8">
+        <ActivityFeed
+          items={activityData?.data || []}
+          isLoading={activityLoading}
+          title="My Recent Activity"
+          compact
+          maxHeight="320px"
+        />
       </section>
     </div>
   )

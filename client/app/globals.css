@@ -62,3 +62,33 @@ button:disabled,
 .primary-gradient {
   background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-container) 100%);
 }
+
+.activity-dot-green {
+  background-color: #22c55e;
+  color: #22c55e;
+}
+
+.activity-dot-blue {
+  background-color: #3b82f6;
+  color: #3b82f6;
+}
+
+.activity-dot-red {
+  background-color: #ef4444;
+  color: #ef4444;
+}
+
+.activity-dot-purple {
+  background-color: #8b5cf6;
+  color: #8b5cf6;
+}
+
+.activity-dot-amber {
+  background-color: #f59e0b;
+  color: #f59e0b;
+}
+
+.activity-dot-teal {
+  background-color: #14b8a6;
+  color: #14b8a6;
+}

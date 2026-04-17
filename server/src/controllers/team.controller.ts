@@ -50,9 +50,9 @@ export const create = async (req: AuthRequest, res: Response): Promise<void> => 
   }
 }
 
-export const update = async (req: Request, res: Response): Promise<void> => {
+export const update = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    const team = await TeamService.update(req.params.id, req.body)
+    const team = await TeamService.update(req.params.id, req.body, req.user?.id)
     res.json(team)
   } catch (error) {
     if (error instanceof Error && error.message === 'NOT_FOUND') {
@@ -63,9 +63,9 @@ export const update = async (req: Request, res: Response): Promise<void> => {
   }
 }
 
-export const remove = async (req: Request, res: Response): Promise<void> => {
+export const remove = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    await TeamService.remove(req.params.id)
+    await TeamService.remove(req.params.id, req.user?.id)
     res.json({ message: 'Team deleted successfully' })
   } catch (error) {
     if (error instanceof Error && error.message === 'NOT_FOUND') {
@@ -76,9 +76,9 @@ export const remove = async (req: Request, res: Response): Promise<void> => {
   }
 }
 
-export const addMember = async (req: Request, res: Response): Promise<void> => {
+export const addMember = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    const team = await TeamService.addMember(req.params.id, req.body.user_id)
+    const team = await TeamService.addMember(req.params.id, req.body.user_id, req.user?.id)
     res.json(team)
   } catch (error) {
     const message = error instanceof Error ? error.message : 'UNKNOWN_ERROR'
@@ -91,9 +91,9 @@ export const addMember = async (req: Request, res: Response): Promise<void> => {
   }
 }
 
-export const removeMember = async (req: Request, res: Response): Promise<void> => {
+export const removeMember = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    await TeamService.removeMember(req.params.id, req.params.userId)
+    await TeamService.removeMember(req.params.id, req.params.userId, req.user?.id)
     res.json({ message: 'Member removed successfully' })
   } catch (error) {
     if (error instanceof Error && error.message === 'TEAM_NOT_FOUND') {

@@ -11,7 +11,6 @@ import {
   FileText,
   FolderKanban,
   Mail,
-  MessageSquareText,
   Pencil,
   Plus,
   Share2,
@@ -19,6 +18,7 @@ import {
   UserPlus,
   UsersRound,
 } from 'lucide-react'
+import { ActivityFeed } from '@/components/activity/ActivityFeed'
 import { roleLabels } from '@/components/employees/constants'
 import { AddProjectMemberSearch } from '@/components/projects/AddProjectMemberSearch'
 import { ProjectFormModal } from '@/components/projects/ProjectFormModal'
@@ -29,6 +29,7 @@ import { StatusBadge } from '@/components/shared/StatusBadge'
 import { TechStackChip } from '@/components/shared/TechStackChip'
 import { TaskFormModal } from '@/components/tasks/TaskFormModal'
 import { formatTaskDueDate } from '@/components/tasks/taskUtils'
+import { useEntityActivity } from '@/hooks/useActivity'
 import { useCreateNote, useNotes } from '@/hooks/useNotes'
 import {
   useProject,
@@ -402,20 +403,6 @@ function TeamTab({ project, canEdit }: { project: Project; canEdit: boolean }) {
   )
 }
 
-function ComingSoon({ icon: Icon, title, description }: { icon: typeof FolderKanban; title: string; description: string }) {
-  return (
-    <section className="rounded-3xl bg-[color:var(--color-surface-card)] p-10 shadow-[var(--shadow-card)]">
-      <div className="mx-auto flex max-w-md flex-col items-center text-center">
-        <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[color:var(--color-primary-light)] text-[color:var(--color-primary)]">
-          <Icon size={26} />
-        </span>
-        <h2 className="mt-5 text-xl font-black text-[color:var(--color-text-primary)]">{title}</h2>
-        <p className="mt-2 text-sm leading-6 text-[color:var(--color-text-secondary)]">{description}</p>
-      </div>
-    </section>
-  )
-}
-
 function ProjectTasksTab({ projectId }: { projectId: string }) {
   const [filter, setFilter] = useState<TaskStatus | ''>('')
   const [modalOpen, setModalOpen] = useState(false)
@@ -599,6 +586,20 @@ function ProjectNotesTab({ projectId }: { projectId: string }) {
   )
 }
 
+function ProjectActivityTab({ project }: { project: Project }) {
+  const { data: activity = [], isLoading } = useEntityActivity('project', project.id)
+
+  return (
+    <ActivityFeed
+      items={activity}
+      isLoading={isLoading}
+      title={`${project.name} Activity`}
+      compact
+      maxHeight="560px"
+    />
+  )
+}
+
 export default function ProjectDetailPage() {
   const params = useParams<{ id: string }>()
   const router = useRouter()
@@ -696,9 +697,7 @@ export default function ProjectDetailPage() {
         {activeTab === 'team' ? <TeamTab project={project} canEdit={canEdit} /> : null}
         {activeTab === 'tasks' ? <ProjectTasksTab projectId={project.id} /> : null}
         {activeTab === 'notes' ? <ProjectNotesTab projectId={project.id} /> : null}
-        {activeTab === 'activity' ? (
-          <ComingSoon icon={MessageSquareText} title="Activity arrives in Phase 7" description="Audit history and collaboration events will appear here later." />
-        ) : null}
+        {activeTab === 'activity' ? <ProjectActivityTab project={project} /> : null}
       </div>
 
       <ProjectFormModal open={editOpen} onClose={() => setEditOpen(false)} project={project} />

@@ -37,9 +37,9 @@ export const getOne = async (req: Request, res: Response): Promise<void> => {
   }
 }
 
-export const create = async (req: Request, res: Response): Promise<void> => {
+export const create = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    const user = await EmployeeService.create(req.body)
+    const user = await EmployeeService.create(req.body, req.user?.id)
     res.status(201).json(EmployeeService.sanitize(user))
   } catch (error) {
     if (error instanceof Error && error.message === 'EMAIL_EXISTS') {
@@ -50,9 +50,9 @@ export const create = async (req: Request, res: Response): Promise<void> => {
   }
 }
 
-export const update = async (req: Request, res: Response): Promise<void> => {
+export const update = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    const user = await EmployeeService.update(req.params.id, req.body)
+    const user = await EmployeeService.update(req.params.id, req.body, req.user?.id)
     res.json(EmployeeService.sanitize(user))
   } catch (error) {
     if (error instanceof Error && error.message === 'NOT_FOUND') {
@@ -71,7 +71,7 @@ export const uploadAvatar = async (req: AuthRequest, res: Response): Promise<voi
     }
 
     const avatarPath = `uploads/avatars/${req.file.filename}`
-    await EmployeeService.updateAvatar(req.params.id, avatarPath)
+    await EmployeeService.updateAvatar(req.params.id, avatarPath, req.user?.id)
     res.json({ avatar_path: avatarPath, url: `http://localhost:4000/${avatarPath}` })
   } catch (error) {
     if (error instanceof Error && error.message === 'NOT_FOUND') {
@@ -89,7 +89,7 @@ export const remove = async (req: AuthRequest, res: Response): Promise<void> => 
       return
     }
 
-    await EmployeeService.remove(req.params.id)
+    await EmployeeService.remove(req.params.id, req.user?.id)
     res.json({ message: 'Employee deactivated successfully' })
   } catch (error) {
     if (error instanceof Error && error.message === 'NOT_FOUND') {
@@ -108,4 +108,3 @@ export const getSkills = async (_req: Request, res: Response): Promise<void> => 
     sendServerError(res, 'Failed to fetch skills')
   }
 }
-

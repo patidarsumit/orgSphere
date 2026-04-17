@@ -3,6 +3,7 @@ import cookieParser from 'cookie-parser'
 import cors from 'cors'
 import express from 'express'
 import path from 'path'
+import activityRoutes from './routes/activity.routes'
 import authRoutes from './routes/auth.routes'
 import dashboardRoutes from './routes/dashboard.routes'
 import employeeRoutes from './routes/employee.routes'
@@ -26,6 +27,7 @@ app.use(cookieParser())
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')))
 
 app.use('/api/auth', authRoutes)
+app.use('/api/activity', activityRoutes)
 app.use('/api/dashboard', dashboardRoutes)
 app.use('/api/employees', employeeRoutes)
 app.use('/api/projects', projectRoutes)

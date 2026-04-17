@@ -3,6 +3,7 @@ import { AppDataSource } from '../data-source'
 import { Team } from '../entities/Team'
 import { Project } from '../entities/Project'
 import { User } from '../entities/User'
+import * as ActivityService from './activity.service'
 
 const repo = () => AppDataSource.getRepository(Team)
 const userRepo = () => AppDataSource.getRepository(User)
@@ -123,25 +124,47 @@ export const create = async (input: CreateTeamInput, creatorId: string) => {
     await repo().save(saved)
   }
 
+  await ActivityService.log({
+    action: 'created',
+    entity_type: 'team',
+    entity_id: saved.id,
+    entity_name: saved.name,
+    actor_id: creatorId,
+  })
   return findById(saved.id)
 }
 
-export const update = async (id: string, input: UpdateTeamInput) => {
+export const update = async (id: string, input: UpdateTeamInput, actorId?: string) => {
   const team = await repo().findOne({ where: { id } })
   if (!team) throw new Error('NOT_FOUND')
 
   Object.assign(team, input)
-  return repo().save(team)
+  const saved = await repo().save(team)
+  await ActivityService.log({
+    action: 'updated',
+    entity_type: 'team',
+    entity_id: id,
+    entity_name: saved.name,
+    actor_id: actorId,
+  })
+  return saved
 }
 
-export const remove = async (id: string) => {
+export const remove = async (id: string, actorId?: string) => {
   const team = await repo().findOne({ where: { id } })
   if (!team) throw new Error('NOT_FOUND')
 
   await repo().remove(team)
+  await ActivityService.log({
+    action: 'deleted',
+    entity_type: 'team',
+    entity_id: id,
+    entity_name: team.name,
+    actor_id: actorId,
+  })
 }
 
-export const addMember = async (teamId: string, userId: string) => {
+export const addMember = async (teamId: string, userId: string, actorId?: string) => {
   const team = await repo()
     .createQueryBuilder('team')
     .leftJoinAndSelect('team.members', 'member')
@@ -159,10 +182,18 @@ export const addMember = async (teamId: string, userId: string) => {
 
   team.members = [...team.members, user]
   await repo().save(team)
+  await ActivityService.log({
+    action: 'member_added',
+    entity_type: 'team_member',
+    entity_id: teamId,
+    entity_name: team.name,
+    actor_id: actorId,
+    metadata: { member_name: user.name, member_id: userId },
+  })
   return findById(teamId)
 }
 
-export const removeMember = async (teamId: string, userId: string) => {
+export const removeMember = async (teamId: string, userId: string, actorId?: string) => {
   const team = await repo()
     .createQueryBuilder('team')
     .leftJoinAndSelect('team.members', 'member')
@@ -171,8 +202,17 @@ export const removeMember = async (teamId: string, userId: string) => {
 
   if (!team) throw new Error('TEAM_NOT_FOUND')
 
+  const removedUser = team.members.find((member) => member.id === userId)
   team.members = team.members.filter((member) => member.id !== userId)
   await repo().save(team)
+  await ActivityService.log({
+    action: 'member_removed',
+    entity_type: 'team_member',
+    entity_id: teamId,
+    entity_name: team.name,
+    actor_id: actorId,
+    metadata: { member_name: removedUser?.name ?? 'a member', member_id: userId },
+  })
 }
 
 export const getTeamsByUserId = async (userId: string) => {

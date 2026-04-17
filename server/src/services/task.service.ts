@@ -1,6 +1,7 @@
 import { CreateTaskInput, TaskQuery, UpdateTaskInput } from '@orgsphere/schemas'
 import { AppDataSource } from '../data-source'
 import { Task } from '../entities/Task'
+import * as ActivityService from './activity.service'
 
 const repo = () => AppDataSource.getRepository(Task)
 
@@ -113,6 +114,13 @@ export const create = async (input: CreateTaskInput, userId: string) => {
     created_by: userId,
   })
   const saved = await repo().save(task)
+  await ActivityService.log({
+    action: 'created',
+    entity_type: 'task',
+    entity_id: saved.id,
+    entity_name: saved.title,
+    actor_id: userId,
+  })
   return findById(saved.id, userId)
 }
 
@@ -122,6 +130,7 @@ export const update = async (id: string, userId: string, input: UpdateTaskInput)
   })
   if (!task) throw new Error('NOT_FOUND')
 
+  const oldStatus = task.status
   Object.assign(task, {
     ...input,
     description: input.description === undefined ? task.description : input.description,
@@ -129,6 +138,32 @@ export const update = async (id: string, userId: string, input: UpdateTaskInput)
     project_id: input.project_id === undefined ? task.project_id : input.project_id || null,
   })
   await repo().save(task)
+  if (input.status === 'done' && oldStatus !== 'done') {
+    await ActivityService.log({
+      action: 'completed',
+      entity_type: 'task',
+      entity_id: id,
+      entity_name: task.title,
+      actor_id: userId,
+    })
+  } else if (input.status && input.status !== oldStatus) {
+    await ActivityService.log({
+      action: 'status_changed',
+      entity_type: 'task',
+      entity_id: id,
+      entity_name: task.title,
+      actor_id: userId,
+      metadata: { old_status: oldStatus, new_status: input.status },
+    })
+  } else {
+    await ActivityService.log({
+      action: 'updated',
+      entity_type: 'task',
+      entity_id: id,
+      entity_name: task.title,
+      actor_id: userId,
+    })
+  }
   return findById(id, userId)
 }
 
@@ -139,6 +174,13 @@ export const remove = async (id: string, userId: string) => {
   if (!task) throw new Error('NOT_FOUND')
 
   await repo().remove(task)
+  await ActivityService.log({
+    action: 'deleted',
+    entity_type: 'task',
+    entity_id: id,
+    entity_name: task.title,
+    actor_id: userId,
+  })
 }
 
 export const countOpenByUser = async (userId: string) => {

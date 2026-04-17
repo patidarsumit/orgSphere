@@ -1,6 +1,7 @@
 import { Request, Response } from 'express'
 import { ZodError, z } from 'zod'
 import { projectQuerySchema } from '@orgsphere/schemas'
+import { AuthRequest } from '../middleware/auth'
 import * as ProjectService from '../services/project.service'
 
 const memberRoleSchema = z.object({
@@ -65,18 +66,18 @@ export const getRecent = async (_req: Request, res: Response): Promise<void> => 
   }
 }
 
-export const create = async (req: Request, res: Response): Promise<void> => {
+export const create = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    const project = await ProjectService.create(req.body)
+    const project = await ProjectService.create(req.body, req.user?.id)
     res.status(201).json(project)
   } catch {
     sendServerError(res, 'Failed to create project')
   }
 }
 
-export const update = async (req: Request, res: Response): Promise<void> => {
+export const update = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    const project = await ProjectService.update(req.params.id, req.body)
+    const project = await ProjectService.update(req.params.id, req.body, req.user?.id)
     res.json(project)
   } catch (error) {
     if (error instanceof Error && error.message === 'NOT_FOUND') {
@@ -87,9 +88,9 @@ export const update = async (req: Request, res: Response): Promise<void> => {
   }
 }
 
-export const remove = async (req: Request, res: Response): Promise<void> => {
+export const remove = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    await ProjectService.remove(req.params.id)
+    await ProjectService.remove(req.params.id, req.user?.id)
     res.json({ message: 'Project deleted successfully' })
   } catch (error) {
     if (error instanceof Error && error.message === 'NOT_FOUND') {
@@ -100,9 +101,9 @@ export const remove = async (req: Request, res: Response): Promise<void> => {
   }
 }
 
-export const addMember = async (req: Request, res: Response): Promise<void> => {
+export const addMember = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    const project = await ProjectService.addMember(req.params.id, req.body)
+    const project = await ProjectService.addMember(req.params.id, req.body, req.user?.id)
     res.status(201).json(project)
   } catch (error) {
     const message = error instanceof Error ? error.message : 'UNKNOWN_ERROR'
@@ -115,9 +116,9 @@ export const addMember = async (req: Request, res: Response): Promise<void> => {
   }
 }
 
-export const removeMember = async (req: Request, res: Response): Promise<void> => {
+export const removeMember = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    await ProjectService.removeMember(req.params.id, req.params.userId)
+    await ProjectService.removeMember(req.params.id, req.params.userId, req.user?.id)
     res.json({ message: 'Member removed successfully' })
   } catch (error) {
     if (error instanceof Error && error.message === 'NOT_FOUND') {
