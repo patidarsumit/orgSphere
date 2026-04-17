@@ -27,9 +27,10 @@ import { TechStackChip } from '@/components/shared/TechStackChip'
 import {
   useProject,
   useRemoveProjectMember,
+  useUpdateProjectMemberRole,
 } from '@/hooks/useProjects'
 import { RootState } from '@/store'
-import { Project } from '@/types'
+import { Project, ProjectMember } from '@/types'
 
 type ProjectTab = 'overview' | 'team' | 'tasks' | 'notes' | 'activity'
 
@@ -186,6 +187,64 @@ function OverviewTab({ project, onTeamTab }: { project: Project; onTeamTab: () =
   )
 }
 
+function ProjectRoleEditor({
+  member,
+  canEdit,
+  projectId,
+}: {
+  member: ProjectMember
+  canEdit: boolean
+  projectId: string
+}) {
+  const [editing, setEditing] = useState(false)
+  const [role, setRole] = useState(member.role)
+  const updateRole = useUpdateProjectMemberRole(projectId)
+
+  const saveRole = async () => {
+    const nextRole = role.trim()
+    if (nextRole && nextRole !== member.role) {
+      await updateRole.mutateAsync({ userId: member.user_id, role: nextRole })
+    } else {
+      setRole(member.role)
+    }
+    setEditing(false)
+  }
+
+  if (!canEdit || !editing) {
+    return (
+      <button
+        type="button"
+        onClick={() => canEdit && setEditing(true)}
+        className={`max-w-full truncate text-[11px] font-bold text-[color:var(--color-text-primary)] ${
+          canEdit ? 'cursor-pointer hover:text-[color:var(--color-primary)]' : 'cursor-default'
+        }`}
+        title={canEdit ? 'Edit project role' : undefined}
+      >
+        {member.role}
+      </button>
+    )
+  }
+
+  return (
+    <input
+      value={role}
+      onChange={(event) => setRole(event.target.value)}
+      onBlur={() => void saveRole()}
+      onKeyDown={(event) => {
+        if (event.key === 'Enter') {
+          void saveRole()
+        }
+        if (event.key === 'Escape') {
+          setRole(member.role)
+          setEditing(false)
+        }
+      }}
+      autoFocus
+      className="h-7 w-full rounded-lg border border-[color:var(--color-border)] bg-white px-2 text-center text-[11px] font-bold text-[color:var(--color-text-primary)] outline-none focus:ring-2 focus:ring-[color:var(--color-primary)]/20"
+    />
+  )
+}
+
 function TeamTab({ project, canEdit }: { project: Project; canEdit: boolean }) {
   const removeMember = useRemoveProjectMember(project.id)
   const existingMemberIds = project.project_members.map((member) => member.user_id)
@@ -228,11 +287,9 @@ function TeamTab({ project, canEdit }: { project: Project; canEdit: boolean }) {
               <div className="my-6 grid w-full grid-cols-2 gap-2">
                 <div className="rounded-lg bg-[color:var(--color-surface-low)] p-2">
                   <p className="text-[10px] font-black uppercase text-[color:var(--color-text-tertiary)]">
-                    Role
+                    Project Role
                   </p>
-                  <p className="truncate text-xs font-bold text-[color:var(--color-text-primary)]">
-                    {member.role}
-                  </p>
+                  <ProjectRoleEditor member={member} canEdit={canEdit} projectId={project.id} />
                 </div>
                 <div className="rounded-lg bg-[color:var(--color-surface-low)] p-2">
                   <p className="text-[10px] font-black uppercase text-[color:var(--color-text-tertiary)]">
