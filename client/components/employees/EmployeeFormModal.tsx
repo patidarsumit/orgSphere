@@ -4,7 +4,6 @@ import { ChangeEvent, useState } from 'react'
 import { isAxiosError } from 'axios'
 import { Search, X } from 'lucide-react'
 import { useForm } from 'react-hook-form'
-import { useDispatch } from 'react-redux'
 import { ZodError } from 'zod'
 import { createEmployeeSchema, updateEmployeeSchema } from '@orgsphere/schemas'
 import { Avatar } from '@/components/shared/Avatar'
@@ -14,7 +13,7 @@ import {
   useUpdateEmployee,
   useUploadEmployeeAvatar,
 } from '@/hooks/useEmployees'
-import { addToast } from '@/store/slices/uiSlice'
+import { appToast } from '@/lib/toast'
 import { Employee } from '@/types'
 import { employeeRoles, roleLabels } from './constants'
 
@@ -76,7 +75,6 @@ export function EmployeeFormModal({ open, employee, onClose }: EmployeeFormModal
 }
 
 function EmployeeFormModalContent({ employee, onClose }: Omit<EmployeeFormModalProps, 'open'>) {
-  const dispatch = useDispatch()
   const [skills, setSkills] = useState<string[]>(() => employee?.skills || [])
   const [skillInput, setSkillInput] = useState('')
   const [formError, setFormError] = useState<string | null>(null)
@@ -132,9 +130,11 @@ function EmployeeFormModalContent({ employee, onClose }: Omit<EmployeeFormModalP
     try {
       const result = await uploadAvatar.mutateAsync(file)
       setAvatarPath(result.avatar_path)
-      dispatch(addToast({ type: 'success', message: 'Avatar updated' }))
+      appToast.success('Avatar updated')
     } catch (error) {
-      setFormError(errorMessage(error, 'Failed to upload avatar'))
+      const message = errorMessage(error, 'Failed to upload avatar')
+      setFormError(message)
+      appToast.error(message)
     }
   }
 
@@ -151,7 +151,7 @@ function EmployeeFormModalContent({ employee, onClose }: Omit<EmployeeFormModalP
           skills,
         })
         await updateEmployee.mutateAsync(payload)
-        dispatch(addToast({ type: 'success', message: 'Employee updated' }))
+        appToast.success('Employee updated')
       } else {
         const payload = createEmployeeSchema.parse({
           name: values.name,
@@ -163,7 +163,7 @@ function EmployeeFormModalContent({ employee, onClose }: Omit<EmployeeFormModalP
           skills,
         })
         await createEmployee.mutateAsync(payload)
-        dispatch(addToast({ type: 'success', message: 'Employee created' }))
+        appToast.success('Employee created')
       }
       onClose()
     } catch (error) {
@@ -181,10 +181,14 @@ function EmployeeFormModalContent({ employee, onClose }: Omit<EmployeeFormModalP
             setError(fieldName, { type: 'validate', message: issue.message })
           }
         })
-        setFormError(error.issues[0]?.message || 'Please check the form details')
+        const message = error.issues[0]?.message || 'Please check the form details'
+        setFormError(message)
+        appToast.warning(message)
         return
       }
-      setFormError(errorMessage(error, 'Unable to save employee'))
+      const message = errorMessage(error, 'Unable to save employee')
+      setFormError(message)
+      appToast.error(message)
     }
   }
 

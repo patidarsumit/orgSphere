@@ -5,11 +5,10 @@ import { isAxiosError } from 'axios'
 import { X } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
-import { useDispatch } from 'react-redux'
 import { ZodError } from 'zod'
 import { createTeamSchema, updateTeamSchema } from '@orgsphere/schemas'
 import { useCreateTeam, useUpdateTeam } from '@/hooks/useTeams'
-import { addToast } from '@/store/slices/uiSlice'
+import { appToast } from '@/lib/toast'
 import { Team } from '@/types'
 
 interface TeamFormModalProps {
@@ -59,7 +58,6 @@ export function TeamFormModal({ open, onClose, team }: TeamFormModalProps) {
 
 function TeamFormModalContent({ onClose, team }: Omit<TeamFormModalProps, 'open'>) {
   const router = useRouter()
-  const dispatch = useDispatch()
   const createTeam = useCreateTeam()
   const updateTeam = useUpdateTeam(team?.id || '')
   const [formError, setFormError] = useState<string | null>(null)
@@ -81,7 +79,7 @@ function TeamFormModalContent({ onClose, team }: Omit<TeamFormModalProps, 'open'
           description: values.description || null,
         })
         await updateTeam.mutateAsync(payload)
-        dispatch(addToast({ type: 'success', message: 'Team updated' }))
+        appToast.success('Team updated')
         onClose()
         return
       }
@@ -91,7 +89,7 @@ function TeamFormModalContent({ onClose, team }: Omit<TeamFormModalProps, 'open'
         description: values.description || undefined,
       })
       const createdTeam = await createTeam.mutateAsync(payload)
-      dispatch(addToast({ type: 'success', message: 'Team created' }))
+      appToast.success('Team created')
       onClose()
       router.push(`/teams/${createdTeam.id}`)
     } catch (error) {
@@ -102,11 +100,15 @@ function TeamFormModalContent({ onClose, team }: Omit<TeamFormModalProps, 'open'
             setError(fieldName, { type: 'validate', message: issue.message })
           }
         })
-        setFormError(error.issues[0]?.message || 'Please check the form details')
+        const message = error.issues[0]?.message || 'Please check the form details'
+        setFormError(message)
+        appToast.warning(message)
         return
       }
 
-      setFormError(errorMessage(error, 'Unable to save team'))
+      const message = errorMessage(error, 'Unable to save team')
+      setFormError(message)
+      appToast.error(message)
     }
   }
 

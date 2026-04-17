@@ -6,6 +6,7 @@ import { roleLabels } from '@/components/employees/constants'
 import { Avatar } from '@/components/shared/Avatar'
 import { useEmployees } from '@/hooks/useEmployees'
 import { useAddTeamMember } from '@/hooks/useTeams'
+import { appToast, getToastErrorMessage } from '@/lib/toast'
 import { User } from '@/types'
 
 interface AddMemberSearchProps {
@@ -50,11 +51,16 @@ export function AddMemberSearch({
   )
 
   const addSelectedMember = async (employee: User) => {
-    await addMember.mutateAsync(employee.id)
-    setQuery('')
-    setActiveIndex(0)
-    setOpen(false)
-    onMemberAdded?.()
+    try {
+      await addMember.mutateAsync(employee.id)
+      appToast.success(`${employee.name} added to team`)
+      setQuery('')
+      setActiveIndex(0)
+      setOpen(false)
+      onMemberAdded?.()
+    } catch (error) {
+      appToast.error(getToastErrorMessage(error, 'Unable to add team member'))
+    }
   }
 
   const onKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {

@@ -8,6 +8,7 @@ import { X } from 'lucide-react'
 import { useSelector } from 'react-redux'
 import { useCreateTask, useUpdateTask } from '@/hooks/useTasks'
 import { useUserProjects } from '@/hooks/useProjects'
+import { appToast, getToastErrorMessage } from '@/lib/toast'
 import { RootState } from '@/store'
 import { Task } from '@/types'
 
@@ -57,12 +58,18 @@ export function TaskFormModal({ open, onClose, task, defaults }: TaskFormModalPr
   if (!open) return null
 
   const onSubmit = async (values: CreateTaskInput) => {
-    if (task) {
-      await updateTask.mutateAsync({ id: task.id, ...values })
-    } else {
-      await createTask.mutateAsync(values)
+    try {
+      if (task) {
+        await updateTask.mutateAsync({ id: task.id, ...values })
+        appToast.success('Task updated')
+      } else {
+        await createTask.mutateAsync(values)
+        appToast.success('Task created')
+      }
+      onClose()
+    } catch (error) {
+      appToast.error(getToastErrorMessage(error, task ? 'Unable to update task' : 'Unable to create task'))
     }
-    onClose()
   }
 
   return (

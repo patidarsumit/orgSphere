@@ -6,6 +6,7 @@ import { roleLabels } from '@/components/employees/constants'
 import { Avatar } from '@/components/shared/Avatar'
 import { useEmployees } from '@/hooks/useEmployees'
 import { useAddProjectMember } from '@/hooks/useProjects'
+import { appToast, getToastErrorMessage } from '@/lib/toast'
 import { User } from '@/types'
 
 interface AddProjectMemberSearchProps {
@@ -49,11 +50,16 @@ export function AddProjectMemberSearch({
   )
 
   const addSelectedMember = async (employee: User) => {
-    await addMember.mutateAsync({ user_id: employee.id, role: role.trim() || 'Member' })
-    setQuery('')
-    setRole('Member')
-    setActiveIndex(0)
-    setOpen(false)
+    try {
+      await addMember.mutateAsync({ user_id: employee.id, role: role.trim() || 'Member' })
+      appToast.success(`${employee.name} added to project`)
+      setQuery('')
+      setRole('Member')
+      setActiveIndex(0)
+      setOpen(false)
+    } catch (error) {
+      appToast.error(getToastErrorMessage(error, 'Unable to add project member'))
+    }
   }
 
   const onKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {

@@ -22,6 +22,7 @@ import { SkillsFilter } from '@/components/employees/SkillsFilter'
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog'
 import { EmptyState } from '@/components/shared/EmptyState'
 import { useDeactivateEmployee, useEmployees } from '@/hooks/useEmployees'
+import { appToast, getToastErrorMessage } from '@/lib/toast'
 import { RootState } from '@/store'
 import { Employee, UserRole } from '@/types'
 
@@ -158,6 +159,15 @@ export default function EmployeesPage() {
     setSkill('')
   }
 
+  const refreshEmployees = async () => {
+    try {
+      await refetch()
+      appToast.success('Employees refreshed')
+    } catch {
+      appToast.error('Unable to refresh employees')
+    }
+  }
+
   const openCreateModal = () => {
     setEditingEmployee(undefined)
     setModalOpen(true)
@@ -177,8 +187,13 @@ export default function EmployeesPage() {
     if (!deactivateTarget) {
       return
     }
-    await deactivateEmployee.mutateAsync(deactivateTarget.id)
-    setDeactivateTarget(undefined)
+    try {
+      await deactivateEmployee.mutateAsync(deactivateTarget.id)
+      appToast.success(`${deactivateTarget.name} deactivated`)
+      setDeactivateTarget(undefined)
+    } catch (error) {
+      appToast.error(getToastErrorMessage(error, 'Unable to deactivate employee'))
+    }
   }
 
   const hasFilters = Boolean(search || role || skill)
@@ -267,7 +282,7 @@ export default function EmployeesPage() {
           ) : null}
           <button
             type="button"
-            onClick={() => void refetch()}
+            onClick={() => void refreshEmployees()}
             className="flex h-12 w-12 items-center justify-center rounded-xl bg-[color:var(--color-surface-card)] text-[color:var(--color-text-secondary)] shadow-sm transition-colors hover:text-[color:var(--color-primary)]"
             aria-label="Refresh employee list"
             title="Refresh employees"

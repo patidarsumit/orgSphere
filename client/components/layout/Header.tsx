@@ -9,6 +9,7 @@ import { ActivityFeedItem } from '@/components/activity/ActivityFeedItem'
 import { Avatar } from '@/components/shared/Avatar'
 import { useActivityFeed, useMarkAllRead, useUnreadCount } from '@/hooks/useActivity'
 import api from '@/lib/axios'
+import { appToast } from '@/lib/toast'
 import { RootState } from '@/store'
 import { clearAuth } from '@/store/slices/authSlice'
 import { toggleSidebar } from '@/store/slices/uiSlice'
@@ -70,7 +71,10 @@ export function Header() {
   }
 
   const markReadAndClose = () => {
-    markAllRead.mutate()
+    markAllRead.mutate(undefined, {
+      onSuccess: () => appToast.info('Notifications marked as read'),
+      onError: () => appToast.error('Unable to mark notifications as read'),
+    })
     setBellOpen(false)
   }
 

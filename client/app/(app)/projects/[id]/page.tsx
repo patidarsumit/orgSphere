@@ -37,6 +37,7 @@ import {
   useUpdateProjectMemberRole,
 } from '@/hooks/useProjects'
 import { useProjectTasks, useUpdateTask } from '@/hooks/useTasks'
+import { appToast, getToastErrorMessage } from '@/lib/toast'
 import { RootState } from '@/store'
 import { Project, ProjectMember, TaskStatus } from '@/types'
 
@@ -210,12 +211,19 @@ function ProjectRoleEditor({
 
   const saveRole = async () => {
     const nextRole = role.trim()
-    if (nextRole && nextRole !== member.role) {
-      await updateRole.mutateAsync({ userId: member.user_id, role: nextRole })
-    } else {
+    try {
+      if (nextRole && nextRole !== member.role) {
+        await updateRole.mutateAsync({ userId: member.user_id, role: nextRole })
+        appToast.success('Project role updated')
+      } else {
+        setRole(member.role)
+      }
+      setEditing(false)
+    } catch (error) {
       setRole(member.role)
+      setEditing(false)
+      appToast.error(getToastErrorMessage(error, 'Unable to update project role'))
     }
-    setEditing(false)
   }
 
   if (!canEdit || !editing) {
@@ -259,6 +267,15 @@ function TeamTab({ project, canEdit }: { project: Project; canEdit: boolean }) {
   const activeDepartments = Array.from(
     new Set(project.project_members.map((member) => member.user.department).filter(Boolean))
   )
+
+  const removeProjectMember = async (member: ProjectMember) => {
+    try {
+      await removeMember.mutateAsync(member.user_id)
+      appToast.success(`${member.user.name} removed from project`)
+    } catch (error) {
+      appToast.error(getToastErrorMessage(error, 'Unable to remove project member'))
+    }
+  }
 
   return (
     <div className="space-y-8">
@@ -318,7 +335,7 @@ function TeamTab({ project, canEdit }: { project: Project; canEdit: boolean }) {
                 {canEdit ? (
                   <button
                     type="button"
-                    onClick={() => void removeMember.mutateAsync(member.user_id)}
+                    onClick={() => void removeProjectMember(member)}
                     className="text-xs font-bold text-red-600 hover:underline"
                   >
                     Remove
@@ -410,6 +427,15 @@ function ProjectTasksTab({ projectId }: { projectId: string }) {
   const updateTask = useUpdateTask()
   const tasks = data?.data || []
 
+  const toggleTaskStatus = async (taskId: string, isDone: boolean) => {
+    try {
+      await updateTask.mutateAsync({ id: taskId, status: isDone ? 'todo' : 'done' })
+      appToast.success(isDone ? 'Task reopened' : 'Task marked done')
+    } catch (error) {
+      appToast.error(getToastErrorMessage(error, 'Unable to update task'))
+    }
+  }
+
   return (
     <section className="rounded-3xl bg-white p-6 shadow-[var(--shadow-card)]">
       <div className="mb-5 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -466,7 +492,7 @@ function ProjectTasksTab({ projectId }: { projectId: string }) {
             <div key={task.id} className="flex flex-wrap items-center gap-3 px-4 py-3 hover:bg-[color:var(--color-surface-low)]">
               <button
                 type="button"
-                onClick={() => void updateTask.mutateAsync({ id: task.id, status: task.status === 'done' ? 'todo' : 'done' })}
+                onClick={() => void toggleTaskStatus(task.id, task.status === 'done')}
                 className={`h-5 w-5 rounded-full border ${task.status === 'done' ? 'border-green-600 bg-green-600' : 'border-[color:var(--color-border-strong)] bg-white'}`}
                 aria-label="Toggle task"
               />
@@ -513,13 +539,18 @@ function ProjectNotesTab({ projectId }: { projectId: string }) {
   const notes = data?.data || []
 
   const addNote = async () => {
-    const note = await createNote.mutateAsync({
-      title: 'Untitled project note',
-      content: { type: 'doc', content: [{ type: 'paragraph' }] },
-      tags: ['Project'],
-      project_id: projectId,
-    })
-    router.push(`/my/notes?note=${note.id}`)
+    try {
+      const note = await createNote.mutateAsync({
+        title: 'Untitled project note',
+        content: { type: 'doc', content: [{ type: 'paragraph' }] },
+        tags: ['Project'],
+        project_id: projectId,
+      })
+      appToast.success('Project note created')
+      router.push(`/my/notes?note=${note.id}`)
+    } catch (error) {
+      appToast.error(getToastErrorMessage(error, 'Unable to create project note'))
+    }
   }
 
   return (

@@ -5,14 +5,13 @@ import { useRouter } from 'next/navigation'
 import { isAxiosError } from 'axios'
 import { Plus, X } from 'lucide-react'
 import { UseFormRegister, useForm } from 'react-hook-form'
-import { useDispatch } from 'react-redux'
 import { ZodError } from 'zod'
 import { createProjectSchema, updateProjectSchema } from '@orgsphere/schemas'
 import { TechStackChip } from '@/components/shared/TechStackChip'
 import { useEmployees } from '@/hooks/useEmployees'
 import { useCreateProject, useUpdateProject } from '@/hooks/useProjects'
 import { useTeams } from '@/hooks/useTeams'
-import { addToast } from '@/store/slices/uiSlice'
+import { appToast } from '@/lib/toast'
 import { Project, ProjectStatus } from '@/types'
 import { commonTech, projectStatusOptions } from './projectUtils'
 
@@ -78,7 +77,6 @@ export function ProjectFormModal({ open, onClose, project }: ProjectFormModalPro
 
 function ProjectFormModalContent({ onClose, project }: Omit<ProjectFormModalProps, 'open'>) {
   const router = useRouter()
-  const dispatch = useDispatch()
   const [techStack, setTechStack] = useState<string[]>(() => project?.tech_stack || [])
   const [techInput, setTechInput] = useState('')
   const [formError, setFormError] = useState<string | null>(null)
@@ -140,14 +138,14 @@ function ProjectFormModalContent({ onClose, project }: Omit<ProjectFormModalProp
           start_date: values.start_date || null,
         })
         await updateProject.mutateAsync(payload)
-        dispatch(addToast({ type: 'success', message: 'Project updated' }))
+        appToast.success('Project updated')
         onClose()
         return
       }
 
       const payload = createProjectSchema.parse(rawPayload)
       const createdProject = await createProject.mutateAsync(payload)
-      dispatch(addToast({ type: 'success', message: 'Project created' }))
+      appToast.success('Project created')
       onClose()
       router.push(`/projects/${createdProject.id}`)
     } catch (error) {
@@ -166,10 +164,14 @@ function ProjectFormModalContent({ onClose, project }: Omit<ProjectFormModalProp
             setError(fieldName, { type: 'validate', message: issue.message })
           }
         })
-        setFormError(error.issues[0]?.message || 'Please check the project details')
+        const message = error.issues[0]?.message || 'Please check the project details'
+        setFormError(message)
+        appToast.warning(message)
         return
       }
-      setFormError(errorMessage(error, 'Unable to save project'))
+      const message = errorMessage(error, 'Unable to save project')
+      setFormError(message)
+      appToast.error(message)
     }
   }
 

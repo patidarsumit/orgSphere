@@ -26,6 +26,7 @@ import { StatusBadge } from '@/components/shared/StatusBadge'
 import { TechStackChip } from '@/components/shared/TechStackChip'
 import { useTeamProjects } from '@/hooks/useProjects'
 import { useDeleteTeam, useRemoveTeamMember, useTeam } from '@/hooks/useTeams'
+import { appToast, getToastErrorMessage } from '@/lib/toast'
 import { RootState } from '@/store'
 import { TeamMember } from '@/types'
 
@@ -151,13 +152,23 @@ export default function TeamDetailPage() {
     if (!removeTarget) {
       return
     }
-    await removeMember.mutateAsync(removeTarget.id)
-    setRemoveTarget(null)
+    try {
+      await removeMember.mutateAsync(removeTarget.id)
+      appToast.success(`${removeTarget.name} removed from team`)
+      setRemoveTarget(null)
+    } catch (error) {
+      appToast.error(getToastErrorMessage(error, 'Unable to remove team member'))
+    }
   }
   const onConfirmDelete = async () => {
-    await deleteTeam.mutateAsync(team.id)
-    setDeleteOpen(false)
-    router.push('/teams')
+    try {
+      await deleteTeam.mutateAsync(team.id)
+      appToast.success('Team deleted')
+      setDeleteOpen(false)
+      router.push('/teams')
+    } catch (error) {
+      appToast.error(getToastErrorMessage(error, 'Unable to delete team'))
+    }
   }
 
   return (

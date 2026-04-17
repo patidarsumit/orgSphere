@@ -10,9 +10,9 @@ import { useForm } from 'react-hook-form'
 import { useDispatch, useSelector } from 'react-redux'
 import { LoginInput, loginSchema, UserResponse } from '@orgsphere/schemas'
 import api from '@/lib/axios'
+import { appToast } from '@/lib/toast'
 import { RootState } from '@/store'
 import { setCredentials } from '@/store/slices/authSlice'
-import { addToast } from '@/store/slices/uiSlice'
 
 interface LoginResponse {
   user: UserResponse
@@ -52,7 +52,6 @@ export default function LoginPage() {
   const router = useRouter()
   const isAuthenticated = useSelector((state: RootState) => state.auth.isAuthenticated)
   const [showPassword, setShowPassword] = useState(false)
-  const [toastMessage, setToastMessage] = useState<string | null>(null)
   const [checkingSession, setCheckingSession] = useState(true)
 
   const {
@@ -78,8 +77,7 @@ export default function LoginPage() {
     },
     onError: (error) => {
       const message = getErrorMessage(error)
-      dispatch(addToast({ type: 'error', message }))
-      setToastMessage(message)
+      appToast.error(message)
     },
   })
 
@@ -128,12 +126,6 @@ export default function LoginPage() {
 
   return (
     <main className="min-h-screen bg-[color:var(--color-surface-low)] px-4 py-8 text-[color:var(--color-text-primary)] sm:px-6 lg:px-8">
-      {toastMessage ? (
-        <div className="fixed right-5 top-5 rounded-lg bg-gray-900 px-4 py-3 text-sm font-medium text-white shadow-lg">
-          {toastMessage}
-        </div>
-      ) : null}
-
       <div className="mx-auto grid min-h-[calc(100vh-4rem)] w-full max-w-6xl overflow-hidden rounded-2xl bg-white shadow-[var(--shadow-card)] ring-1 ring-[color:var(--color-border)] lg:grid-cols-[1.05fr_0.95fr]">
         <section className="hidden bg-[color:var(--color-text-primary)] p-10 text-white lg:flex lg:flex-col lg:justify-between">
           <div>

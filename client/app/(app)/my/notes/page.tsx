@@ -15,6 +15,7 @@ import { ConfirmDialog } from '@/components/shared/ConfirmDialog'
 import { EmptyState } from '@/components/shared/EmptyState'
 import { useCreateNote, useDeleteNote, useNote, useNotes, useUpdateNote } from '@/hooks/useNotes'
 import { useUserProjects } from '@/hooks/useProjects'
+import { appToast, getToastErrorMessage } from '@/lib/toast'
 import { RootState } from '@/store'
 import { Note } from '@/types'
 
@@ -128,22 +129,32 @@ export default function MyNotesPage() {
   )
 
   const createBlankNote = async (projectId?: string | null) => {
-    const note = await createNote.mutateAsync({
-      title: 'Untitled note',
-      content: emptyDoc,
-      tags: [],
-      project_id: projectId || null,
-    })
-    void setSelectedNoteId(note.id)
+    try {
+      const note = await createNote.mutateAsync({
+        title: 'Untitled note',
+        content: emptyDoc,
+        tags: [],
+        project_id: projectId || null,
+      })
+      appToast.success('Note created')
+      void setSelectedNoteId(note.id)
+    } catch (error) {
+      appToast.error(getToastErrorMessage(error, 'Unable to create note'))
+    }
   }
 
   const saveNote = async (input: Record<string, unknown>) => {
     if (!selectedNote) return
 
     setSaveStatus('Saving...')
-    const saved = await updateNote.mutateAsync({ id: selectedNote.id, ...input })
-    setSaveStatus(`Saved at ${formatSavedTime(saved.updated_at)}`)
-    window.setTimeout(() => setSaveStatus(''), 3000)
+    try {
+      const saved = await updateNote.mutateAsync({ id: selectedNote.id, ...input })
+      setSaveStatus(`Saved at ${formatSavedTime(saved.updated_at)}`)
+      window.setTimeout(() => setSaveStatus(''), 3000)
+    } catch (error) {
+      setSaveStatus('Save failed')
+      appToast.error(getToastErrorMessage(error, 'Unable to save note'))
+    }
   }
 
   const saveTitle = async (value: string) => {
@@ -170,15 +181,29 @@ export default function MyNotesPage() {
 
     const tags = [...selectedNote.tags, nextTag]
     setTagInput('')
-    void updateNote.mutateAsync({ id: selectedNote.id, tags })
     saveTags(tags)
   }
 
   const removeTag = (tag: string) => {
     if (!selectedNote) return
     const tags = selectedNote.tags.filter((item) => item !== tag)
-    void updateNote.mutateAsync({ id: selectedNote.id, tags })
     saveTags(tags)
+  }
+
+  const confirmDelete = async () => {
+    if (!deleteTarget) {
+      return
+    }
+
+    const deletingSelected = deleteTarget.id === selectedNoteId
+    try {
+      await deleteNote.mutateAsync(deleteTarget.id)
+      appToast.success('Note deleted')
+      if (deletingSelected) void setSelectedNoteId('')
+      setDeleteTarget(null)
+    } catch (error) {
+      appToast.error(getToastErrorMessage(error, 'Unable to delete note'))
+    }
   }
 
   const handleContentChange = (content: Record<string, unknown>) => {
@@ -367,15 +392,7 @@ export default function MyNotesPage() {
         description="This note will be removed from your workspace."
         dangerous
         onCancel={() => setDeleteTarget(null)}
-        onConfirm={() => {
-          if (deleteTarget) {
-            const deletingSelected = deleteTarget.id === selectedNoteId
-            void deleteNote.mutateAsync(deleteTarget.id).then(() => {
-              if (deletingSelected) void setSelectedNoteId('')
-            })
-          }
-          setDeleteTarget(null)
-        }}
+        onConfirm={() => void confirmDelete()}
       />
     </div>
   )

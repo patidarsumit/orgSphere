@@ -28,6 +28,7 @@ import { iconClassForTeam } from '@/components/teams/teamUtils'
 import { useDeactivateEmployee, useEmployee } from '@/hooks/useEmployees'
 import { useUserProjects } from '@/hooks/useProjects'
 import { useUserTeams } from '@/hooks/useTeams'
+import { appToast, getToastErrorMessage } from '@/lib/toast'
 import { RootState } from '@/store'
 import { Employee } from '@/types'
 
@@ -126,9 +127,14 @@ export default function EmployeeDetailPage() {
   }, [isError, router])
 
   const onDeactivate = async () => {
-    await deactivateEmployee.mutateAsync(params.id)
-    setConfirmOpen(false)
-    router.push('/employees')
+    try {
+      await deactivateEmployee.mutateAsync(params.id)
+      appToast.success('Employee deactivated')
+      setConfirmOpen(false)
+      router.push('/employees')
+    } catch (error) {
+      appToast.error(getToastErrorMessage(error, 'Unable to deactivate employee'))
+    }
   }
 
   if (isLoading || !employee) {

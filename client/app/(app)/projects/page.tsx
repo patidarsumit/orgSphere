@@ -23,6 +23,7 @@ import { EmptyState } from '@/components/shared/EmptyState'
 import { StatusBadge } from '@/components/shared/StatusBadge'
 import { TechStackChip } from '@/components/shared/TechStackChip'
 import { useDeleteProject, useProjects } from '@/hooks/useProjects'
+import { appToast, getToastErrorMessage } from '@/lib/toast'
 import { Project, ProjectStatus } from '@/types'
 
 const pageNumbersFor = (currentPage: number, totalPages: number) => {
@@ -285,7 +286,12 @@ export default function ProjectsPage() {
 
   const onDelete = async (project: Project) => {
     if (window.confirm(`Delete ${project.name}?`)) {
-      await deleteProject.mutateAsync(project.id)
+      try {
+        await deleteProject.mutateAsync(project.id)
+        appToast.success('Project deleted')
+      } catch (error) {
+        appToast.error(getToastErrorMessage(error, 'Unable to delete project'))
+      }
     }
   }
 

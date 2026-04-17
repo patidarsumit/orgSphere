@@ -20,6 +20,7 @@ import { useRecentNotes, useNotes } from '@/hooks/useNotes'
 import { useUserProjects } from '@/hooks/useProjects'
 import { useTasks, useTodayTasks, useUpdateTask } from '@/hooks/useTasks'
 import api from '@/lib/axios'
+import { appToast, getToastErrorMessage } from '@/lib/toast'
 import { RootState } from '@/store'
 
 interface DashboardStats {
@@ -113,6 +114,15 @@ export default function MyDashboardPage() {
   const openTasks = stats?.myOpenTasks ?? totalTasks - doneTasks
   const progress = totalTasks > 0 ? (doneTasks / totalTasks) * 100 : 0
 
+  const markTaskDone = async (taskId: string) => {
+    try {
+      await updateTask.mutateAsync({ id: taskId, status: 'done' })
+      appToast.success('Task marked done')
+    } catch (error) {
+      appToast.error(getToastErrorMessage(error, 'Unable to update task'))
+    }
+  }
+
   return (
     <div className="-m-8 min-h-full bg-[color:var(--color-surface-low)] p-5 sm:p-8">
       <header className="mb-8 flex flex-col gap-4 rounded-xl bg-white p-6 shadow-[var(--shadow-card)] lg:flex-row lg:items-center lg:justify-between">
@@ -174,7 +184,7 @@ export default function MyDashboardPage() {
               <div key={task.id} className="flex items-center gap-3 rounded-lg px-3 py-3 hover:bg-[color:var(--color-surface-low)]">
                 <button
                   type="button"
-                  onClick={() => void updateTask.mutateAsync({ id: task.id, status: 'done' })}
+                  onClick={() => void markTaskDone(task.id)}
                   className="h-5 w-5 shrink-0 rounded-full border border-[color:var(--color-border-strong)] hover:border-[color:var(--color-primary)]"
                   aria-label="Mark task done"
                 />

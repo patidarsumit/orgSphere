@@ -25,6 +25,7 @@ import { ConfirmDialog } from '@/components/shared/ConfirmDialog'
 import { EmptyState } from '@/components/shared/EmptyState'
 import { StatusBadge } from '@/components/shared/StatusBadge'
 import { useDeleteTask, useTasks, useUpdateTask } from '@/hooks/useTasks'
+import { appToast, getToastErrorMessage } from '@/lib/toast'
 import { RootState } from '@/store'
 import { Task, TaskPriority, TaskStatus } from '@/types'
 
@@ -42,15 +43,22 @@ function TaskCheckbox({ task }: { task: Task }) {
   const updateTask = useUpdateTask()
   const isDone = task.status === 'done'
 
+  const toggleTask = async () => {
+    try {
+      await updateTask.mutateAsync({
+        id: task.id,
+        status: isDone ? 'todo' : 'done',
+      })
+      appToast.success(isDone ? 'Task reopened' : 'Task marked done')
+    } catch (error) {
+      appToast.error(getToastErrorMessage(error, 'Unable to update task'))
+    }
+  }
+
   return (
     <button
       type="button"
-      onClick={() =>
-        void updateTask.mutateAsync({
-          id: task.id,
-          status: isDone ? 'todo' : 'done',
-        })
-      }
+      onClick={() => void toggleTask()}
       className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full border ${
         isDone
           ? 'border-green-600 bg-green-600 text-white'
@@ -273,6 +281,20 @@ export default function MyTasksPage() {
     setModalOpen(true)
   }
 
+  const confirmDelete = async () => {
+    if (!deleteTarget) {
+      return
+    }
+
+    try {
+      await deleteTask.mutateAsync(deleteTarget.id)
+      appToast.success('Task deleted')
+      setDeleteTarget(null)
+    } catch (error) {
+      appToast.error(getToastErrorMessage(error, 'Unable to delete task'))
+    }
+  }
+
   return (
     <div className="-m-8 min-h-full bg-[color:var(--color-surface-low)] p-5 sm:p-8">
       <header className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
@@ -407,12 +429,7 @@ export default function MyTasksPage() {
         description="This task will be removed from your workspace."
         dangerous
         onCancel={() => setDeleteTarget(null)}
-        onConfirm={() => {
-          if (deleteTarget) {
-            void deleteTask.mutateAsync(deleteTarget.id)
-          }
-          setDeleteTarget(null)
-        }}
+        onConfirm={() => void confirmDelete()}
       />
     </div>
   )
