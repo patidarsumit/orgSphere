@@ -1,25 +1,20 @@
 'use client'
 
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
 import { useEffect, useMemo, useState, useTransition } from 'react'
 import { parseAsInteger, parseAsString, useQueryState } from 'nuqs'
 import {
   ChevronLeft,
   ChevronRight,
-  ChevronsUpDown,
   FolderKanban,
   MoreHorizontal,
-  Pencil,
   Plus,
   Search,
-  Trash2,
 } from 'lucide-react'
 import { ProjectFormModal } from '@/components/projects/ProjectFormModal'
 import {
   commonTech,
   projectStatusOptions,
-  statusDotClassName,
   truncateText,
 } from '@/components/projects/projectUtils'
 import { Avatar } from '@/components/shared/Avatar'
@@ -36,46 +31,41 @@ const pageNumbersFor = (currentPage: number, totalPages: number) => {
 
 function ProjectsTableSkeleton() {
   return (
-    <div className="overflow-hidden rounded-3xl bg-[color:var(--color-surface-card)] shadow-[var(--shadow-card)]">
+    <div className="overflow-hidden rounded-2xl bg-[color:var(--color-surface-card)] p-3 shadow-sm">
       {Array.from({ length: 5 }, (_, index) => (
-        <div key={index} className="grid grid-cols-12 gap-4 border-b border-[color:var(--color-border)] p-4">
-          <div className="col-span-3 h-5 animate-pulse rounded bg-[color:var(--color-surface-low)]" />
-          <div className="col-span-3 h-5 animate-pulse rounded bg-[color:var(--color-surface-low)]" />
-          <div className="col-span-2 h-5 animate-pulse rounded bg-[color:var(--color-surface-low)]" />
-          <div className="col-span-2 h-5 animate-pulse rounded bg-[color:var(--color-surface-low)]" />
-          <div className="col-span-2 h-5 animate-pulse rounded bg-[color:var(--color-surface-low)]" />
+        <div key={index} className="mb-2 grid grid-cols-12 gap-4 rounded-xl bg-[color:var(--color-surface-low)] p-4">
+          <div className="col-span-3 h-5 animate-pulse rounded bg-[color:var(--color-surface-card)]" />
+          <div className="col-span-3 h-5 animate-pulse rounded bg-[color:var(--color-surface-card)]" />
+          <div className="col-span-2 h-5 animate-pulse rounded bg-[color:var(--color-surface-card)]" />
+          <div className="col-span-2 h-5 animate-pulse rounded bg-[color:var(--color-surface-card)]" />
+          <div className="col-span-2 h-5 animate-pulse rounded bg-[color:var(--color-surface-card)]" />
         </div>
       ))}
     </div>
   )
 }
 
-function TechInitials({ technologies }: { technologies: string[] }) {
+function ProjectTechStack({ technologies }: { technologies: string[] }) {
   const visibleTech = technologies.slice(0, 2)
   const hiddenTechCount = Math.max(technologies.length - visibleTech.length, 0)
 
   if (technologies.length === 0) {
-    return <span className="text-sm text-[color:var(--color-text-tertiary)]">-</span>
+    return <span className="text-sm text-[color:var(--color-text-tertiary)]">No tech</span>
   }
 
   return (
-    <div className="flex gap-1.5">
+    <div className="flex flex-wrap gap-1.5">
       {visibleTech.map((tech) => (
         <span
           key={tech}
           title={tech}
-          className="flex h-7 w-7 items-center justify-center rounded-md bg-[color:var(--color-surface-low)] text-[10px] font-black text-[color:var(--color-text-secondary)]"
+          className="rounded-full bg-[color:var(--color-surface-card)] px-2 py-0.5 text-xs font-medium text-[color:var(--color-text-secondary)]"
         >
-          {tech
-            .split(/[\s.-]+/)
-            .map((part) => part[0])
-            .join('')
-            .slice(0, 2)
-            .toUpperCase()}
+          {tech}
         </span>
       ))}
       {hiddenTechCount > 0 ? (
-        <span className="flex h-7 w-7 items-center justify-center rounded-md bg-[color:var(--color-surface-low)] text-[10px] font-black text-[color:var(--color-text-secondary)]">
+        <span className="rounded-full bg-[color:var(--color-surface-card)] px-2 py-0.5 text-xs font-medium text-[color:var(--color-text-tertiary)]">
           +{hiddenTechCount}
         </span>
       ) : null}
@@ -98,14 +88,14 @@ function ProjectAvatarStack({ project }: { project: Project }) {
           key={person.id}
           href={`/employees/${person.id}`}
           onClick={(event) => event.stopPropagation()}
-          className="rounded-full ring-2 ring-white transition-transform hover:z-10 hover:-translate-y-0.5"
+          className="rounded-full transition-transform hover:z-10 hover:-translate-y-0.5"
           title={person.name}
         >
           <Avatar name={person.name} avatarPath={person.avatar_path} size="sm" />
         </Link>
       ))}
       {hiddenCount > 0 ? (
-        <span className="flex h-8 w-8 items-center justify-center rounded-full border-2 border-white bg-[color:var(--color-primary-light)] text-[10px] font-black text-[color:var(--color-primary)]">
+        <span className="flex h-6 w-6 items-center justify-center rounded-full border-2 border-white bg-[color:var(--color-primary-light)] text-[10px] font-black text-[color:var(--color-primary)]">
           +{hiddenCount}
         </span>
       ) : null}
@@ -122,51 +112,35 @@ function ProjectActions({
   onEdit: (project: Project) => void
   onDelete: (project: Project) => void
 }) {
-  const [open, setOpen] = useState(false)
-
   return (
-    <div className="relative flex justify-end">
-      <button
-        type="button"
-        onClick={(event) => {
-          event.stopPropagation()
-          setOpen((value) => !value)
-        }}
-        className="rounded-lg p-2 text-[color:var(--color-text-tertiary)] hover:bg-[color:var(--color-surface-low)] hover:text-[color:var(--color-text-primary)]"
-        aria-label={`Project actions for ${project.name}`}
+    <div className="flex items-center justify-end gap-2">
+      <Link
+        href={`/projects/${project.id}`}
+        className="rounded-lg px-3 py-1.5 text-sm font-bold text-[color:var(--color-primary)] hover:bg-[color:var(--color-surface-card)]"
       >
-        <MoreHorizontal size={18} />
-      </button>
-      {open ? (
-        <div
-          className="absolute right-0 top-10 z-20 w-40 rounded-xl bg-white p-1 shadow-[var(--shadow-modal)] ring-1 ring-[color:var(--color-border)]"
-          onClick={(event) => event.stopPropagation()}
-        >
-          <Link
-            href={`/projects/${project.id}`}
-            className="block rounded-lg px-3 py-2 text-sm font-medium text-[color:var(--color-text-secondary)] hover:bg-[color:var(--color-surface-low)]"
-          >
-            View Details
-          </Link>
+        View
+      </Link>
+      <details className="relative">
+        <summary className="flex h-8 w-8 cursor-pointer list-none items-center justify-center rounded-lg text-[color:var(--color-text-tertiary)] hover:bg-[color:var(--color-surface-card)]">
+          <MoreHorizontal size={16} />
+        </summary>
+        <div className="absolute right-0 z-10 mt-2 w-36 rounded-xl bg-white/90 p-1 text-left shadow-[var(--shadow-modal)] backdrop-blur-md">
           <button
             type="button"
             onClick={() => onEdit(project)}
-            className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm font-medium text-[color:var(--color-text-secondary)] hover:bg-[color:var(--color-surface-low)]"
+            className="block w-full rounded-lg px-3 py-2 text-left text-sm text-[color:var(--color-text-secondary)] hover:bg-[color:var(--color-surface-low)]"
           >
-            <Pencil size={14} />
             Edit
           </button>
-          <div className="my-1 h-px bg-[color:var(--color-border)]" />
           <button
             type="button"
             onClick={() => onDelete(project)}
-            className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm font-medium text-red-600 hover:bg-red-50"
+            className="block w-full rounded-lg px-3 py-2 text-left text-sm text-red-600 hover:bg-red-50"
           >
-            <Trash2 size={14} />
             Delete
           </button>
         </div>
-      ) : null}
+      </details>
     </div>
   )
 }
@@ -180,44 +154,36 @@ function ProjectRow({
   onEdit: (project: Project) => void
   onDelete: (project: Project) => void
 }) {
-  const router = useRouter()
-
   return (
-    <tr
-      onClick={() => router.push(`/projects/${project.id}`)}
-      className="group h-[60px] cursor-pointer border-b border-indigo-50/70 transition-colors hover:bg-indigo-50/40"
-    >
-      <td className="px-8 py-4">
-        <div className="flex items-center gap-3">
-          <span className={`h-2.5 w-2.5 rounded-full ring-4 ring-white ${statusDotClassName[project.status]}`} />
+    <tr className="h-[52px] rounded-xl bg-[color:var(--color-surface-low)] transition-colors hover:bg-[color:var(--color-surface-high)]">
+      <td className="rounded-l-xl px-5 py-3">
+        <div className="min-w-0">
           <Link
             href={`/projects/${project.id}`}
-            onClick={(event) => event.stopPropagation()}
-            className="font-bold text-[color:var(--color-text-primary)] transition-colors group-hover:text-[color:var(--color-primary)]"
+            className="block truncate text-sm font-semibold text-[color:var(--color-text-primary)] hover:text-[color:var(--color-primary)]"
           >
             {project.name}
           </Link>
+          <span className="block max-w-[260px] truncate text-xs text-[color:var(--color-text-tertiary)]">
+            {truncateText(project.description, 58)}
+          </span>
         </div>
       </td>
-      <td className="px-6 py-4 text-sm text-[color:var(--color-text-secondary)]">
-        {truncateText(project.description, 48)}
-      </td>
-      <td className="px-6 py-4 text-center">
+      <td className="px-5 py-3">
         <StatusBadge status={project.status} />
       </td>
-      <td className="px-6 py-4">
-        <TechInitials technologies={project.tech_stack} />
+      <td className="px-5 py-3">
+        <ProjectTechStack technologies={project.tech_stack} />
       </td>
-      <td className="px-6 py-4">
+      <td className="px-5 py-3">
         <ProjectAvatarStack project={project} />
       </td>
-      <td className="px-6 py-4">
+      <td className="px-5 py-3">
         <div className="space-y-1">
           {project.tech_lead ? (
             <Link
               href={`/employees/${project.tech_lead.id}`}
-              onClick={(event) => event.stopPropagation()}
-              className="block text-xs font-bold text-[color:var(--color-text-primary)] hover:text-[color:var(--color-primary)]"
+              className="block text-sm font-medium text-[color:var(--color-text-secondary)] hover:text-[color:var(--color-primary)]"
             >
               {project.tech_lead.name}
             </Link>
@@ -225,8 +191,7 @@ function ProjectRow({
           {project.manager ? (
             <Link
               href={`/employees/${project.manager.id}`}
-              onClick={(event) => event.stopPropagation()}
-              className="block text-[10px] font-medium text-[color:var(--color-text-tertiary)] hover:text-[color:var(--color-primary)]"
+              className="block text-xs text-[color:var(--color-text-tertiary)] hover:text-[color:var(--color-primary)]"
             >
               {project.manager.name}
             </Link>
@@ -236,7 +201,7 @@ function ProjectRow({
           ) : null}
         </div>
       </td>
-      <td className="px-8 py-4">
+      <td className="rounded-r-xl px-5 py-3 text-right">
         <ProjectActions project={project} onEdit={onEdit} onDelete={onDelete} />
       </td>
     </tr>
@@ -434,38 +399,47 @@ export default function ProjectsPage() {
         ) : null}
 
         {!isLoading && !isError && projects.length > 0 ? (
-          <section className="overflow-hidden rounded-3xl bg-[color:var(--color-surface-card)] shadow-[var(--shadow-card)]">
-            <div className="overflow-x-auto">
-              <table className="min-w-[1100px] w-full text-left">
-                <thead className="bg-[color:var(--color-surface-low)] text-xs font-black uppercase tracking-widest text-[color:var(--color-text-tertiary)]">
-                  <tr>
-                    <th className="px-8 py-5">Project Name</th>
-                    <th className="px-6 py-5">Description</th>
-                    <th className="px-6 py-5 text-center">Status</th>
-                    <th className="px-6 py-5">Tech Stack</th>
-                    <th className="px-6 py-5">Team</th>
-                    <th className="px-6 py-5">Lead / Mgr</th>
-                    <th className="px-8 py-5 text-right">
-                      <span className="inline-flex items-center gap-1">
+          <>
+            <section className="overflow-hidden rounded-2xl bg-[color:var(--color-surface-card)] p-3 shadow-sm">
+              <div className="overflow-x-auto">
+                <table className="min-w-full border-separate border-spacing-y-2 text-left">
+                  <thead className="sticky top-0 bg-[color:var(--color-surface-card)]">
+                    <tr>
+                      <th className="px-5 py-3 text-left text-[11px] font-bold uppercase tracking-widest text-[color:var(--color-text-tertiary)]">
+                        Project
+                      </th>
+                      <th className="px-5 py-3 text-left text-[11px] font-bold uppercase tracking-widest text-[color:var(--color-text-tertiary)]">
+                        Status
+                      </th>
+                      <th className="px-5 py-3 text-left text-[11px] font-bold uppercase tracking-widest text-[color:var(--color-text-tertiary)]">
+                        Tech Stack
+                      </th>
+                      <th className="px-5 py-3 text-left text-[11px] font-bold uppercase tracking-widest text-[color:var(--color-text-tertiary)]">
+                        Team
+                      </th>
+                      <th className="px-5 py-3 text-left text-[11px] font-bold uppercase tracking-widest text-[color:var(--color-text-tertiary)]">
+                        Lead / Manager
+                      </th>
+                      <th className="px-5 py-3 text-right text-[11px] font-bold uppercase tracking-widest text-[color:var(--color-text-tertiary)]">
                         Actions
-                        <ChevronsUpDown size={14} />
-                      </span>
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {projects.map((project) => (
-                    <ProjectRow
-                      key={project.id}
-                      project={project}
-                      onEdit={onEdit}
-                      onDelete={onDelete}
-                    />
-                  ))}
-                </tbody>
-              </table>
-            </div>
-            <div className="flex flex-col gap-4 border-t border-[color:var(--color-border)] p-4 sm:flex-row sm:items-center sm:justify-between">
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {projects.map((project) => (
+                      <ProjectRow
+                        key={project.id}
+                        project={project}
+                        onEdit={onEdit}
+                        onDelete={onDelete}
+                      />
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </section>
+
+            <div className="mt-4 flex flex-col gap-4 border-t border-[color:var(--color-border-strong)] pt-8 sm:flex-row sm:items-center sm:justify-between">
               <span className="text-sm text-[color:var(--color-text-tertiary)]">
                 Showing {showingStart}-{showingEnd} of {totalProjects} results
               </span>
@@ -474,7 +448,7 @@ export default function ProjectsPage() {
                   type="button"
                   disabled={page <= 1}
                   onClick={() => setPage(page - 1)}
-                  className="rounded-lg bg-white p-2 text-[color:var(--color-text-secondary)] disabled:cursor-not-allowed disabled:text-[color:var(--color-text-tertiary)]"
+                  className="rounded-lg bg-[color:var(--color-surface-low)] p-2 text-[color:var(--color-text-secondary)] transition-colors hover:bg-[color:var(--color-surface-high)] disabled:cursor-not-allowed disabled:text-[color:var(--color-text-tertiary)]"
                   aria-label="Previous page"
                 >
                   <ChevronLeft size={18} />
@@ -484,10 +458,10 @@ export default function ProjectsPage() {
                     key={pageNumber}
                     type="button"
                     onClick={() => setPage(pageNumber)}
-                    className={`h-9 min-w-9 rounded-lg px-3 text-sm font-semibold ${
+                    className={`h-9 min-w-9 rounded-lg px-3 text-sm font-semibold transition-colors ${
                       page === pageNumber
                         ? 'bg-[color:var(--color-primary)] text-white'
-                        : 'text-[color:var(--color-text-secondary)] hover:bg-white'
+                        : 'text-[color:var(--color-text-secondary)] hover:bg-[color:var(--color-surface-low)]'
                     }`}
                   >
                     {pageNumber}
@@ -497,14 +471,14 @@ export default function ProjectsPage() {
                   type="button"
                   disabled={page >= totalPages}
                   onClick={() => setPage(page + 1)}
-                  className="rounded-lg bg-white p-2 text-[color:var(--color-text-secondary)] disabled:cursor-not-allowed disabled:text-[color:var(--color-text-tertiary)]"
+                  className="rounded-lg bg-[color:var(--color-surface-low)] p-2 text-[color:var(--color-text-secondary)] transition-colors hover:bg-[color:var(--color-surface-high)] disabled:cursor-not-allowed disabled:text-[color:var(--color-text-tertiary)]"
                   aria-label="Next page"
                 >
                   <ChevronRight size={18} />
                 </button>
               </div>
             </div>
-          </section>
+          </>
         ) : null}
       </div>
 

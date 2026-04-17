@@ -42,6 +42,7 @@ function TeamCard({ team }: { team: Team }) {
     avatarPath: member.avatar_path,
   }))
   const onlineCount = Math.max(1, Math.ceil(team.members.length / 2))
+  const projectCount = team.projects_count || 0
 
   return (
     <article className="group relative overflow-hidden rounded-2xl bg-[color:var(--color-surface-card)] p-6 shadow-[var(--shadow-card)] transition-all duration-200 hover:-translate-y-0.5 hover:bg-white hover:shadow-lg">
@@ -74,7 +75,7 @@ function TeamCard({ team }: { team: Team }) {
       <div className="mt-6 flex items-center gap-2 border-t border-[color:var(--color-border)] py-4">
         <FolderOpen size={15} className="text-[color:var(--color-text-tertiary)]" />
         <span className="text-xs font-semibold text-[color:var(--color-text-secondary)]">
-          Projects arrive in Phase 5
+          {projectCount} {projectCount === 1 ? 'Project' : 'Projects'}
         </span>
       </div>
 

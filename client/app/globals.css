@@ -17,8 +17,8 @@
   --color-surface-high: #e2e8f8;
   --color-surface-highest: #dce2f3;
   --color-surface-card: #ffffff;
-  --color-border: rgba(199,196,216,0.15);
-  --color-border-strong: rgba(199,196,216,0.3);
+  --color-border: rgba(136,132,158,0.28);
+  --color-border-strong: rgba(111,106,138,0.42);
   --color-text-primary: #151c27;
   --color-text-secondary: #464555;
   --color-text-tertiary: #777587;
@@ -43,7 +43,9 @@ body {
 }
 
 button,
-input {
+input,
+select,
+textarea {
   font: inherit;
 }
 

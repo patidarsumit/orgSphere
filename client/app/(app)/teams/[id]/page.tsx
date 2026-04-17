@@ -300,7 +300,9 @@ export default function TeamDetailPage() {
                       Projects
                     </p>
                     <p className="text-sm font-semibold text-[color:var(--color-text-primary)]">
-                      Phase 5
+                      {projectsLoading
+                        ? 'Loading...'
+                        : `${teamProjects.length} ${teamProjects.length === 1 ? 'project' : 'projects'}`}
                     </p>
                   </div>
                 </div>

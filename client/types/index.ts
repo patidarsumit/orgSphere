@@ -37,6 +37,7 @@ export interface Team {
   updated_at: string
   members: TeamMember[]
   creator?: User | null
+  projects_count?: number
 }
 
 export type ProjectStatus = 'active' | 'completed' | 'on_hold' | 'planned' | 'archived'

@@ -1,10 +1,35 @@
 import { CreateTeamInput, TeamQuery, UpdateTeamInput } from '@orgsphere/schemas'
 import { AppDataSource } from '../data-source'
 import { Team } from '../entities/Team'
+import { Project } from '../entities/Project'
 import { User } from '../entities/User'
 
 const repo = () => AppDataSource.getRepository(Team)
 const userRepo = () => AppDataSource.getRepository(User)
+const projectRepo = () => AppDataSource.getRepository(Project)
+
+const attachProjectCounts = async <T extends Team>(teams: T[]) => {
+  const teamIds = teams.map((team) => team.id)
+
+  if (teamIds.length === 0) {
+    return teams
+  }
+
+  const rows = await projectRepo()
+    .createQueryBuilder('project')
+    .select('project.team_id', 'team_id')
+    .addSelect('COUNT(project.id)', 'count')
+    .where('project.team_id IN (:...teamIds)', { teamIds })
+    .groupBy('project.team_id')
+    .getRawMany<{ team_id: string; count: string }>()
+  const countsByTeamId = new Map(rows.map((row) => [row.team_id, Number(row.count)]))
+
+  teams.forEach((team) => {
+    team.projects_count = countsByTeamId.get(team.id) || 0
+  })
+
+  return teams
+}
 
 export const findAll = async (query: TeamQuery) => {
   const { page, limit, search } = query
@@ -37,6 +62,7 @@ export const findAll = async (query: TeamQuery) => {
   }
 
   const [teams, total] = await qb.getManyAndCount()
+  await attachProjectCounts(teams)
 
   return {
     data: teams,
@@ -48,7 +74,7 @@ export const findAll = async (query: TeamQuery) => {
 }
 
 export const findById = async (id: string) => {
-  return repo()
+  const team = await repo()
     .createQueryBuilder('team')
     .leftJoinAndSelect('team.members', 'member')
     .leftJoinAndSelect('team.creator', 'creator')
@@ -75,6 +101,12 @@ export const findById = async (id: string) => {
     .where('team.id = :id', { id })
     .orderBy('member.name', 'ASC')
     .getOne()
+
+  if (team) {
+    await attachProjectCounts([team])
+  }
+
+  return team
 }
 
 export const create = async (input: CreateTeamInput, creatorId: string) => {
@@ -144,7 +176,7 @@ export const removeMember = async (teamId: string, userId: string) => {
 }
 
 export const getTeamsByUserId = async (userId: string) => {
-  return repo()
+  const teams = await repo()
     .createQueryBuilder('team')
     .innerJoin('team.members', 'member', 'member.id = :userId', { userId })
     .leftJoinAndSelect('team.members', 'allMembers')
@@ -163,4 +195,6 @@ export const getTeamsByUserId = async (userId: string) => {
     ])
     .orderBy('team.name', 'ASC')
     .getMany()
+
+  return attachProjectCounts(teams)
 }

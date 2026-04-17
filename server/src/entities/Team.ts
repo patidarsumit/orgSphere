@@ -6,9 +6,11 @@ import {
   JoinTable,
   ManyToMany,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm'
+import { Project } from './Project'
 import { User } from './User'
 
 @Entity('teams')
@@ -36,6 +38,11 @@ export class Team {
     inverseJoinColumn: { name: 'user_id', referencedColumnName: 'id' },
   })
   members!: User[]
+
+  @OneToMany(() => Project, (project) => project.team)
+  projects!: Project[]
+
+  projects_count?: number
 
   @CreateDateColumn()
   created_at!: Date

@@ -7,6 +7,7 @@ import {
   ShieldCheck,
   UsersRound,
 } from 'lucide-react'
+import { PublicAccountMenu } from '@/components/public/PublicAccountMenu'
 
 const stats = [
   { value: '500+', label: 'Companies' },
@@ -51,12 +52,7 @@ export default function LandingPage() {
             <span className="h-4 w-4 rounded-full bg-indigo-600" />
             <span className="text-lg font-semibold">OrgSphere</span>
           </Link>
-          <Link
-            href="/login"
-            className="rounded-lg border border-indigo-600 px-4 py-2 text-sm font-medium text-indigo-600 hover:bg-indigo-50"
-          >
-            Login
-          </Link>
+          <PublicAccountMenu />
         </div>
       </header>
 
