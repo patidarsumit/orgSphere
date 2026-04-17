@@ -262,6 +262,10 @@ export default function MyTasksPage() {
     'priority',
     parseAsString.withDefault('').withOptions({ startTransition })
   )
+  const [selectedTaskId, setSelectedTaskId] = useQueryState(
+    'task',
+    parseAsString.withDefault('').withOptions({ startTransition })
+  )
   const [modalOpen, setModalOpen] = useState(false)
   const [editingTask, setEditingTask] = useState<Task | null>(null)
   const [defaultStatus, setDefaultStatus] = useState<TaskStatus>('todo')
@@ -273,12 +277,23 @@ export default function MyTasksPage() {
     priority: priority as TaskPriority | '',
     limit: 100,
   })
-  const tasks = data?.data || []
+  const tasks = useMemo(() => data?.data || [], [data])
+  const selectedTask = useMemo(
+    () => tasks.find((task) => task.id === selectedTaskId) || null,
+    [selectedTaskId, tasks]
+  )
+  const activeTask = selectedTask || editingTask
+  const taskModalOpen = modalOpen || Boolean(selectedTask)
 
   const openAdd = (nextStatus: TaskStatus = 'todo') => {
     setDefaultStatus(nextStatus)
     setEditingTask(null)
     setModalOpen(true)
+  }
+
+  const closeTaskModal = () => {
+    setModalOpen(false)
+    if (selectedTaskId) void setSelectedTaskId('')
   }
 
   const confirmDelete = async () => {
@@ -418,9 +433,9 @@ export default function MyTasksPage() {
       ) : null}
 
       <TaskFormModal
-        open={modalOpen}
-        onClose={() => setModalOpen(false)}
-        task={editingTask}
+        open={taskModalOpen}
+        onClose={closeTaskModal}
+        task={activeTask}
         defaults={{ status: defaultStatus }}
       />
       <ConfirmDialog

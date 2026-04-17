@@ -19,6 +19,8 @@ const entityHref = (item: ActivityItem) => {
   if (item.entity_type === 'team' || item.entity_type === 'team_member') {
     return `/teams/${item.entity_id}`
   }
+  if (item.entity_type === 'task') return `/my/tasks?task=${item.entity_id}`
+  if (item.entity_type === 'note') return `/my/notes?note=${item.entity_id}`
   return null
 }
 
