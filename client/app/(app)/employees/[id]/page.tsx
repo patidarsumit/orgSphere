@@ -116,8 +116,8 @@ export default function EmployeeDetailPage() {
   const { data: employee, isLoading, isError } = useEmployee(params.id)
   const { data: userTeams = [], isLoading: teamsLoading } = useUserTeams(params.id)
   const { data: userProjects = [], isLoading: projectsLoading } = useUserProjects(params.id)
-  const canEdit = can.editEmployee(params.id)
-  const canDeactivate = can.deactivateEmployee(params.id)
+  const canEdit = can.editEmployee(employee ?? params.id)
+  const canDeactivate = can.deactivateEmployee(employee ?? params.id)
 
   useEffect(() => {
     if (isError) {

@@ -1,5 +1,7 @@
 import { z } from 'zod'
 
+const userRoleSchema = z.enum(['admin', 'hr', 'manager', 'tech_lead', 'employee', 'viewer'])
+
 export const updateUserSchema = z.object({
   name: z.string().min(2).optional(),
   department: z.string().optional(),
@@ -11,7 +13,7 @@ export const userResponseSchema = z.object({
   id: z.string().uuid(),
   name: z.string(),
   email: z.string().email(),
-  role: z.enum(['admin', 'manager', 'tech_lead', 'employee']),
+  role: userRoleSchema,
   department: z.string().nullable(),
   skills: z.array(z.string()),
   avatar_path: z.string().nullable(),
@@ -22,4 +24,3 @@ export const userResponseSchema = z.object({
 
 export type UpdateUserInput = z.infer<typeof updateUserSchema>
 export type UserResponse = z.infer<typeof userResponseSchema>
-

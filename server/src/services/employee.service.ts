@@ -6,6 +6,18 @@ import * as ActivityService from './activity.service'
 
 const repo = () => AppDataSource.getRepository(User)
 
+const roleAssignmentRules: Record<string, User['role'][]> = {
+  admin: ['admin', 'hr', 'manager', 'tech_lead', 'employee', 'viewer'],
+  hr: ['employee', 'viewer'],
+  manager: ['tech_lead', 'employee', 'viewer'],
+}
+
+const canAssignRole = (actorRole: string | undefined, targetRole: User['role']) =>
+  actorRole ? roleAssignmentRules[actorRole]?.includes(targetRole) ?? false : false
+
+const canEditAnyEmployee = (actorRole: string | undefined) =>
+  actorRole === 'admin' || actorRole === 'hr'
+
 export const sanitize = (user: User) => {
   const { password_hash: _passwordHash, ...safe } = user
   return safe
@@ -99,7 +111,7 @@ export const findById = async (id: string) => {
 export const create = async (input: CreateEmployeeInput, actorId?: string, actorRole?: string) => {
   const existing = await repo().findOne({ where: { email: input.email } })
   if (existing) throw new Error('EMAIL_EXISTS')
-  if (actorRole !== 'admin' && input.role === 'admin') throw new Error('FORBIDDEN')
+  if (!canAssignRole(actorRole, input.role)) throw new Error('FORBIDDEN')
 
   const password_hash = await bcrypt.hash(input.password, 12)
   const user = repo().create({
@@ -128,16 +140,26 @@ export const update = async (id: string, input: UpdateEmployeeInput, actorId?: s
   const actor = await repo().findOne({ where: { id: actorId } })
   if (!actor) throw new Error('FORBIDDEN')
 
-  if (actor.role !== 'admin' && id !== actorId) throw new Error('FORBIDDEN')
+  const canEditAny = canEditAnyEmployee(actor.role)
+  if (!canEditAny && id !== actorId) throw new Error('FORBIDDEN')
 
-  const safeInput =
-    actor.role === 'admin'
-      ? input
-      : {
-          name: input.name,
-          department: input.department,
-          skills: input.skills,
-        }
+  if (input.role && !canAssignRole(actor.role, input.role)) throw new Error('FORBIDDEN')
+  if (input.is_active !== undefined && actor.role !== 'admin') throw new Error('FORBIDDEN')
+
+  const safeInput = canEditAny
+    ? {
+        name: input.name,
+        role: actor.role === 'admin' ? input.role : undefined,
+        department: input.department,
+        skills: input.skills,
+        manager_id: input.manager_id,
+        is_active: actor.role === 'admin' ? input.is_active : undefined,
+      }
+    : {
+        name: input.name,
+        department: input.department,
+        skills: input.skills,
+      }
 
   Object.assign(user, safeInput)
   const saved = await repo().save(user)
@@ -158,7 +180,7 @@ export const updateAvatar = async (id: string, avatarPath: string, actorId?: str
 
   const actor = await repo().findOne({ where: { id: actorId } })
   if (!actor) throw new Error('FORBIDDEN')
-  if (actor.role !== 'admin' && id !== actorId) throw new Error('FORBIDDEN')
+  if (!canEditAnyEmployee(actor.role) && id !== actorId) throw new Error('FORBIDDEN')
 
   const result = await repo().update(id, { avatar_path: avatarPath })
   if (!result.affected) throw new Error('NOT_FOUND')
@@ -174,6 +196,12 @@ export const updateAvatar = async (id: string, avatarPath: string, actorId?: str
 export const remove = async (id: string, actorId?: string) => {
   const user = await repo().findOne({ where: { id } })
   if (!user) throw new Error('NOT_FOUND')
+  if (!actorId) throw new Error('FORBIDDEN')
+
+  const actor = await repo().findOne({ where: { id: actorId } })
+  if (!actor) throw new Error('FORBIDDEN')
+  if (actor.role !== 'admin' && actor.role !== 'hr') throw new Error('FORBIDDEN')
+  if (actor.role === 'hr' && user.role === 'admin') throw new Error('FORBIDDEN')
 
   user.is_active = false
   const saved = await repo().save(user)

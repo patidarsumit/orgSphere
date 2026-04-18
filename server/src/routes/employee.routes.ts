@@ -10,7 +10,11 @@ import {
   uploadAvatar,
 } from '../controllers/employee.controller'
 import { authMiddleware } from '../middleware/auth'
-import { adminOnly, canCreateEmployee, canEditEmployee } from '../middleware/permissions'
+import {
+  canCreateEmployee,
+  canDeactivateEmployee,
+  canEditEmployee,
+} from '../middleware/permissions'
 import { avatarUpload } from '../middleware/upload'
 import { validate } from '../middleware/validate'
 
@@ -24,6 +28,6 @@ router.get('/:id', getOne)
 router.post('/', canCreateEmployee, validate(createEmployeeSchema), create)
 router.put('/:id', canEditEmployee, validate(updateEmployeeSchema), update)
 router.post('/:id/avatar', canEditEmployee, avatarUpload.single('avatar'), uploadAvatar)
-router.delete('/:id', adminOnly, remove)
+router.delete('/:id', canDeactivateEmployee, remove)
 
 export default router

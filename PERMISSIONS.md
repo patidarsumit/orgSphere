@@ -4,37 +4,41 @@ OrgSphere uses role-based access control with ownership checks. The backend is t
 
 ## Roles
 
-Highest to lowest:
+Broadest to narrowest:
 
 1. `admin`
-2. `manager`
-3. `tech_lead`
-4. `employee`
+2. `hr`
+3. `manager`
+4. `tech_lead`
+5. `employee`
+6. `viewer`
+
+Note: roles are not treated as a pure hierarchy for every action. `hr` is lateral and focused on employee records, not project or settings control.
 
 ## Access Summary
 
-| Area | Admin | Manager | Tech Lead | Employee |
-| --- | --- | --- | --- | --- |
-| View employees | Yes | Yes | Yes | Yes |
-| Create employees | Yes | Yes | No | No |
-| Edit any employee | Yes | No | No | No |
-| Edit own profile | Yes | Yes | Yes | Yes |
-| Deactivate employees | Yes | No | No | No |
-| View teams | Yes | Yes | Yes | Yes |
-| Create teams | Yes | Yes | No | No |
-| Edit/manage own created team | Yes | Creator only | Creator only | Creator only |
-| Delete teams | Yes | No | No | No |
-| View projects | Yes | Yes | Yes | Yes |
-| Create projects | Yes | Yes | No | No |
-| Edit/manage project | Yes | If project manager | If tech lead | No |
-| Delete projects | Yes | No | No | No |
-| View own tasks | Yes | Yes | Yes | Yes |
-| Manage own tasks | Yes | Yes | Yes | Yes |
-| Manage any task | Yes | No | No | No |
-| View/manage own notes | Yes | Yes | Yes | Yes |
-| View/manage others' notes | No | No | No | No |
-| View activity feed | Yes | Yes | Yes | Yes |
-| Access settings | Yes | No | No | No |
+| Area | Admin | HR | Manager | Tech Lead | Employee | Viewer |
+| --- | --- | --- | --- | --- | --- | --- |
+| View employees | Yes | Yes | Yes | Yes | Yes | Yes |
+| Create employees | Yes | Yes | Yes | No | No | No |
+| Edit any employee | Yes | Yes | No | No | No | No |
+| Edit own profile | Yes | Yes | Yes | Yes | Yes | Yes |
+| Deactivate employees | Yes | Yes, except admin accounts | No | No | No | No |
+| View teams | Yes | Yes | Yes | Yes | Yes | Yes |
+| Create teams | Yes | No | Yes | No | No | No |
+| Edit/manage own created team | Yes | Creator only | Creator only | Creator only | Creator only | Creator only |
+| Delete teams | Yes | No | No | No | No | No |
+| View projects | Yes | Yes | Yes | Yes | Yes | Yes |
+| Create projects | Yes | No | Yes | No | No | No |
+| Edit/manage project | Yes | No | If project manager | If tech lead | No | No |
+| Delete projects | Yes | No | No | No | No | No |
+| View own tasks | Yes | Yes | Yes | Yes | Yes | Yes |
+| Manage own tasks | Yes | Yes | Yes | Yes | Yes | Yes |
+| Manage any task | Yes | No | No | No | No | No |
+| View/manage own notes | Yes | Yes | Yes | Yes | Yes | Yes |
+| View/manage others' notes | No | No | No | No | No | No |
+| View activity feed | Yes | Yes | Yes | Yes | Yes | Yes |
+| Access settings | Yes | No | No | No | No | No |
 
 ## Ownership Rules
 
@@ -42,6 +46,7 @@ Highest to lowest:
 
 - Everyone can view the employee directory.
 - Admins can edit any employee.
+- HR can edit employee records across the org.
 - Users can edit their own profile.
 - Non-admin self-edit is limited to safe profile fields:
   - name
@@ -49,7 +54,11 @@ Highest to lowest:
   - skills
   - avatar
 - Non-admin users cannot change their own role, manager, or active status.
-- Only admins can deactivate employees.
+- Admins can create any role.
+- HR can create `employee` and `viewer` users.
+- Managers can create `tech_lead`, `employee`, and `viewer` users.
+- Admins and HR can deactivate employees.
+- HR cannot deactivate admin accounts.
 
 ### Teams
 

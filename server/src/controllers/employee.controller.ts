@@ -108,6 +108,10 @@ export const remove = async (req: AuthRequest, res: Response): Promise<void> => 
       res.status(404).json({ message: 'Employee not found' })
       return
     }
+    if (error instanceof Error && error.message === 'FORBIDDEN') {
+      res.status(403).json({ message: 'Insufficient permissions', action: 'employees.deactivate' })
+      return
+    }
     sendServerError(res, 'Failed to deactivate employee')
   }
 }

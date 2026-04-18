@@ -15,7 +15,7 @@ import {
 } from '@/hooks/useEmployees'
 import { usePermissions } from '@/hooks/usePermissions'
 import { appToast } from '@/lib/toast'
-import { Employee } from '@/types'
+import { Employee, UserRole } from '@/types'
 import { employeeRoles, roleLabels } from './constants'
 
 interface EmployeeFormModalProps {
@@ -28,7 +28,7 @@ interface EmployeeFormValues {
   name: string
   email: string
   password: string
-  role: 'admin' | 'manager' | 'tech_lead' | 'employee'
+  role: UserRole
   department: string
   manager_id: string
 }
@@ -76,7 +76,7 @@ export function EmployeeFormModal({ open, employee, onClose }: EmployeeFormModal
 }
 
 function EmployeeFormModalContent({ employee, onClose }: Omit<EmployeeFormModalProps, 'open'>) {
-  const { isAdmin } = usePermissions()
+  const { isAdmin, isHr } = usePermissions()
   const [skills, setSkills] = useState<string[]>(() => employee?.skills || [])
   const [skillInput, setSkillInput] = useState('')
   const [formError, setFormError] = useState<string | null>(null)
@@ -88,8 +88,13 @@ function EmployeeFormModalContent({ employee, onClose }: Omit<EmployeeFormModalP
   const uploadAvatar = useUploadEmployeeAvatar(employee?.id || '')
   const { data: managers } = useEmployees({ limit: 100, is_active: true })
   const isEdit = Boolean(employee)
-  const canEditPrivilegedFields = isAdmin || !isEdit
-  const roleOptions = isAdmin ? employeeRoles : employeeRoles.filter((role) => role !== 'admin')
+  const canManageRoles = isAdmin || isHr || !isEdit
+  const canManageManager = isAdmin || isHr || !isEdit
+  const roleOptions = isAdmin
+    ? employeeRoles
+    : isHr
+      ? employeeRoles.filter((role) => role === 'employee' || role === 'viewer')
+      : employeeRoles.filter((role) => role === 'tech_lead' || role === 'employee' || role === 'viewer')
 
   const {
     formState: { errors },
@@ -149,9 +154,9 @@ function EmployeeFormModalContent({ employee, onClose }: Omit<EmployeeFormModalP
       if (isEdit && employee) {
         const payload = updateEmployeeSchema.parse({
           name: values.name,
-          role: canEditPrivilegedFields ? values.role : undefined,
+          role: canManageRoles ? values.role : undefined,
           department: values.department || null,
-          manager_id: canEditPrivilegedFields ? values.manager_id || null : undefined,
+          manager_id: canManageManager ? values.manager_id || null : undefined,
           skills,
         })
         await updateEmployee.mutateAsync(payload)
@@ -296,7 +301,7 @@ function EmployeeFormModalContent({ employee, onClose }: Omit<EmployeeFormModalP
               </label>
             ) : null}
 
-            {canEditPrivilegedFields ? (
+            {canManageRoles ? (
               <label className="block">
                 <span className="text-sm font-medium text-[color:var(--color-text-secondary)]">Role</span>
                 <select
@@ -320,7 +325,7 @@ function EmployeeFormModalContent({ employee, onClose }: Omit<EmployeeFormModalP
               />
             </label>
 
-            {canEditPrivilegedFields ? (
+            {canManageManager ? (
               <label className="block">
                 <span className="text-sm font-medium text-[color:var(--color-text-secondary)]">Manager</span>
                 <input type="hidden" {...register('manager_id')} />

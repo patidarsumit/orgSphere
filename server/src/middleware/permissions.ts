@@ -4,6 +4,7 @@ import { Project } from '../entities/Project'
 import { Team } from '../entities/Team'
 import { Task } from '../entities/Task'
 import { Note } from '../entities/Note'
+import { User } from '../entities/User'
 import { UserRole } from '../entities/User'
 import { can, isUserRole, PermissionAction } from '../permissions'
 import { AuthRequest } from './auth'
@@ -73,6 +74,43 @@ export const canEditEmployee = (req: AuthRequest, res: Response, next: NextFunct
   }
 
   forbidden(res, 'You can only edit your own profile', 'employees.edit_own')
+}
+
+export const canDeactivateEmployee = async (
+  req: AuthRequest,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  const role = getRole(req)
+
+  if (!req.user || !role) {
+    res.status(401).json({ message: 'Unauthorized' })
+    return
+  }
+
+  if (!can(role, 'employees.deactivate')) {
+    forbidden(res, 'Insufficient permissions', 'employees.deactivate')
+    return
+  }
+
+  if (req.params.id === req.user.id) {
+    res.status(400).json({ message: 'Cannot deactivate your own account' })
+    return
+  }
+
+  const target = await AppDataSource.getRepository(User).findOne({ where: { id: req.params.id } })
+
+  if (!target) {
+    res.status(404).json({ message: 'Employee not found' })
+    return
+  }
+
+  if (role === 'hr' && target.role === 'admin') {
+    forbidden(res, 'Only admins can deactivate admin accounts', 'employees.deactivate')
+    return
+  }
+
+  next()
 }
 
 export const canManageProject = async (

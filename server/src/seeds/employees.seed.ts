@@ -31,6 +31,13 @@ const employees: SeedEmployee[] = [
     skills: ['Product Strategy', 'Agile', 'Roadmapping'],
   },
   {
+    name: 'Riya Menon',
+    email: 'riya@orgsphere.io',
+    role: 'hr',
+    department: 'People Operations',
+    skills: ['Onboarding', 'HRIS', 'Policy Management'],
+  },
+  {
     name: 'Raj Mehta',
     email: 'raj@orgsphere.io',
     role: 'tech_lead',
@@ -43,6 +50,13 @@ const employees: SeedEmployee[] = [
     role: 'employee',
     department: 'Design',
     skills: ['Figma', 'UI Design', 'User Research', 'Prototyping'],
+  },
+  {
+    name: 'Arjun Kapoor',
+    email: 'arjun@orgsphere.io',
+    role: 'viewer',
+    department: 'Leadership',
+    skills: ['Reporting', 'Stakeholder Reviews'],
   },
   {
     name: 'Vikram Nair',
@@ -123,6 +137,7 @@ async function seed() {
   await setManager(repo, 'raj@orgsphere.io', 'sumit@orgsphere.io')
   await setManager(repo, 'priya@orgsphere.io', 'sumit@orgsphere.io')
   await setManager(repo, 'amit@orgsphere.io', 'sumit@orgsphere.io')
+  await setManager(repo, 'riya@orgsphere.io', 'sumit@orgsphere.io')
 
   for (const email of ['ananya@orgsphere.io', 'vikram@orgsphere.io', 'neha@orgsphere.io']) {
     await setManager(repo, email, 'raj@orgsphere.io')

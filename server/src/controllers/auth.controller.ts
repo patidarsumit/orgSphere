@@ -64,11 +64,10 @@ const setRefreshCookie = (res: Response, refreshToken: string) => {
 
 export const register = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { name, email, password, role } = req.body as {
+    const { name, email, password } = req.body as {
       name: string
       email: string
       password: string
-      role: User['role']
     }
     const repo = userRepo()
 
@@ -79,7 +78,7 @@ export const register = async (req: Request, res: Response): Promise<void> => {
     }
 
     const password_hash = await bcrypt.hash(password, 12)
-    const user = repo.create({ name, email, password_hash, role })
+    const user = repo.create({ name, email, password_hash, role: 'employee' })
     await repo.save(user)
 
     const { accessToken, refreshToken } = generateTokens(user)

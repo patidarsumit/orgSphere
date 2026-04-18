@@ -62,7 +62,7 @@ export const getRoles = async (_req: AuthRequest, res: Response): Promise<void> 
 export const updateRole = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const role = req.body.role as User['role']
-    const validRoles: User['role'][] = ['admin', 'manager', 'tech_lead', 'employee']
+    const validRoles: User['role'][] = ['admin', 'hr', 'manager', 'tech_lead', 'employee', 'viewer']
 
     if (!validRoles.includes(role)) {
       res.status(400).json({ message: 'Invalid role' })

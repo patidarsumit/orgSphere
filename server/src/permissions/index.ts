@@ -15,16 +15,16 @@ export type PermissionAction =
   | 'notes.manage_own'
   | 'settings.access'
 
-export const ROLE_HIERARCHY: UserRole[] = ['employee', 'tech_lead', 'manager', 'admin']
+export const ROLE_HIERARCHY: UserRole[] = ['viewer', 'employee', 'tech_lead', 'manager', 'hr', 'admin']
 
 export const hasMinRole = (userRole: UserRole, minRole: UserRole): boolean =>
   ROLE_HIERARCHY.indexOf(userRole) >= ROLE_HIERARCHY.indexOf(minRole)
 
 export const PERMISSIONS: Record<PermissionAction, UserRole[]> = {
-  'employees.create': ['admin', 'manager'],
-  'employees.edit_any': ['admin'],
-  'employees.edit_own': ['admin', 'manager', 'tech_lead', 'employee'],
-  'employees.deactivate': ['admin'],
+  'employees.create': ['admin', 'manager', 'hr'],
+  'employees.edit_any': ['admin', 'hr'],
+  'employees.edit_own': ['admin', 'hr', 'manager', 'tech_lead', 'employee', 'viewer'],
+  'employees.deactivate': ['admin', 'hr'],
   'teams.create': ['admin', 'manager'],
   'teams.manage': ['admin'],
   'teams.delete': ['admin'],
@@ -32,7 +32,7 @@ export const PERMISSIONS: Record<PermissionAction, UserRole[]> = {
   'projects.manage': ['admin'],
   'projects.delete': ['admin'],
   'tasks.manage_any': ['admin'],
-  'notes.manage_own': ['admin', 'manager', 'tech_lead', 'employee'],
+  'notes.manage_own': ['admin', 'hr', 'manager', 'tech_lead', 'employee', 'viewer'],
   'settings.access': ['admin'],
 }
 

@@ -38,7 +38,7 @@ const tabs: Array<{ id: SettingsTab; label: string; icon: typeof User }> = [
   { id: 'account', label: 'My Account', icon: KeyRound },
 ]
 
-const roleOptions: UserRole[] = ['admin', 'manager', 'tech_lead', 'employee']
+const roleOptions: UserRole[] = ['admin', 'hr', 'manager', 'tech_lead', 'employee', 'viewer']
 
 function Card({ children, className = '' }: { children: React.ReactNode; className?: string }) {
   return (
@@ -248,9 +248,11 @@ function RolesTab() {
             <thead className="text-xs uppercase text-gray-400"><tr><th className="py-3">Role</th><th>View</th><th>Create</th><th>Edit</th><th>Delete</th></tr></thead>
             <tbody className="divide-y divide-gray-50 font-semibold text-gray-700">
               <tr><td className="py-3">Admin</td><td>All</td><td>All</td><td>All</td><td>All</td></tr>
+              <tr><td className="py-3">HR</td><td>All</td><td>Employees</td><td>Employees</td><td>Employee deactivation</td></tr>
               <tr><td className="py-3">Manager</td><td>All</td><td>Projects</td><td>Own scope</td><td>-</td></tr>
               <tr><td className="py-3">Tech Lead</td><td>All</td><td>Tasks</td><td>Own scope</td><td>-</td></tr>
               <tr><td className="py-3">Employee</td><td>All</td><td>Tasks</td><td>Own scope</td><td>-</td></tr>
+              <tr><td className="py-3">Viewer</td><td>All</td><td>-</td><td>Own workspace only</td><td>-</td></tr>
             </tbody>
           </table>
         </div>

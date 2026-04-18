@@ -11,7 +11,7 @@ import {
 } from 'typeorm'
 import { Team } from './Team'
 
-export type UserRole = 'admin' | 'manager' | 'tech_lead' | 'employee'
+export type UserRole = 'admin' | 'hr' | 'manager' | 'tech_lead' | 'employee' | 'viewer'
 
 @Entity('users')
 export class User {
@@ -29,7 +29,7 @@ export class User {
 
   @Column({
     type: 'enum',
-    enum: ['admin', 'manager', 'tech_lead', 'employee'],
+    enum: ['admin', 'hr', 'manager', 'tech_lead', 'employee', 'viewer'],
     default: 'employee',
   })
   role!: UserRole
