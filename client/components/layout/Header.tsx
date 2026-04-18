@@ -200,7 +200,7 @@ export function Header() {
           {menuOpen ? (
             <div className="absolute right-0 top-11 z-30 w-40 rounded-lg bg-white p-1 shadow-[var(--shadow-modal)] ring-1 ring-gray-100">
               <Link
-                href="/my/dashboard"
+                href={user ? `/employees/${user.id}` : '/my/dashboard'}
                 className="block rounded-md px-3 py-2 text-sm text-gray-600 hover:bg-gray-50 hover:text-gray-900"
                 onClick={() => setMenuOpen(false)}
               >

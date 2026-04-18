@@ -140,6 +140,43 @@ export default function EmployeeDetailPage() {
     return <ProfileSkeleton />
   }
 
+  const contributionItems = [
+    !projectsLoading && userProjects.length > 0
+      ? {
+          text: `Contributing to ${userProjects.length} active ${userProjects.length === 1 ? 'project' : 'projects'}.`,
+          meta: userProjects
+            .slice(0, 2)
+            .map((membership) => membership.project.name)
+            .join(', '),
+        }
+      : null,
+    !teamsLoading && userTeams.length > 0
+      ? {
+          text: `Collaborating across ${userTeams.length} official ${userTeams.length === 1 ? 'team' : 'teams'}.`,
+          meta: userTeams
+            .slice(0, 2)
+            .map((team) => team.name)
+            .join(', '),
+        }
+      : null,
+    employee.skills.length > 0
+      ? {
+          text: `Maintains ${employee.skills.length} listed ${employee.skills.length === 1 ? 'skill' : 'skills'} on their profile.`,
+          meta: employee.skills.slice(0, 3).join(', '),
+        }
+      : null,
+  ].filter(Boolean) as Array<{ text: string; meta: string }>
+
+  const visibleContributions =
+    contributionItems.length > 0
+      ? contributionItems
+      : [
+          {
+            text: 'Profile is ready for project and team contributions.',
+            meta: employee.department || roleLabels[employee.role],
+          },
+        ]
+
   return (
     <div className="relative -m-8 min-h-screen bg-[color:var(--color-surface)]">
       <div className="h-[120px] bg-[color:var(--color-surface-highest)]">
@@ -429,16 +466,16 @@ export default function EmployeeDetailPage() {
           <section className="rounded-xl bg-[color:var(--color-surface-card)] p-8 shadow-sm">
             <SectionTitle eyebrow="Recent Contributions" />
             <div className="relative mt-6 space-y-6 before:absolute before:bottom-2 before:left-[11px] before:top-2 before:w-[2px] before:bg-[color:var(--color-surface-low)]">
-              {[1, 2].map((item) => (
-                <div key={item} className="relative pl-8">
+              {visibleContributions.map((item) => (
+                <div key={`${item.text}-${item.meta}`} className="relative pl-8">
                   <div className="absolute left-0 top-1 flex h-6 w-6 items-center justify-center rounded-full bg-[color:var(--color-primary-container)] ring-4 ring-white">
                     <Activity size={12} className="text-white" />
                   </div>
                   <p className="text-sm text-[color:var(--color-text-secondary)]">
-                    Activity will appear after the activity module is connected.
+                    {item.text}
                   </p>
                   <p className="mt-1 text-[10px] text-[color:var(--color-text-tertiary)]">
-                    Phase 7
+                    {item.meta}
                   </p>
                 </div>
               ))}
