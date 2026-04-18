@@ -2,12 +2,12 @@
 
 import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import axios from 'axios'
 import { useDispatch, useSelector } from 'react-redux'
+import api from '@/lib/axios'
 import { Header } from '@/components/layout/Header'
 import { Sidebar } from '@/components/layout/Sidebar'
 import { RootState } from '@/store'
-import { clearAuth, setCredentials, setLoading } from '@/store/slices/authSlice'
+import { setCredentials, setLoading } from '@/store/slices/authSlice'
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const dispatch = useDispatch()
@@ -16,41 +16,29 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     const restoreSession = async () => {
-      if (isAuthenticated) {
-        return
-      }
-
       try {
-        const { data } = await axios.post(
-          `${process.env.NEXT_PUBLIC_API_URL}/auth/refresh`,
-          {},
-          { withCredentials: true }
-        )
+        const { data } = await api.post('/auth/refresh')
         dispatch(setCredentials(data))
       } catch {
-        dispatch(clearAuth())
+        dispatch(setLoading(false))
+        router.push('/login')
       }
     }
 
-    void restoreSession()
-  }, [dispatch, isAuthenticated])
-
-  useEffect(() => {
-    if (!isLoading && !isAuthenticated) {
-      router.push('/login')
-    }
-  }, [isAuthenticated, isLoading, router])
-
-  useEffect(() => {
-    if (isAuthenticated) {
+    if (!isAuthenticated) {
+      void restoreSession()
+    } else {
       dispatch(setLoading(false))
     }
-  }, [dispatch, isAuthenticated])
+  }, [dispatch, isAuthenticated, router])
 
   if (isLoading) {
     return (
       <div className="flex h-screen items-center justify-center bg-gray-50">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-indigo-600 border-t-transparent" />
+        <div className="flex flex-col items-center gap-3">
+          <div className="h-8 w-8 animate-spin rounded-full border-4 border-indigo-600 border-t-transparent" />
+          <p className="text-sm text-gray-500">Loading OrgSphere...</p>
+        </div>
       </div>
     )
   }
@@ -60,9 +48,9 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <div className="flex h-screen bg-gray-50">
+    <div className="flex h-screen overflow-hidden bg-gray-50">
       <Sidebar />
-      <div className="flex flex-1 flex-col overflow-hidden">
+      <div className="flex min-w-0 flex-1 flex-col">
         <Header />
         <main className="flex-1 overflow-y-auto p-8">{children}</main>
       </div>

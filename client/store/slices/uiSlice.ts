@@ -14,7 +14,7 @@ interface UIState {
 }
 
 const initialState: UIState = {
-  sidebarOpen: true,
+  sidebarOpen: false,
   activeModal: null,
   toasts: [],
   theme: 'light',
@@ -26,6 +26,9 @@ const uiSlice = createSlice({
   reducers: {
     toggleSidebar: (state) => {
       state.sidebarOpen = !state.sidebarOpen
+    },
+    setSidebarOpen: (state, action: PayloadAction<boolean>) => {
+      state.sidebarOpen = action.payload
     },
     openModal: (state, action: PayloadAction<string>) => {
       state.activeModal = action.payload
@@ -42,7 +45,6 @@ const uiSlice = createSlice({
   },
 })
 
-export const { toggleSidebar, openModal, closeModal, addToast, removeToast } =
+export const { toggleSidebar, setSidebarOpen, openModal, closeModal, addToast, removeToast } =
   uiSlice.actions
 export default uiSlice.reducer
-

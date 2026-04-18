@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from 'express'
 import jwt from 'jsonwebtoken'
+import { env } from '../config/env'
 
 export interface AuthRequest extends Request {
   user?: {
@@ -24,7 +25,7 @@ export const authMiddleware = (
   const token = authHeader.split(' ')[1]
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || '') as {
+    const decoded = jwt.verify(token, env.jwtSecret()) as {
       id: string
       email: string
       role: string
@@ -48,4 +49,3 @@ export const adminOnly = (
 
   next()
 }
-

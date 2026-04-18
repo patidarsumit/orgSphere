@@ -48,7 +48,14 @@ api.interceptors.response.use(
   async (error: AxiosError) => {
     const originalRequest = error.config as RetriableRequestConfig | undefined
 
-    if (error.response?.status !== 401 || !originalRequest || originalRequest._retry) {
+    const isRefreshRequest = originalRequest?.url?.includes('/auth/refresh')
+
+    if (
+      error.response?.status !== 401 ||
+      !originalRequest ||
+      originalRequest._retry ||
+      isRefreshRequest
+    ) {
       return Promise.reject(error)
     }
 
@@ -88,4 +95,3 @@ api.interceptors.response.use(
 )
 
 export default api
-

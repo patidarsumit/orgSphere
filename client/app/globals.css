@@ -3,6 +3,20 @@
 :root {
   --background: #f9fafb;
   --foreground: #111827;
+  --color-primary: #4F46E5;
+  --color-primary-hover: #4338CA;
+  --color-primary-light: #EEF2FF;
+  --color-surface: #F9FAFB;
+  --color-surface-card: #FFFFFF;
+  --color-border: #F3F4F6;
+  --color-border-strong: #E5E7EB;
+  --color-text-primary: #111827;
+  --color-text-secondary: #6B7280;
+  --color-text-tertiary: #9CA3AF;
+  --shadow-card: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-modal: 0 12px 32px -4px rgba(21,28,39,0.12);
+  --radius-card: 12px;
+  --radius-btn: 8px;
 }
 
 @theme inline {
