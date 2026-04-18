@@ -22,7 +22,9 @@ import { roleLabels } from '@/components/employees/constants'
 import { Avatar } from '@/components/shared/Avatar'
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog'
 import { EmptyState } from '@/components/shared/EmptyState'
+import { iconClassForTeam } from '@/components/teams/teamUtils'
 import { useDeactivateEmployee, useEmployee } from '@/hooks/useEmployees'
+import { useUserTeams } from '@/hooks/useTeams'
 import { RootState } from '@/store'
 import { Employee } from '@/types'
 
@@ -109,6 +111,7 @@ export default function EmployeeDetailPage() {
   const [confirmOpen, setConfirmOpen] = useState(false)
   const deactivateEmployee = useDeactivateEmployee()
   const { data: employee, isLoading, isError } = useEmployee(params.id)
+  const { data: userTeams = [], isLoading: teamsLoading } = useUserTeams(params.id)
   const canEdit = currentUser?.role === 'admin' || currentUser?.id === params.id
   const canDeactivate = currentUser?.role === 'admin' && currentUser?.id !== params.id
 
@@ -344,24 +347,40 @@ export default function EmployeeDetailPage() {
             <div className="mb-6 flex items-center justify-between">
               <SectionTitle eyebrow="Collaboration Hub" title="Official Teams" />
               <span className="rounded-full bg-white px-3 py-1 text-xs font-bold text-[color:var(--color-primary)] shadow-sm">
-                Coming Soon
+                {teamsLoading ? 'Loading' : `${userTeams.length} Teams`}
               </span>
             </div>
-            <div className="flex flex-wrap gap-3">
-              {['Design Leadership', 'Enterprise Suite Core', 'Accessibility Taskforce'].map(
-                (team) => (
+            {teamsLoading ? (
+              <div className="flex flex-wrap gap-3">
+                {[1, 2].map((item) => (
                   <div
-                    key={team}
-                    className="flex items-center gap-2 rounded-xl bg-white px-4 py-2 shadow-sm"
+                    key={item}
+                    className="h-9 w-36 animate-pulse rounded-xl bg-white"
+                  />
+                ))}
+              </div>
+            ) : null}
+            {!teamsLoading && userTeams.length > 0 ? (
+              <div className="flex flex-wrap gap-3">
+                {userTeams.map((team) => (
+                  <Link
+                    key={team.id}
+                    href={`/teams/${team.id}`}
+                    className="flex items-center gap-2 rounded-xl bg-white px-4 py-2 shadow-sm transition-transform hover:-translate-y-0.5"
                   >
-                    <span className="h-2 w-2 rounded-full bg-[color:var(--color-primary)]" />
+                    <span className={`h-2.5 w-2.5 rounded-full ${iconClassForTeam(team.name)}`} />
                     <span className="text-sm font-semibold text-[color:var(--color-text-primary)]">
-                      {team}
+                      {team.name}
                     </span>
-                  </div>
-                )
-              )}
-            </div>
+                  </Link>
+                ))}
+              </div>
+            ) : null}
+            {!teamsLoading && userTeams.length === 0 ? (
+              <p className="text-sm text-[color:var(--color-text-tertiary)]">
+                Not a member of any teams.
+              </p>
+            ) : null}
           </section>
 
           <section className="rounded-xl bg-[color:var(--color-surface-card)] p-8 shadow-sm">

@@ -3,11 +3,13 @@ import {
   CreateDateColumn,
   Entity,
   JoinColumn,
+  ManyToMany,
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm'
+import { Team } from './Team'
 
 export type UserRole = 'admin' | 'manager' | 'tech_lead' | 'employee'
 
@@ -51,6 +53,9 @@ export class User {
   @OneToMany(() => User, (user) => user.manager)
   direct_reports!: User[]
 
+  @ManyToMany(() => Team, (team) => team.members)
+  teams!: Team[]
+
   @Column({ type: 'boolean', default: true })
   is_active!: boolean
 
@@ -60,4 +65,3 @@ export class User {
   @UpdateDateColumn()
   updated_at!: Date
 }
-

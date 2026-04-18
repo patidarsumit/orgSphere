@@ -8,6 +8,7 @@ interface Toast {
 
 interface UIState {
   sidebarOpen: boolean
+  sidebarCollapsed: boolean
   activeModal: string | null
   toasts: Toast[]
   theme: 'light' | 'dark'
@@ -15,6 +16,7 @@ interface UIState {
 
 const initialState: UIState = {
   sidebarOpen: false,
+  sidebarCollapsed: false,
   activeModal: null,
   toasts: [],
   theme: 'light',
@@ -29,6 +31,12 @@ const uiSlice = createSlice({
     },
     setSidebarOpen: (state, action: PayloadAction<boolean>) => {
       state.sidebarOpen = action.payload
+    },
+    toggleSidebarCollapsed: (state) => {
+      state.sidebarCollapsed = !state.sidebarCollapsed
+    },
+    setSidebarCollapsed: (state, action: PayloadAction<boolean>) => {
+      state.sidebarCollapsed = action.payload
     },
     openModal: (state, action: PayloadAction<string>) => {
       state.activeModal = action.payload
@@ -45,6 +53,14 @@ const uiSlice = createSlice({
   },
 })
 
-export const { toggleSidebar, setSidebarOpen, openModal, closeModal, addToast, removeToast } =
-  uiSlice.actions
+export const {
+  toggleSidebar,
+  setSidebarOpen,
+  toggleSidebarCollapsed,
+  setSidebarCollapsed,
+  openModal,
+  closeModal,
+  addToast,
+  removeToast,
+} = uiSlice.actions
 export default uiSlice.reducer

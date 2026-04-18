@@ -8,6 +8,7 @@
     "build": "tsc",
     "typecheck": "tsc --noEmit",
     "seed": "ts-node --transpile-only src/seeds/employees.seed.ts",
+    "seed:teams": "ts-node --transpile-only src/seeds/teams.seed.ts",
     "migration:generate": "typeorm migration:generate",
     "migration:run": "typeorm-ts-node-commonjs migration:run -d src/data-source.ts",
     "migration:revert": "typeorm-ts-node-commonjs migration:revert -d src/data-source.ts"
