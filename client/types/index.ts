@@ -11,6 +11,12 @@ export interface User {
   manager_id: string | null
   is_active: boolean
   created_at: string
+  updated_at?: string
+}
+
+export interface Employee extends User {
+  manager?: User | null
+  direct_reports?: User[]
 }
 
 export type ProjectStatus = 'active' | 'completed' | 'on_hold' | 'planned' | 'archived'
@@ -29,4 +35,3 @@ export interface PaginatedResponse<T> {
   limit: number
   totalPages: number
 }
-
