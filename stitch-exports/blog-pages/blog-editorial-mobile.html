@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Blog | OrgSphere</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "surface-container": "#e7eefe",
+                      "on-secondary-fixed": "#140f54",
+                      "tertiary": "#7e3000",
+                      "outline-variant": "#c7c4d8",
+                      "on-primary-fixed": "#0f0069",
+                      "tertiary-container": "#a44100",
+                      "surface-dim": "#d3daea",
+                      "primary-fixed-dim": "#c3c0ff",
+                      "secondary": "#58579b",
+                      "primary": "#3525cd",
+                      "surface-container-lowest": "#ffffff",
+                      "surface-container-low": "#f0f3ff",
+                      "secondary-fixed-dim": "#c3c0ff",
+                      "background": "#f9f9ff",
+                      "primary-container": "#4f46e5",
+                      "secondary-fixed": "#e2dfff",
+                      "error": "#ba1a1a",
+                      "surface-container-highest": "#dce2f3",
+                      "on-secondary": "#ffffff",
+                      "on-tertiary-container": "#ffd2be",
+                      "on-error-container": "#93000a",
+                      "inverse-on-surface": "#ebf1ff",
+                      "secondary-container": "#b6b4ff",
+                      "on-secondary-fixed-variant": "#413f82",
+                      "tertiary-fixed": "#ffdbcc",
+                      "surface-bright": "#f9f9ff",
+                      "on-primary": "#ffffff",
+                      "on-error": "#ffffff",
+                      "inverse-primary": "#c3c0ff",
+                      "on-background": "#151c27",
+                      "error-container": "#ffdad6",
+                      "surface-tint": "#4d44e3",
+                      "on-secondary-container": "#454386",
+                      "inverse-surface": "#2a313d",
+                      "primary-fixed": "#e2dfff",
+                      "surface-variant": "#dce2f3",
+                      "on-tertiary-fixed": "#351000",
+                      "surface": "#f9f9ff",
+                      "on-surface": "#151c27",
+                      "outline": "#777587",
+                      "on-tertiary": "#ffffff",
+                      "on-surface-variant": "#464555",
+                      "on-primary-container": "#dad7ff",
+                      "tertiary-fixed-dim": "#ffb695",
+                      "on-primary-fixed-variant": "#3323cc",
+                      "on-tertiary-fixed-variant": "#7b2f00",
+                      "surface-container-high": "#e2e8f8"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "fontFamily": {
+                      "headline": ["Inter"],
+                      "body": ["Inter"],
+                      "label": ["Inter"]
+              }
+            },
+          },
+        }
+      </script>
+<style>
+        body { font-family: 'Inter', sans-serif; background-color: #f9f9ff; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+      </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="text-on-surface antialiased">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 bg-slate-50/80 backdrop-blur-xl shadow-sm">
+<div class="flex justify-between items-center w-full px-6 py-4 max-w-screen-2xl mx-auto">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-indigo-700" data-icon="grid_view">grid_view</span>
+<span class="text-2xl font-black tracking-tighter text-indigo-700">OrgSphere</span>
+</div>
+<nav class="hidden md:flex gap-8">
+<a class="text-slate-600 font-medium hover:text-indigo-500 transition-all" href="#">Resources</a>
+<a class="text-indigo-700 border-b-2 border-indigo-600 pb-1 font-medium" href="#">Blog</a>
+</nav>
+<div class="flex items-center gap-4">
+<button class="bg-primary-container text-on-primary-container px-6 py-2 rounded-full font-bold text-sm hover:opacity-90 active:scale-95 transition-all">Login</button>
+</div>
+</div>
+</header>
+<main class="pt-20">
+<!-- Hero Section -->
+<section class="bg-surface-container-low px-6 py-16 md:py-24">
+<div class="max-w-4xl mx-auto text-center">
+<h1 class="text-4xl md:text-5xl font-black tracking-tight text-on-surface mb-6">Insights for modern teams.</h1>
+<p class="text-lg md:text-xl text-on-surface-variant leading-relaxed mb-10">Strategies, stories, and ideas on org design, collaboration, and workplace clarity.</p>
+<!-- Pill Filters -->
+<div class="flex flex-wrap justify-center gap-2 overflow-x-auto pb-4 no-scrollbar">
+<button class="bg-primary text-on-primary px-5 py-2 rounded-full text-sm font-bold shadow-md">All</button>
+<button class="bg-surface-container-lowest text-on-surface-variant px-5 py-2 rounded-full text-sm font-medium hover:bg-surface-container-highest transition-colors">Leadership</button>
+<button class="bg-surface-container-lowest text-on-surface-variant px-5 py-2 rounded-full text-sm font-medium hover:bg-surface-container-highest transition-colors">Product</button>
+<button class="bg-surface-container-lowest text-on-surface-variant px-5 py-2 rounded-full text-sm font-medium hover:bg-surface-container-highest transition-colors">Engineering</button>
+<button class="bg-surface-container-lowest text-on-surface-variant px-5 py-2 rounded-full text-sm font-medium hover:bg-surface-container-highest transition-colors">Culture</button>
+<button class="bg-surface-container-lowest text-on-surface-variant px-5 py-2 rounded-full text-sm font-medium hover:bg-surface-container-highest transition-colors">Announcements</button>
+</div>
+</div>
+</section>
+<!-- Featured Article -->
+<section class="px-6 -mt-8">
+<div class="max-w-5xl mx-auto">
+<div class="bg-inverse-surface rounded-xl overflow-hidden shadow-2xl flex flex-col md:flex-row">
+<div class="md:w-1/2 aspect-video md:aspect-auto h-full min-h-[300px] relative">
+<img class="absolute inset-0 w-full h-full object-cover" data-alt="minimalist architectural rendering of a glass building interior with high ceilings and soft afternoon shadows reflecting clean lines" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBPEojhNJtBnyO9e1rmEyK3BXbVFhLnVo616-URJl1vFuZKPWtFWXAJNu2hdAJJyyOqJ9pMdvEJi_7SLK-I2VDlJ7meg9K2f5AEz7sjJYr2jv9THMcY9sI25O1Pk5Philld_NUZ_6cRXuK_aWZVXgAMKQdZuwvKfJxE5BsytaBo14s2pD4cAkOEuaU9J81ksgSQfaQtujcBL3azBdQ5bnz1ykTva5UmBU1gwndQyVINEfkQRbcRMDrMfssHvb1zYttE3p1o6chVhwQ"/>
+</div>
+<div class="md:w-1/2 p-8 md:p-12 flex flex-col justify-center">
+<span class="inline-block bg-tertiary-container text-on-tertiary-container text-[10px] font-black tracking-widest px-3 py-1 rounded-full mb-6">FEATURED</span>
+<h2 class="text-2xl md:text-3xl font-bold text-inverse-on-surface mb-4 leading-tight">How transparent org structures reduce decision fatigue</h2>
+<p class="text-outline-variant mb-8 line-clamp-2">Exploring the psychological impact of organizational visibility and how documented workflows empower autonomy across distributed teams.</p>
+<div class="flex items-center gap-4 mb-8">
+<img class="w-10 h-10 rounded-full border-2 border-primary" data-alt="professional portrait of a woman in a cream blazer with a confident smile in a bright airy studio" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBeQ1xMYYf7SkUPhHqCXOSHGrsinyGvMp8yoCT2lvPzihCGqWPzJwOWtiymDnPos3PkCBkt1rLBpL-WbzWndWtZ-qBDP1AaiAclXwyX9Yv8gMYf-5TdPO53iLbCF3Xjz-B4w6Y7JgfeDLBjFVX1HUl2M13yT_tnWPSCZ_v2blYgntT21iCfpkz8vVVkaEidlWs4qap1R6wRRWuVOishruJMoQOaJd40E4Xg_l2JrLCpdJFJQijljsmxmvoOGrSZdFkwaeEJGHCyxeA"/>
+<div>
+<p class="text-inverse-on-surface font-bold text-sm">Elena Vance</p>
+<p class="text-outline-variant text-xs">Mar 12, 2024</p>
+</div>
+</div>
+<a class="text-primary-fixed-dim font-bold flex items-center gap-2 hover:translate-x-1 transition-transform" href="#">
+                            Read Article <span class="material-symbols-outlined text-sm" data-icon="arrow_forward">arrow_forward</span>
+</a>
+</div>
+</div>
+</div>
+</section>
+<!-- Article Grid -->
+<section class="px-6 py-20 max-w-7xl mx-auto">
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+<!-- Card 1 -->
+<article class="bg-surface-container-lowest rounded-xl overflow-hidden shadow-[0_12px_32px_-4px_rgba(21,28,39,0.06)] hover:shadow-lg transition-shadow border border-outline-variant/10">
+<div class="h-48 relative overflow-hidden bg-gradient-to-br from-indigo-500 to-primary-container">
+<img class="w-full h-full object-cover opacity-80" data-alt="abstract geometric pattern of floating silk sheets in shades of indigo and violet in a soft focus 3D environment" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDOdRZ6Q58wZCo1hxanDWzT65WexhhHDurjl5YNOT8Ri-SUvFYBAe8IjXOuWciAhAvRAsXTRyMQ3bm__4dh187pT4si4X-NLGUL5cfJ-3HME5EwiQYnGDCOPRv6WMV2C53uWc_CJ1rEllM8si9FYvYamTLKmNkZ5hYSzrLeOfVrW6EoAawTSOgOTmI8bT-1U9DWdczwTtDCusBXzrMJzGYb4SZBRa0qYBkJg4z6tNuO8BzbV50sud2AX2TAu7NXl3DBp2v2AMMC6pU"/>
+<div class="absolute top-4 left-4">
+<span class="bg-surface-container-lowest/90 backdrop-blur text-primary text-[10px] font-bold px-3 py-1 rounded-full">LEADERSHIP</span>
+</div>
+</div>
+<div class="p-6">
+<h3 class="text-xl font-bold text-on-surface mb-3 leading-snug">The Silent Killer of Velocity: Implicit Hierarchy</h3>
+<p class="text-on-surface-variant text-sm line-clamp-2 mb-6">Why unwritten rules destroy speed and how to codify your team's decision rights effectively.</p>
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-3">
+<img class="w-8 h-8 rounded-full" data-alt="close-up portrait of a man with short dark hair and spectacles looking thoughtfully at a computer screen" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDFHZwmudC5iZp-1D660m-z6KbAGSKCoFFpZaRsHY8RwPni7s3SaBlq5w4zpcP8Cg0v04duN803nJ8oHfbV_StE5YyXm9ewdkB1WMvZvkoqQe1k1y023rIoWSck-orYNOllj9xY7gdpVUGv60CLl2gszHLsHbyfdrI2TjKia8rn1HTX-K4NxyDqu0uNaw3jQYWexUmF1MF4xWYP3shBuUZpEsoSVALzvJFWCrXrHlcxudmFjD3TgjcMadRc2Vs2JI9n5f2a5tzmmiI"/>
+<span class="text-xs font-semibold text-on-surface">Marcus Thorne</span>
+</div>
+<span class="text-[11px] text-outline text-medium uppercase tracking-tighter">5 min read</span>
+</div>
+</div>
+</article>
+<!-- Card 2 -->
+<article class="bg-surface-container-lowest rounded-xl overflow-hidden shadow-[0_12px_32px_-4px_rgba(21,28,39,0.06)] hover:shadow-lg transition-shadow border border-outline-variant/10">
+<div class="h-48 relative overflow-hidden bg-gradient-to-br from-secondary-container to-secondary">
+<img class="w-full h-full object-cover opacity-80" data-alt="clean overhead shot of a modern wooden desk with a single notebook, a fountain pen, and a small succulent" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDMFH9uoF5gXSV7oluBKVRcYr9vfSXWHU8qmzzRkKz1FVMQw0kgKtAy8yaC7kUiGT-xDJZUI_24dUwR5cu7IzoqLZc0wl_P6xiPzFUIzt9RfUNf5nQJ-tlL8o6kJ6d0P2J8QBWgoqlBh-7BMRX2px4Am4KnoyhQaH0byBMOl72OYk5_tUCRJxa_e0bMP9b2YWatC5P39fZ0ABiG9Ix51evOcxuiwTSzDYABvE3xHRmiA3oeU2-zJiLIoBOGEkGBDg4QvlcgeBJ-LJk"/>
+<div class="absolute top-4 left-4">
+<span class="bg-surface-container-lowest/90 backdrop-blur text-primary text-[10px] font-bold px-3 py-1 rounded-full">PRODUCT</span>
+</div>
+</div>
+<div class="p-6">
+<h3 class="text-xl font-bold text-on-surface mb-3 leading-snug">Outcome-Based Roadmap or Feature Factory?</h3>
+<p class="text-on-surface-variant text-sm line-clamp-2 mb-6">Moving beyond delivery schedules to focus on the real value your product brings to your internal customers.</p>
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-3">
+<img class="w-8 h-8 rounded-full" data-alt="smiling woman with curly hair wearing a denim jacket standing against a soft blue sky background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBWiOQCcEtHrHV0qYCJekTCwaQvQjgevIzeqgABD7AkAJWTt4k0dbznN0Y_DgVNGWANoMPAk6Sb4SBVB5i2xbaAV7EhEgDzOTUbltejIn1rvr8DvrelVUzKiXGmzXReH72WEIzqL2zAOsfUKCZZTvBsvmzOXjgTUEluiBKB3GnMsoqMtY0SyiL5SXQS20P7BOQiwwsUSlchkPDGNg4aQmRTnutKMEQPKy9T_LkFOE4IDWYSw44MGkQjIhqSmtUQKLG75xGkcfWMAGU"/>
+<span class="text-xs font-semibold text-on-surface">Sarah Chen</span>
+</div>
+<span class="text-[11px] text-outline text-medium uppercase tracking-tighter">8 min read</span>
+</div>
+</div>
+</article>
+<!-- Card 3 -->
+<article class="bg-surface-container-lowest rounded-xl overflow-hidden shadow-[0_12px_32px_-4px_rgba(21,28,39,0.06)] hover:shadow-lg transition-shadow border border-outline-variant/10">
+<div class="h-48 relative overflow-hidden bg-gradient-to-br from-tertiary-container to-tertiary">
+<img class="w-full h-full object-cover opacity-80" data-alt="macro photograph of crystalline structures with warm amber and orange lighting glowing from within" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA_jkaNRELL7bPppu7PU14zJF-gWv5asNdBtSM5zA-4lb1ibbHV2GHB2vEGBlsXbcO8guKnX-QQrCf3Z7bIOAfbAtrYoDRCgp92xC7AjdxtQjHq3DqSIk5_zAMBgMFOSLQ2PmYCwMA_hisqtsWLnEGgoy_1VD2vD976WYVNhajBIoPId1FJlairMlXfGyPkVVuJT6uZoEzY1XJhb7LV_3HyMgpedB7w72iFBa9aRoZ-LrVIafUxC3ZOWt7V-o3knPKlZ7s7XpSLW6o"/>
+<div class="absolute top-4 left-4">
+<span class="bg-surface-container-lowest/90 backdrop-blur text-primary text-[10px] font-bold px-3 py-1 rounded-full">CULTURE</span>
+</div>
+</div>
+<div class="p-6">
+<h3 class="text-xl font-bold text-on-surface mb-3 leading-snug">The 4-Day Week: A Year of Lessons in Focus</h3>
+<p class="text-on-surface-variant text-sm line-clamp-2 mb-6">We tracked every metric during our transition to a shorter week. Here is what actually happened to productivity.</p>
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-3">
+<img class="w-8 h-8 rounded-full" data-alt="man in a casual grey sweater standing in a minimalist white office with large windows" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDN1JOAqWasu8BOBTuRe82jKyTD_NhMqzBtdVxUjJFQa8HyhzKlT3f_PZRoEdZueDN6z9fRgKI1DJrJcxvnGgJaqDA9fCc_6R9VzvC-L4njveUgsT-5n9fyoAxzOkCwy5C4TDaBoQ9wfp9z2CuBkCP6hBYxlyXP17L6F1OlaRSRcNLohXUpNbeJOcZF4eRy-3KlMPN69I5rato6_8P-sH5BYnXBQEfrRK94ZNlxe5EPk5JlKMHuipYxSd6x7sTXk63sin4rXiQR2yI"/>
+<span class="text-xs font-semibold text-on-surface">David Miller</span>
+</div>
+<span class="text-[11px] text-outline text-medium uppercase tracking-tighter">12 min read</span>
+</div>
+</div>
+</article>
+<!-- Card 4 -->
+<article class="bg-surface-container-lowest rounded-xl overflow-hidden shadow-[0_12px_32px_-4px_rgba(21,28,39,0.06)] hover:shadow-lg transition-shadow border border-outline-variant/10">
+<div class="h-48 relative overflow-hidden bg-gradient-to-br from-indigo-200 to-indigo-400">
+<img class="w-full h-full object-cover opacity-80" data-alt="dramatic architectural stairs in concrete and light, spiraling upwards in a minimalist art museum" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBLMVFlYbo0yS3ne2l5Vlcup3ouz4zYv3HyYV8tx1MnsCFZ6XR-ZgPbRWTvsjNMiYNhpZ_QM5MFuf8BlfYrlYts3JFV17gO93SgF5_cj3_0bfzsb_iY1oHI6D2ic9c358ZXLecuYF6kIsr5UybxH0_iY7RSjro2xhnfPKPdvKzHQR8x2we0c5tvTDyH8dmn7I_x9JrvuLNy0fXfLK716Fl23dYHhJhMSV965_vULvhC5TLXs4jRNN6yvzQMlPfVnpMEzrUBdRAmgE4"/>
+<div class="absolute top-4 left-4">
+<span class="bg-surface-container-lowest/90 backdrop-blur text-primary text-[10px] font-bold px-3 py-1 rounded-full">ENGINEERING</span>
+</div>
+</div>
+<div class="p-6">
+<h3 class="text-xl font-bold text-on-surface mb-3 leading-snug">Technical Debt is an Organizational Smell</h3>
+<p class="text-on-surface-variant text-sm line-clamp-2 mb-6">How misaligned team structures inevitably lead to architectural spaghetti and how to untangle it.</p>
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-3">
+<img class="w-8 h-8 rounded-full" data-alt="person with dyed hair and stylish glasses in a high-contrast urban setting with neon lights in the distance" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA2p4E0klDQvB8lpjFBHF4yhcpUrzHeo7aJEbbtrWlR5sJ-XKvc9j6jJq4h0j1W5zgaeDaQAukdXN79sm8nixISIUYaLGdJuV5G0NhTO4FC2vh7NJhClFaGnsBkTAMw3uABCU8sI-R_zLc6rimFZz0wDyUT2MtyX2-hHWXjOow-iKlYsumW7kz8sHfhIMiJsSTB9wuCY6iI4aY1EfKGIqGCmPy62_JuwC8qLOCMfAlkfbGyj3Upq4-aprxUn7vr_tVZsxGBygO9WIo"/>
+<span class="text-xs font-semibold text-on-surface">Alex Rivera</span>
+</div>
+<span class="text-[11px] text-outline text-medium uppercase tracking-tighter">6 min read</span>
+</div>
+</div>
+</article>
+<!-- Card 5 -->
+<article class="bg-surface-container-lowest rounded-xl overflow-hidden shadow-[0_12px_32px_-4px_rgba(21,28,39,0.06)] hover:shadow-lg transition-shadow border border-outline-variant/10">
+<div class="h-48 relative overflow-hidden bg-gradient-to-br from-slate-700 to-slate-900">
+<img class="w-full h-full object-cover opacity-80" data-alt="monochrome top view of a structured city grid with long morning shadows and sharp contrasts" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDZWu7UJ9olu0C2j9SEv_g7g_m6PkRzv-viVB-tklosWHHFu2N9ZChoaDwAPKCVeWE3FqOPY7x9v7v7d2yam3ZM-nZzW1OvYxgRdElQYQLJRtqDNPFSiswFdoZxyAblEMyJya0klvdLILec6dx59JnIaKhh397I2g6VG2u0XQQPp12nPAhxF69pT60Bm-pSCLZ0DHdn5o-HzqsMm0n4aqAQef-W1IJbuDKVpY9p8X7g3mgeqbJuN4GV98gOIgUC3DlJrOvuNBp0cfM"/>
+<div class="absolute top-4 left-4">
+<span class="bg-surface-container-lowest/90 backdrop-blur text-primary text-[10px] font-bold px-3 py-1 rounded-full">ANNOCEMENTS</span>
+</div>
+</div>
+<div class="p-6">
+<h3 class="text-xl font-bold text-on-surface mb-3 leading-snug">Introducing OrgSphere 2.0: The Blueprint Update</h3>
+<p class="text-on-surface-variant text-sm line-clamp-2 mb-6">Our biggest release yet focuses on visual hierarchy and automated team charting for hyper-growth teams.</p>
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-3">
+<img class="w-8 h-8 rounded-full" data-alt="professional woman in a dark navy suit standing in front of a sleek corporate logo wall" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC0sdjWmxnk1jsS0zGvSdZ1sX5MxJXCPmdbiErNJ9clCLYvBAsQnwlkOmo9YC0Eh77g9hfUsk6zLPobF8MCtJSUVd-G5gE3dSeHBdUIHnl442OOs8OljFc8nPX7STNvpP5c18dgTO8Q-g84X9dQ6XgTOe0JEGokiMm6gqlhuIAL1jh5wxLLo9gDgLYqJ9MuKY1zDPj4Nwk4CwtEfSv8VXSbqaGESV269UWhVYCWXklxCvA4eAsLIRiLYipYXtHjMY1STHAcGGXht4M"/>
+<span class="text-xs font-semibold text-on-surface">Jessica Wu</span>
+</div>
+<span class="text-[11px] text-outline text-medium uppercase tracking-tighter">4 min read</span>
+</div>
+</div>
+</article>
+<!-- Card 6 -->
+<article class="bg-surface-container-lowest rounded-xl overflow-hidden shadow-[0_12px_32px_-4px_rgba(21,28,39,0.06)] hover:shadow-lg transition-shadow border border-outline-variant/10">
+<div class="h-48 relative overflow-hidden bg-gradient-to-br from-primary-container to-on-primary-fixed-variant">
+<img class="w-full h-full object-cover opacity-80" data-alt="close up of a high-tech circuit board with glowing blue light trails representing data flow" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCxq8mQ6zZJkJrwqODqMWkopVqSmWo1jteUo5gKfKxgNLdbaGRl0w_fn_6210seKxHTd_l953Qy3zCV1mz3a0fqhRsG1tsJuETTsTs1gotLJJivrdbVyOYwd3hOmAotx_buVNfTMCtyyaHo6pfhy_xNw-Z7HG5Nft0e-sDHHXFYtL6BvRDPA8mYN-yEgo7LBaOCc7XJ2TBtlhGPU0INJGl7Kt5Ls9cVZ91mJIhvGjnFl2pPgHp_Qu4Q6I0HyVxpCKM9Hq3G0W5Noc0"/>
+<div class="absolute top-4 left-4">
+<span class="bg-surface-container-lowest/90 backdrop-blur text-primary text-[10px] font-bold px-3 py-1 rounded-full">PRODUCT</span>
+</div>
+</div>
+<div class="p-6">
+<h3 class="text-xl font-bold text-on-surface mb-3 leading-snug">Design Systems as Organizational Glue</h3>
+<p class="text-on-surface-variant text-sm line-clamp-2 mb-6">Why your component library is actually your most powerful tool for team alignment and communication.</p>
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-3">
+<img class="w-8 h-8 rounded-full" data-alt="man in a casual black t-shirt sitting in a brightly lit modern cafe with plants in background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD9aQtcrmGvRYLf1bOmhQ1W5B7ayJdSjYmGpTe0kDF0hcjQfmDoupFcWWB4b_4JaUVnc2jTi-NX3jxPGqcwfatmwhHqqZsYBZbTgkeBcO1uGAFubJTVW6nNeG4gfEGzASA4pWWh1khSGOyXSgzBhBfw2lP5qIgARVhqygAFgqYit3QyZVnqcVcOQTYA3uNm9Xcw8i5qmbtmGivkVuFcEnCprYdVfpCQwYIBA45GbHm02sH8uIrowGnmprau34gKLET36MTm2iK96yo"/>
+<span class="text-xs font-semibold text-on-surface">Jordan Poe</span>
+</div>
+<span class="text-[11px] text-outline text-medium uppercase tracking-tighter">10 min read</span>
+</div>
+</div>
+</article>
+</div>
+</section>
+<!-- Newsletter Banner -->
+<section class="px-6 py-12">
+<div class="max-w-5xl mx-auto bg-primary-container rounded-2xl p-8 md:p-16 flex flex-col md:flex-row items-center justify-between gap-10 shadow-xl overflow-hidden relative">
+<div class="relative z-10 text-center md:text-left max-w-md">
+<h2 class="text-3xl font-black text-on-primary-container mb-4">Stay in the loop</h2>
+<p class="text-on-primary-container/80 text-lg">Weekly insights on scaling teams, building culture, and modern org design delivered to your inbox.</p>
+</div>
+<div class="relative z-10 w-full md:w-auto">
+<form class="flex flex-col sm:flex-row gap-3">
+<input class="bg-surface-container-lowest border-none rounded-full px-6 py-4 w-full sm:w-80 text-on-surface focus:ring-2 focus:ring-secondary outline-none placeholder:text-outline" placeholder="Enter your email" type="email"/>
+<button class="bg-indigo-900 text-white font-bold px-8 py-4 rounded-full hover:bg-black transition-colors whitespace-nowrap" type="submit">Subscribe</button>
+</form>
+<p class="text-[10px] text-on-primary-container/60 mt-3 text-center sm:text-left">No spam. Just curated architecture for your inbox.</p>
+</div>
+<!-- Decorative element -->
+<div class="absolute -right-20 -bottom-20 w-80 h-80 bg-primary rounded-full blur-3xl opacity-20"></div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="bg-slate-50 border-t border-slate-100">
+<div class="max-w-7xl mx-auto px-8 py-16 flex flex-col md:flex-row justify-between items-start gap-12">
+<div class="max-w-xs">
+<div class="flex items-center gap-2 mb-6">
+<span class="text-lg font-bold text-slate-900">OrgSphere</span>
+</div>
+<p class="text-slate-500 text-sm leading-relaxed mb-6">Architectural Curation for Modern Teams. Elevating the way organizations think, move, and build.</p>
+<div class="flex gap-4">
+<span class="material-symbols-outlined text-slate-400 hover:text-indigo-600 cursor-pointer" data-icon="public">public</span>
+<span class="material-symbols-outlined text-slate-400 hover:text-indigo-600 cursor-pointer" data-icon="share">share</span>
+<span class="material-symbols-outlined text-slate-400 hover:text-indigo-600 cursor-pointer" data-icon="alternate_email">alternate_email</span>
+</div>
+</div>
+<div class="grid grid-cols-2 sm:grid-cols-4 gap-12 w-full md:w-auto">
+<div class="flex flex-col gap-4">
+<h4 class="text-xs font-black tracking-widest text-slate-900 uppercase">Product</h4>
+<a class="text-sm text-slate-500 hover:text-indigo-600 transition-colors" href="#">Features</a>
+<a class="text-sm text-slate-500 hover:text-indigo-600 transition-colors" href="#">Templates</a>
+<a class="text-sm text-slate-500 hover:text-indigo-600 transition-colors" href="#">Integrations</a>
+</div>
+<div class="flex flex-col gap-4">
+<h4 class="text-xs font-black tracking-widest text-slate-900 uppercase">Company</h4>
+<a class="text-sm text-slate-500 hover:text-indigo-600 transition-colors" href="#">About</a>
+<a class="text-sm text-slate-500 hover:text-indigo-600 transition-colors" href="#">Careers</a>
+<a class="text-sm text-slate-500 hover:text-indigo-600 transition-colors" href="#">Contact</a>
+</div>
+<div class="flex flex-col gap-4">
+<h4 class="text-xs font-black tracking-widest text-slate-900 uppercase">Support</h4>
+<a class="text-sm text-slate-500 hover:text-indigo-600 transition-colors" href="#">Help Center</a>
+<a class="text-sm text-slate-500 hover:text-indigo-600 transition-colors" href="#">Resources</a>
+<a class="text-sm text-slate-500 hover:text-indigo-600 transition-colors" href="#">Status</a>
+</div>
+<div class="flex flex-col gap-4">
+<h4 class="text-xs font-black tracking-widest text-slate-900 uppercase">Legal</h4>
+<a class="text-sm text-slate-500 hover:text-indigo-600 transition-colors" href="#">Privacy</a>
+<a class="text-sm text-slate-500 hover:text-indigo-600 transition-colors" href="#">Terms</a>
+<a class="text-sm text-slate-500 hover:text-indigo-600 transition-colors" href="#">Security</a>
+</div>
+</div>
+</div>
+<div class="max-w-7xl mx-auto px-8 pb-12">
+<div class="border-t border-slate-200 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
+<p class="text-slate-500 text-xs">© 2024 OrgSphere. Architectural Curation for Modern Teams.</p>
+<div class="flex gap-6">
+<span class="text-xs text-slate-400 font-medium">Built with intentionality.</span>
+</div>
+</div>
+</div>
+</footer>
+</body></html>

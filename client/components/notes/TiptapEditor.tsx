@@ -129,65 +129,67 @@ export function TiptapEditor({
 
   return (
     <div className="flex min-h-0 flex-1 flex-col bg-white">
-      <div className="flex flex-wrap items-center gap-2 border-b border-slate-50 bg-[color:var(--color-surface-low)]/50 px-8 py-3">
-        <ToolbarButton
-          label="Bold"
-          icon={Bold}
-          active={editor.isActive('bold')}
-          onClick={() => editor.chain().focus().toggleBold().run()}
-        />
-        <ToolbarButton
-          label="Italic"
-          icon={Italic}
-          active={editor.isActive('italic')}
-          onClick={() => editor.chain().focus().toggleItalic().run()}
-        />
-        <ToolbarButton
-          label="Underline"
-          icon={UnderlineIcon}
-          active={editor.isActive('underline')}
-          onClick={() =>
-            (
-              editor.chain().focus() as unknown as {
-                toggleUnderline: () => { run: () => boolean }
-              }
-            )
-              .toggleUnderline()
-              .run()
-          }
-        />
-        <ToolbarButton
-          label="Heading"
-          icon={Heading2}
-          active={editor.isActive('heading', { level: 2 })}
-          onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
-        />
-        <span className="mx-1 h-6 w-px bg-[color:var(--color-border)]" />
-        <ToolbarButton
-          label="Bullet list"
-          icon={List}
-          active={editor.isActive('bulletList')}
-          onClick={() => editor.chain().focus().toggleBulletList().run()}
-        />
-        <ToolbarButton
-          label="Numbered list"
-          icon={ListOrdered}
-          active={editor.isActive('orderedList')}
-          onClick={() => editor.chain().focus().toggleOrderedList().run()}
-        />
-        <ToolbarButton
-          label="Code block"
-          icon={Code2}
-          active={editor.isActive('codeBlock')}
-          onClick={() => editor.chain().focus().toggleCodeBlock().run()}
-        />
-        <ToolbarButton
-          label="Link"
-          icon={LinkIcon}
-          active={editor.isActive('link')}
-          onClick={setLink}
-        />
-      </div>
+      {editable ? (
+        <div className="flex flex-wrap items-center gap-2 border-b border-slate-50 bg-[color:var(--color-surface-low)]/50 px-8 py-3">
+          <ToolbarButton
+            label="Bold"
+            icon={Bold}
+            active={editor.isActive('bold')}
+            onClick={() => editor.chain().focus().toggleBold().run()}
+          />
+          <ToolbarButton
+            label="Italic"
+            icon={Italic}
+            active={editor.isActive('italic')}
+            onClick={() => editor.chain().focus().toggleItalic().run()}
+          />
+          <ToolbarButton
+            label="Underline"
+            icon={UnderlineIcon}
+            active={editor.isActive('underline')}
+            onClick={() =>
+              (
+                editor.chain().focus() as unknown as {
+                  toggleUnderline: () => { run: () => boolean }
+                }
+              )
+                .toggleUnderline()
+                .run()
+            }
+          />
+          <ToolbarButton
+            label="Heading"
+            icon={Heading2}
+            active={editor.isActive('heading', { level: 2 })}
+            onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
+          />
+          <span className="mx-1 h-6 w-px bg-[color:var(--color-border)]" />
+          <ToolbarButton
+            label="Bullet list"
+            icon={List}
+            active={editor.isActive('bulletList')}
+            onClick={() => editor.chain().focus().toggleBulletList().run()}
+          />
+          <ToolbarButton
+            label="Numbered list"
+            icon={ListOrdered}
+            active={editor.isActive('orderedList')}
+            onClick={() => editor.chain().focus().toggleOrderedList().run()}
+          />
+          <ToolbarButton
+            label="Code block"
+            icon={Code2}
+            active={editor.isActive('codeBlock')}
+            onClick={() => editor.chain().focus().toggleCodeBlock().run()}
+          />
+          <ToolbarButton
+            label="Link"
+            icon={LinkIcon}
+            active={editor.isActive('link')}
+            onClick={setLink}
+          />
+        </div>
+      ) : null}
       <EditorContent
         editor={editor}
         className="prose prose-sm max-w-none flex-1 overflow-y-auto bg-white p-8 [&_.ProseMirror_code]:rounded [&_.ProseMirror_code]:bg-[color:var(--color-surface-low)] [&_.ProseMirror_code]:px-1 [&_.ProseMirror_h2]:mb-3 [&_.ProseMirror_h2]:mt-6 [&_.ProseMirror_h2]:text-xl [&_.ProseMirror_h2]:font-bold [&_.ProseMirror_p]:text-[color:var(--color-text-secondary)] [&_.ProseMirror_p]:leading-relaxed [&_.ProseMirror_pre]:my-4 [&_.ProseMirror_pre]:rounded-xl [&_.ProseMirror_pre]:border-l-4 [&_.ProseMirror_pre]:border-indigo-500 [&_.ProseMirror_pre]:!bg-slate-900 [&_.ProseMirror_pre]:p-6 [&_.ProseMirror_pre]:text-sm [&_.ProseMirror_pre]:!text-slate-100 [&_.ProseMirror_pre_code]:!bg-transparent [&_.ProseMirror_pre_code]:!p-0 [&_.ProseMirror_pre_code]:!text-slate-100 [&_.ProseMirror_pre_code_*]:!bg-transparent [&_.ProseMirror_ul]:ml-6 [&_.ProseMirror_ul]:list-disc [&_.ProseMirror_ol]:ml-6 [&_.ProseMirror_ol]:list-decimal [&_.is-editor-empty:first-child]:before:pointer-events-none [&_.is-editor-empty:first-child]:before:float-left [&_.is-editor-empty:first-child]:before:h-0 [&_.is-editor-empty:first-child]:before:text-[color:var(--color-text-tertiary)] [&_.is-editor-empty:first-child]:before:content-[attr(data-placeholder)]"

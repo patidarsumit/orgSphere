@@ -1,0 +1,17 @@
+{
+  "name": "OrgSphere",
+  "short_name": "OrgSphere",
+  "description": "Know your organization from every angle",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f9fafb",
+  "theme_color": "#4f46e5",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

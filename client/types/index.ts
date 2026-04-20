@@ -182,3 +182,36 @@ export interface SettingsOverview {
   totalProjects: number
   totalTeams: number
 }
+
+export type PostStatus = 'draft' | 'published' | 'archived'
+
+export interface BlogPost {
+  id: string
+  title: string
+  subtitle: string | null
+  slug: string
+  cover_image_url: string | null
+  tags: string[]
+  reading_time: number
+  views: number
+  published_at: string | null
+  created_at: string
+  updated_at: string
+  status?: PostStatus
+  content?: Record<string, unknown>
+  author: {
+    id: string
+    name: string
+    avatar_path: string | null
+    role: UserRole
+    department: string | null
+  } | null
+}
+
+export interface BlogPaginatedResponse {
+  data: BlogPost[]
+  total: number
+  page: number
+  limit: number
+  totalPages: number
+}

@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>OrgSphere | Know your organization</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "error": "#ba1a1a",
+                    "on-secondary-container": "#454386",
+                    "on-tertiary-fixed": "#351000",
+                    "surface-dim": "#d3daea",
+                    "secondary-fixed-dim": "#c3c0ff",
+                    "outline": "#777587",
+                    "secondary-container": "#b6b4ff",
+                    "on-background": "#151c27",
+                    "primary-fixed-dim": "#c3c0ff",
+                    "tertiary-fixed-dim": "#ffb695",
+                    "on-surface": "#151c27",
+                    "error-container": "#ffdad6",
+                    "surface-bright": "#f9f9ff",
+                    "primary-fixed": "#e2dfff",
+                    "inverse-surface": "#2a313d",
+                    "on-tertiary-container": "#ffd2be",
+                    "on-error": "#ffffff",
+                    "primary": "#3525cd",
+                    "tertiary-fixed": "#ffdbcc",
+                    "on-surface-variant": "#464555",
+                    "on-secondary-fixed-variant": "#413f82",
+                    "background": "#f9f9ff",
+                    "on-primary-container": "#dad7ff",
+                    "on-error-container": "#93000a",
+                    "inverse-primary": "#c3c0ff",
+                    "secondary-fixed": "#e2dfff",
+                    "on-secondary-fixed": "#140f54",
+                    "on-primary": "#ffffff",
+                    "on-tertiary": "#ffffff",
+                    "on-secondary": "#ffffff",
+                    "tertiary": "#7e3000",
+                    "tertiary-container": "#a44100",
+                    "surface-variant": "#dce2f3",
+                    "surface-tint": "#4d44e3",
+                    "primary-container": "#4f46e5",
+                    "on-primary-fixed-variant": "#3323cc",
+                    "surface-container-highest": "#dce2f3",
+                    "surface": "#f9f9ff",
+                    "surface-container-lowest": "#ffffff",
+                    "surface-container-high": "#e2e8f8",
+                    "inverse-on-surface": "#ebf1ff",
+                    "secondary": "#58579b",
+                    "on-primary-fixed": "#0f0069",
+                    "surface-container-low": "#f0f3ff",
+                    "surface-container": "#e7eefe",
+                    "outline-variant": "#c7c4d8",
+                    "on-tertiary-fixed-variant": "#7b2f00"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "1.5rem",
+                    "full": "9999px"
+            },
+            "fontFamily": {
+                    "headline": ["Inter"],
+                    "body": ["Inter"],
+                    "label": ["Inter"]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .hero-gradient {
+            background: linear-gradient(135deg, #3525cd 0%, #4f46e5 100%);
+        }
+        .blog-gradient {
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface selection:bg-primary-container selection:text-on-primary-container overflow-x-hidden">
+<!-- TopAppBar Shell -->
+<header class="fixed top-0 w-full h-[56px] bg-[#f9f9ff]/80 backdrop-blur-md z-50 flex justify-between items-center px-6 lg:px-12">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-3xl" data-icon="hub">hub</span>
+<span class="text-xl font-bold text-[#151c27] tracking-tighter">OrgSphere</span>
+</div>
+<div class="flex items-center gap-6">
+<button class="text-sm font-semibold text-on-surface hover:text-primary transition-colors">Resources</button>
+<button class="px-5 py-2 rounded-xl border border-outline-variant text-sm font-semibold hover:bg-surface-container-low transition-all">Login</button>
+</div>
+</header>
+<main class="pt-[56px]">
+<!-- Hero Section -->
+<section class="relative px-6 lg:px-12 pt-20 pb-32 overflow-hidden">
+<div class="absolute top-[-10%] right-[-5%] w-[600px] h-[600px] bg-primary/5 rounded-full blur-[120px] -z-10"></div>
+<div class="max-w-7xl mx-auto flex flex-col items-center text-center">
+<div class="inline-flex items-center px-3 py-1 rounded-full bg-primary-container/10 text-primary text-xs font-bold mb-6 tracking-wide">
+                    NOW IN PRIVATE BETA
+                </div>
+<h1 class="text-5xl md:text-7xl font-extrabold text-on-surface leading-[1.1] tracking-tight mb-8 max-w-4xl">
+                    Know your organization.<br/>
+<span class="text-primary italic">From every angle.</span>
+</h1>
+<p class="text-lg md:text-xl text-on-surface-variant max-w-2xl mb-10 leading-relaxed">
+                    OrgSphere connects your projects, people, and teams in one unified workspace — so everyone always knows what's happening and who's responsible.
+                </p>
+<div class="flex flex-col sm:flex-row items-center gap-4 mb-20">
+<button class="hero-gradient text-white px-8 py-4 rounded-xl font-bold shadow-lg shadow-primary/20 hover:scale-[1.02] transition-transform flex items-center gap-2">
+                        Get Started
+                        <span class="material-symbols-outlined text-sm" data-icon="arrow_forward">arrow_forward</span>
+</button>
+<button class="px-8 py-4 text-primary font-bold hover:bg-surface-container-low rounded-xl transition-all flex items-center gap-2">
+                        See how it works
+                        <span class="material-symbols-outlined text-sm" data-icon="play_circle">play_circle</span>
+</button>
+</div>
+<div class="w-full max-w-5xl relative group">
+<div class="absolute -inset-1 bg-gradient-to-r from-primary/20 to-secondary/20 rounded-[2rem] blur opacity-25 group-hover:opacity-50 transition duration-1000 group-hover:duration-200"></div>
+<div class="relative bg-surface-container-lowest rounded-[2rem] shadow-2xl overflow-hidden border border-outline-variant/10">
+<img alt="OrgSphere Dashboard Preview" class="w-full h-auto object-cover opacity-90 group-hover:opacity-100 transition-opacity" data-alt="Sleek software dashboard interface with minimalist data visualizations, teal and indigo accents, showing organization hierarchies and team progress charts in a clean white space environment" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAKmkx4Fm66Bbyb1JsXWRHy8B8rwHxOQwilRa9PB1VodwJZWRS03U8uCZJAJ-5OBqMswBWW3lfd2WjaGkdPM2FaOSNmxTpsdvIQtLZ23mOHav89qpg80wRQVGnvMbLbnn-dmqJQb-2o4lDGrF9BjtcnYHb-Y1PAVCnxdl3KoMi5t39crNMa-h1juw0MyYPsu-xaE_iEbEflaPGx4R494wQXW3b5gDVQT-RYyOyNnWu2JjWatX4IKdlHqX-CfwwKBjwsqPqlB5LZCIY"/>
+<div class="absolute inset-0 flex items-center justify-center bg-on-background/5 backdrop-blur-[2px]">
+<div class="bg-surface/90 px-6 py-3 rounded-full shadow-sm text-sm font-medium border border-outline-variant/20">
+                                App preview
+                            </div>
+</div>
+</div>
+</div>
+<div class="mt-24 grid grid-cols-1 md:grid-cols-3 gap-12 w-full max-w-4xl border-t border-outline-variant/20 pt-16">
+<div class="flex flex-col items-center">
+<span class="text-4xl font-extrabold text-on-surface">500+</span>
+<span class="text-sm font-medium text-on-surface-variant uppercase tracking-widest mt-2">companies</span>
+</div>
+<div class="flex flex-col items-center">
+<span class="text-4xl font-extrabold text-on-surface">10,000+</span>
+<span class="text-sm font-medium text-on-surface-variant uppercase tracking-widest mt-2">employees connected</span>
+</div>
+<div class="flex flex-col items-center">
+<span class="text-4xl font-extrabold text-on-surface">99.9%</span>
+<span class="text-sm font-medium text-on-surface-variant uppercase tracking-widest mt-2">uptime guarantee</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Features Bento Grid -->
+<section class="bg-surface-container-low py-32 px-6 lg:px-12">
+<div class="max-w-7xl mx-auto">
+<div class="text-center mb-20">
+<h2 class="text-3xl md:text-4xl font-bold tracking-tight mb-4">The architecture of collaboration</h2>
+<p class="text-on-surface-variant max-w-xl mx-auto">Modern tools for modern hierarchies. Built to scale with your team's ambitions.</p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+<!-- Feature 1 -->
+<div class="bg-surface-container-lowest p-10 rounded-[2rem] hover:shadow-xl transition-shadow flex flex-col h-full group">
+<div class="w-14 h-14 rounded-2xl bg-primary/5 flex items-center justify-center mb-8 group-hover:bg-primary/10 transition-colors">
+<span class="material-symbols-outlined text-primary text-3xl" data-icon="visibility">visibility</span>
+</div>
+<h3 class="text-xl font-bold mb-4">Project Visibility</h3>
+<p class="text-on-surface-variant leading-relaxed mb-6">
+                            Eliminate silos with transparent project tracking. See dependencies and timelines across the entire organization in real-time.
+                        </p>
+<div class="mt-auto pt-4 border-t border-surface-container-low">
+<a class="text-primary font-bold text-sm inline-flex items-center gap-1 group-hover:gap-2 transition-all" href="#">
+                                Learn more
+                                <span class="material-symbols-outlined text-sm" data-icon="chevron_right">chevron_right</span>
+</a>
+</div>
+</div>
+<!-- Feature 2 -->
+<div class="bg-surface-container-lowest p-10 rounded-[2rem] hover:shadow-xl transition-shadow flex flex-col h-full group">
+<div class="w-14 h-14 rounded-2xl bg-tertiary/5 flex items-center justify-center mb-8 group-hover:bg-tertiary/10 transition-colors">
+<span class="material-symbols-outlined text-tertiary text-3xl" data-icon="account_tree">account_tree</span>
+</div>
+<h3 class="text-xl font-bold mb-4">Team Directory</h3>
+<p class="text-on-surface-variant leading-relaxed mb-6">
+                            Dynamic org charts that actually work. Understand reporting lines and expertise clusters without the administrative overhead.
+                        </p>
+<div class="mt-auto pt-4 border-t border-surface-container-low">
+<a class="text-tertiary font-bold text-sm inline-flex items-center gap-1 group-hover:gap-2 transition-all" href="#">
+                                Explore structure
+                                <span class="material-symbols-outlined text-sm" data-icon="chevron_right">chevron_right</span>
+</a>
+</div>
+</div>
+<!-- Feature 3 -->
+<div class="bg-surface-container-lowest p-10 rounded-[2rem] hover:shadow-xl transition-shadow flex flex-col h-full group">
+<div class="w-14 h-14 rounded-2xl bg-secondary/5 flex items-center justify-center mb-8 group-hover:bg-secondary/10 transition-colors">
+<span class="material-symbols-outlined text-secondary text-3xl" data-icon="grid_view">grid_view</span>
+</div>
+<h3 class="text-xl font-bold mb-4">Personal Workspace</h3>
+<p class="text-on-surface-variant leading-relaxed mb-6">
+                            A focused sanctuary for individual contributors. Tailored views that pull relevant data from across your various team assignments.
+                        </p>
+<div class="mt-auto pt-4 border-t border-surface-container-low">
+<a class="text-secondary font-bold text-sm inline-flex items-center gap-1 group-hover:gap-2 transition-all" href="#">
+                                View demo
+                                <span class="material-symbols-outlined text-sm" data-icon="chevron_right">chevron_right</span>
+</a>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Blog Section -->
+<section class="bg-[#FFFFFF] py-24 px-6 lg:px-12">
+<div class="max-w-7xl mx-auto">
+<div class="text-center mb-16">
+<h2 class="text-[24px] font-[600] text-on-surface mb-2">From the OrgSphere Blog</h2>
+<p class="text-[14px] text-on-surface-variant">Insights on org design, team clarity, and the future of work.</p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
+<!-- Article 1 -->
+<div class="bg-white rounded-[12px] shadow-sm hover:shadow-md transition-shadow p-5 flex flex-col">
+<div class="relative w-full h-[180px] rounded-lg mb-6 blog-gradient overflow-hidden">
+<div class="absolute top-3 left-3 px-3 py-1 bg-[#4F46E5] text-white text-[10px] font-bold rounded-full uppercase tracking-wider">
+                            Org Design
+                        </div>
+</div>
+<div class="flex items-center gap-2 mb-4">
+<div class="w-6 h-6 rounded-full bg-[#4F46E5] flex items-center justify-center text-[10px] text-white font-bold">SM</div>
+<span class="text-[12px] text-on-surface font-medium">Sarah M. · 5 min read</span>
+</div>
+<h3 class="text-[18px] font-bold text-on-surface leading-snug mb-3 line-clamp-2">Why Flat Hierarchies Often Fail at Scale</h3>
+<p class="text-[14px] text-on-surface-variant mb-6 line-clamp-3">Most companies celebrate going flat — until communication breaks down and decision-making grinds to a halt…</p>
+<div class="mt-auto">
+<a class="text-[#4F3FE8] text-sm font-semibold hover:underline" href="#">Read article →</a>
+</div>
+</div>
+<!-- Article 2 -->
+<div class="bg-white rounded-[12px] shadow-sm hover:shadow-md transition-shadow p-5 flex flex-col">
+<div class="relative w-full h-[180px] rounded-lg mb-6 blog-gradient opacity-90 overflow-hidden">
+<div class="absolute top-3 left-3 px-3 py-1 bg-[#4F46E5] text-white text-[10px] font-bold rounded-full uppercase tracking-wider">
+                            Team Leadership
+                        </div>
+</div>
+<div class="flex items-center gap-2 mb-4">
+<div class="w-6 h-6 rounded-full bg-[#4F46E5] flex items-center justify-center text-[10px] text-white font-bold">JR</div>
+<span class="text-[12px] text-on-surface font-medium">James R. · 7 min read</span>
+</div>
+<h3 class="text-[18px] font-bold text-on-surface leading-snug mb-3 line-clamp-2">The Manager's Blind Spot: Cross-Team Dependencies</h3>
+<p class="text-[14px] text-on-surface-variant mb-6 line-clamp-3">Projects don't fail because of bad people. They fail because no one could see the full picture of overlapping team goals…</p>
+<div class="mt-auto">
+<a class="text-[#4F3FE8] text-sm font-semibold hover:underline" href="#">Read article →</a>
+</div>
+</div>
+<!-- Article 3 -->
+<div class="bg-white rounded-[12px] shadow-sm hover:shadow-md transition-shadow p-5 flex flex-col">
+<div class="relative w-full h-[180px] rounded-lg mb-6 blog-gradient opacity-80 overflow-hidden">
+<div class="absolute top-3 left-3 px-3 py-1 bg-[#4F46E5] text-white text-[10px] font-bold rounded-full uppercase tracking-wider">
+                            Product
+                        </div>
+</div>
+<div class="flex items-center gap-2 mb-4">
+<div class="w-6 h-6 rounded-full bg-[#4F46E5] flex items-center justify-center text-[10px] text-white font-bold">PK</div>
+<span class="text-[12px] text-on-surface font-medium">Priya K. · 4 min read</span>
+</div>
+<h3 class="text-[18px] font-bold text-on-surface leading-snug mb-3 line-clamp-2">Building a Team Directory That People Actually Use</h3>
+<p class="text-[14px] text-on-surface-variant mb-6 line-clamp-3">A directory is only as good as the data quality and the habits around it. Here's how to build one that scales with your culture…</p>
+<div class="mt-auto">
+<a class="text-[#4F3FE8] text-sm font-semibold hover:underline" href="#">Read article →</a>
+</div>
+</div>
+</div>
+<div class="flex justify-center">
+<button class="px-8 py-3 rounded-xl border border-[#4F3FE8] text-[#4F3FE8] font-bold text-sm hover:bg-[#4F3FE8]/5 transition-colors">
+                    View all articles →
+                </button>
+</div>
+</div>
+</section>
+<!-- Final CTA -->
+<section class="py-32 px-6 lg:px-12 overflow-hidden relative">
+<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-primary/5 rounded-full blur-[150px] -z-10"></div>
+<div class="max-w-4xl mx-auto text-center">
+<h2 class="text-4xl md:text-5xl font-extrabold tracking-tight mb-8">Ready to unify your workspace?</h2>
+<p class="text-xl text-on-surface-variant mb-12 max-w-2xl mx-auto leading-relaxed">
+                    Join hundreds of organizations transforming their culture through radical clarity and connection.
+                </p>
+<div class="flex flex-col sm:flex-row justify-center gap-4">
+<button class="hero-gradient text-white px-10 py-5 rounded-2xl font-bold text-lg shadow-xl shadow-primary/20 hover:translate-y-[-2px] transition-all">
+                        Create Your Space
+                    </button>
+<button class="bg-surface-container-lowest border border-outline-variant px-10 py-5 rounded-2xl font-bold text-lg hover:bg-surface-container-low transition-all">
+                        Contact Sales
+                    </button>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="bg-surface-container-highest/30 pt-20 pb-12 px-6 lg:px-12 border-t border-outline-variant/10">
+<div class="max-w-7xl mx-auto">
+<div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-12 mb-16">
+<div class="col-span-2">
+<div class="flex items-center gap-2 mb-6">
+<span class="material-symbols-outlined text-primary text-2xl" data-icon="hub">hub</span>
+<span class="text-xl font-bold text-[#151c27] tracking-tighter">OrgSphere</span>
+</div>
+<p class="text-on-surface-variant text-sm max-w-xs leading-loose">
+                        The architectural curator for modern organizational excellence. Designed for people, built for scale.
+                    </p>
+</div>
+<div>
+<h4 class="font-bold text-sm mb-6 uppercase tracking-widest">Product</h4>
+<ul class="space-y-4 text-sm text-on-surface-variant">
+<li><a class="hover:text-primary transition-colors" href="#">Features</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">Integrations</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">Pricing</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">Changelog</a></li>
+</ul>
+</div>
+<div>
+<h4 class="font-bold text-sm mb-6 uppercase tracking-widest">Company</h4>
+<ul class="space-y-4 text-sm text-on-surface-variant">
+<li><a class="hover:text-primary transition-colors" href="#">About Us</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">Careers</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">Blog</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">Contact</a></li>
+</ul>
+</div>
+<div>
+<h4 class="font-bold text-sm mb-6 uppercase tracking-widest">Support</h4>
+<ul class="space-y-4 text-sm text-on-surface-variant">
+<li><a class="hover:text-primary transition-colors" href="#">Documentation</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">Help Center</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">API Status</a></li>
+</ul>
+</div>
+<div>
+<h4 class="font-bold text-sm mb-6 uppercase tracking-widest">Legal</h4>
+<ul class="space-y-4 text-sm text-on-surface-variant">
+<li><a class="hover:text-primary transition-colors" href="#">Privacy</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">Terms</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">Cookies</a></li>
+</ul>
+</div>
+</div>
+<div class="flex flex-col md:flex-row justify-between items-center pt-10 border-t border-outline-variant/10 text-xs font-medium text-on-surface-variant/60">
+<p>© 2024 OrgSphere Technologies Inc. All rights reserved.</p>
+<div class="flex gap-6 mt-4 md:mt-0">
+<a class="hover:text-primary" href="#"><span class="material-symbols-outlined text-lg" data-icon="public">public</span></a>
+<a class="hover:text-primary" href="#"><span class="material-symbols-outlined text-lg" data-icon="chat">chat</span></a>
+<a class="hover:text-primary" href="#"><span class="material-symbols-outlined text-lg" data-icon="share">share</span></a>
+</div>
+</div>
+</div>
+</footer>
+</body></html>

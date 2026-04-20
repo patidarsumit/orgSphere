@@ -27,6 +27,7 @@ export type ActivityEntityType =
   | 'team'
   | 'task'
   | 'note'
+  | 'post'
   | 'project_member'
   | 'team_member'
 

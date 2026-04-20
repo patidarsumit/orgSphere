@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "error": "#ba1a1a",
+                    "on-primary": "#ffffff",
+                    "surface-container-high": "#e2e8f8",
+                    "error-container": "#ffdad6",
+                    "surface": "#f9f9ff",
+                    "surface-container-lowest": "#ffffff",
+                    "primary-container": "#4f46e5",
+                    "primary": "#3525cd",
+                    "on-secondary-fixed-variant": "#413f82",
+                    "surface-bright": "#f9f9ff",
+                    "on-primary-fixed-variant": "#3323cc",
+                    "surface-container-highest": "#dce2f3",
+                    "on-primary-fixed": "#0f0069",
+                    "on-error": "#ffffff",
+                    "on-background": "#151c27",
+                    "on-surface": "#151c27",
+                    "outline-variant": "#c7c4d8",
+                    "tertiary-fixed": "#ffdbcc",
+                    "on-secondary-fixed": "#140f54",
+                    "surface-variant": "#dce2f3",
+                    "surface-dim": "#d3daea",
+                    "on-primary-container": "#dad7ff",
+                    "on-surface-variant": "#464555",
+                    "on-tertiary-container": "#ffd2be",
+                    "surface-tint": "#4d44e3",
+                    "outline": "#777587",
+                    "on-secondary-container": "#454386",
+                    "tertiary": "#7e3000",
+                    "on-error-container": "#93000a",
+                    "background": "#f9f9ff",
+                    "secondary": "#58579b",
+                    "on-tertiary-fixed": "#351000",
+                    "inverse-surface": "#2a313d",
+                    "secondary-fixed-dim": "#c3c0ff",
+                    "tertiary-container": "#a44100",
+                    "secondary-container": "#b6b4ff",
+                    "secondary-fixed": "#e2dfff",
+                    "surface-container": "#e7eefe",
+                    "on-tertiary-fixed-variant": "#7b2f00",
+                    "primary-fixed-dim": "#c3c0ff",
+                    "inverse-on-surface": "#ebf1ff",
+                    "on-secondary": "#ffffff",
+                    "primary-fixed": "#e2dfff",
+                    "tertiary-fixed-dim": "#ffb695",
+                    "surface-container-low": "#f0f3ff",
+                    "on-tertiary": "#ffffff",
+                    "inverse-primary": "#c3c0ff"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "fontFamily": {
+                    "headline": ["Inter"],
+                    "body": ["Inter"],
+                    "label": ["Inter"]
+            }
+          }
+        }
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface text-on-surface antialiased">
+<!-- TopAppBar -->
+<nav class="fixed top-0 w-full z-50 bg-[#f9f9ff]/80 dark:bg-[#151c27]/80 backdrop-blur-xl">
+<div class="flex justify-between items-center px-6 py-5 max-w-screen-2xl mx-auto">
+<div class="text-2xl font-bold tracking-tighter text-[#151c27] dark:text-[#f9f9ff]">OrgSphere</div>
+<!-- Mobile Menu Toggle (Simplified for Mobile request) -->
+<div class="flex items-center gap-4">
+<a class="text-[#4F46E5] font-semibold border-b-2 border-[#4F46E5] pb-1 text-sm" href="#">Blog</a>
+<span class="material-symbols-outlined text-on-surface opacity-70">menu</span>
+</div>
+</div>
+</nav>
+<main class="pt-20">
+<!-- Article Hero -->
+<section class="bg-surface-container-low px-6 py-12 text-center">
+<div class="max-w-xl mx-auto">
+<nav class="flex justify-center gap-2 text-xs font-medium text-outline mb-6">
+<span>Blog</span>
+<span class="opacity-40">/</span>
+<span class="text-primary">Leadership</span>
+</nav>
+<div class="inline-block px-4 py-1.5 rounded-full bg-primary-container text-on-primary-container text-xs font-bold mb-6">
+                    Leadership
+                </div>
+<h1 class="text-3xl font-extrabold tracking-tight text-on-surface mb-4 leading-tight">
+                    How transparent org structures reduce decision fatigue
+                </h1>
+<p class="text-lg text-on-surface-variant mb-8 leading-relaxed">
+                    When everyone knows who owns what, teams move faster.
+                </p>
+<div class="flex flex-col items-center gap-4 mb-8">
+<div class="flex items-center gap-3">
+<img alt="Sarah Chen" class="w-10 h-10 rounded-full object-cover" data-alt="professional portrait of Sarah Chen, a modern tech leader with a warm smile in a brightly lit office" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB5L3d8wrbrVWAoCVELexzm6Vv-oLdN8yEtrVWEruR6pm6Uz9C4sYgmUML6mMfSLFNvofXdr3GRKB7asmmddUZ9VpBClnlCxd3mPnzFWHIetU1PiCFc6H6AHgieZFkDLYW652bv6T5bmqsq4zAA4HoUEWcen03kCwIbKOiRTUSPx6qiMcdnUVyb-YYWEscuD3ku9hAVvYzquOWMGSgG-FBh-emyLKrxChFH9JAW93ppm-_RF82o5_6DaVWfFNaOKhO0_nqEhdxyPBk"/>
+<div class="text-left">
+<p class="text-sm font-bold text-on-surface">By Sarah Chen</p>
+<p class="text-xs text-outline">April 12, 2026 · 6 min read</p>
+</div>
+</div>
+</div>
+<div class="flex justify-center gap-6 border-t border-outline-variant/10 pt-6">
+<button class="text-outline hover:text-primary transition-colors">
+<span class="material-symbols-outlined">share</span>
+</button>
+<button class="text-outline hover:text-primary transition-colors">
+<span class="material-symbols-outlined">link</span>
+</button>
+<button class="text-outline hover:text-primary transition-colors">
+<span class="material-symbols-outlined">bookmark</span>
+</button>
+</div>
+</div>
+</section>
+<!-- Hero Image -->
+<div class="px-4 -mt-6">
+<div class="w-full h-64 md:h-96 rounded-xl overflow-hidden shadow-xl bg-gradient-to-br from-primary to-primary-container">
+<img alt="Abstract Org Structure" class="w-full h-full object-cover opacity-60 mix-blend-overlay" data-alt="abstract dark background with neon indigo geometric lines and data visualization elements representing organizational flow" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB6kbQYiKFqijA4cTDqhfVzCkLFOyw7H1n7Yt3Z3GPitSaqrrmpMZ0v8QVTd4vRoOQWLSDDI-HFsuuK-SA6DPTLs-o1MCDLSyeXZ7PC7VurHjRyq8NdqETGpZDn9agWeJaOy4ljtcEfiROtue2_myzoLLnZk8JQsXBPMLxgPxRM9D_2MR0fRhKZtiMI9ho0QHiw1V3_YSxQ_vivAWf6L-rcuiYGwt6oTC5tHGxwB-aW_DDsz8RfjJR-8mzCEzqyJEXUPI5H4VuVZ_g"/>
+</div>
+</div>
+<!-- Article Body -->
+<article class="max-w-2xl mx-auto px-6 py-16">
+<div class="prose prose-indigo max-w-none text-[18px] leading-[1.8] text-on-surface-variant space-y-8">
+<p>
+                    In the modern workplace, the greatest bottleneck isn't usually a lack of talent or resources—it's the friction of ambiguity. When teams are forced to navigate murky reporting lines or vague ownership boundaries, the mental energy required just to "start" a project creates a cumulative burden known as decision fatigue.
+                </p>
+<h2 class="text-2xl font-bold text-on-surface tracking-tight mt-12 mb-4">The Cost of Ambiguity</h2>
+<p>
+                    Research suggests that knowledge workers spend up to 40% of their day on "work about work." This includes clarifying roles, chasing status updates, and identifying who actually has the final "yes" on a specific initiative. 
+                </p>
+<blockquote class="border-l-4 border-primary pl-6 py-2 my-10 bg-surface-container-low/50 rounded-r-xl italic text-on-surface font-medium">
+                    "Transparency isn't just about honesty; it's about architectural clarity that liberates individual agency."
+                </blockquote>
+<p>
+                    By implementing a visible, live-updating organizational sphere, companies can eliminate the "who should I ask?" loop. This clarity isn't just a convenience—it's a performance multiplier.
+                </p>
+<div class="my-10 space-y-2">
+<img alt="Team Collaboration" class="rounded-xl w-full" data-alt="collaborative team meeting around a glass table in a modern airy office with large windows" src="https://lh3.googleusercontent.com/aida-public/AB6AXuABZb3JzYacjACgaaZ75WMecR-9S8My3cVJQ4sSmKkcslefNz0muBDFSWySSSUk_i3--X6_mHcqgwAfSfVjO74kUTBfSDxpqU5L-XxpFH5SE4mpd9JZklHM-S4nC6-VB6Vkf3TVRchCwgvdOcWK089xwgkVSL7enRlc7MeN5_idOqz959oU3WTMllXTA6G_BzN4VkmcwWvseDvr_9ccux53lKHPqKKJ-y1JNsiw86oAWTvQatZqhdgfQyLG85xvv2O9b79XzWFH-cc"/>
+<p class="text-sm text-outline text-center italic">Teams thrive when ownership is mapped and visible to all.</p>
+</div>
+<h2 class="text-2xl font-bold text-on-surface tracking-tight mt-12 mb-4">Three Pillars of Clear Structure</h2>
+<ul class="space-y-4 list-none pl-0">
+<li class="flex gap-4">
+<span class="material-symbols-outlined text-primary shrink-0">check_circle</span>
+<span><strong>Radical Visibility:</strong> Every role, responsibility, and metric should be searchable in a central directory.</span>
+</li>
+<li class="flex gap-4">
+<span class="material-symbols-outlined text-primary shrink-0">check_circle</span>
+<span><strong>Direct Ownership:</strong> Projects shouldn't belong to "departments"; they should belong to individuals.</span>
+</li>
+<li class="flex gap-4">
+<span class="material-symbols-outlined text-primary shrink-0">check_circle</span>
+<span><strong>Elastic Boundaries:</strong> Clarity shouldn't mean rigidity. Structures must evolve as the company scales.</span>
+</li>
+</ul>
+<hr class="border-none h-px bg-outline-variant/30 my-16"/>
+<div class="flex flex-wrap gap-2 items-center">
+<span class="text-sm font-bold text-on-surface">Tagged in:</span>
+<span class="px-3 py-1 bg-surface-container-high rounded-full text-xs font-medium text-primary">Org Design</span>
+<span class="px-3 py-1 bg-surface-container-high rounded-full text-xs font-medium text-primary">Leadership</span>
+<span class="px-3 py-1 bg-surface-container-high rounded-full text-xs font-medium text-primary">Clarity</span>
+</div>
+</div>
+<!-- Author Card -->
+<div class="mt-20 p-8 bg-surface-container-lowest rounded-2xl shadow-[0_12px_32px_-4px_rgba(21,28,39,0.08)]">
+<div class="flex flex-col items-center text-center gap-6">
+<img alt="Sarah Chen" class="w-24 h-24 rounded-full object-cover border-4 border-surface" data-alt="close up headshot of Sarah Chen, professional leader with friendly expression" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDfdoc3LjdEeNi8kznfTMo5iOol8owsKr2LP6OpLPjXe9pVH50Pk6Q77eWZzznI8k2BotK3FPIhMLD9oNvzKZ9et_BILvZxRPRutZYF3c3EpPaTOXBbJXwbZMxbkJmYswtxNiOrC3guz9GC-a4U3j6FUIFJ5PmU6i_pFtHD2JXqI9oLnS1MKngwiAalkWmrEP3qti_qZl8RvQfodEf-Q-fHxXCkR_V6qYSZWswN9ZvugGmIxdF_9ctP5--01-GrtF2VVdcy_N5JgjQ"/>
+<div>
+<h3 class="text-xl font-bold text-on-surface mb-2">Sarah Chen</h3>
+<p class="text-on-surface-variant leading-relaxed text-sm mb-4">
+                            Sarah is the Head of Organizational Design at OrgSphere, where she helps Fortune 500 companies rethink collaboration for the remote-first era.
+                        </p>
+<a class="text-primary font-bold text-sm inline-flex items-center gap-2 hover:underline" href="#">
+                            Follow on LinkedIn <span class="material-symbols-outlined text-sm">arrow_forward</span>
+</a>
+</div>
+</div>
+</div>
+</article>
+<!-- Related Articles -->
+<section class="bg-surface-container-low py-20 px-6">
+<div class="max-w-xl mx-auto">
+<div class="flex justify-between items-end mb-10">
+<h2 class="text-2xl font-black text-on-surface tracking-tight">Keep reading</h2>
+<a class="text-primary font-bold text-sm" href="#">View all articles →</a>
+</div>
+<div class="grid grid-cols-1 gap-10">
+<!-- Related Card 1 -->
+<div class="group cursor-pointer">
+<div class="aspect-video w-full rounded-xl overflow-hidden mb-4 bg-surface-container-highest">
+<img alt="Article Thumbnail" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="team of diverse professionals high-fiving in a modern minimalist workspace" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAlYbuulPcBU_wVIPXD0js7WYjJijRMGL6nKrL9H9aPHD_Br6dc8Im6tXV0MN0icHfpOlEnpcouUjCabuxJr1I7PbHGkBKvlWICdzwiaiHM2kx4wyhYaQPeu2yGTb9KNgMJBO2HdYWtJuXrOhvhNQKvS8Jd-Wls2ysfAZwGyMO6K4c-EE3Ue50P8WjWptdmU1O12yDD16pJDe6wwTeOk8a4LwVvANzK9yhDqK8q9j89vtja7IItB7Zrex9CQ3BsJ2nme9hlbLtKXjc"/>
+</div>
+<span class="text-[10px] uppercase tracking-widest font-black text-tertiary mb-2 block">Culture</span>
+<h3 class="text-lg font-bold text-on-surface leading-tight group-hover:text-primary transition-colors">Why "culture fit" is killing your innovation pipeline</h3>
+<p class="text-xs text-outline mt-2">May 4, 2026 · 8 min read</p>
+</div>
+<!-- Related Card 2 -->
+<div class="group cursor-pointer">
+<div class="aspect-video w-full rounded-xl overflow-hidden mb-4 bg-surface-container-highest">
+<img alt="Article Thumbnail" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="close up of a high-end mechanical keyboard on a clean white desk with soft shadows" src="https://lh3.googleusercontent.com/aida-public/AB6AXuClwbxKhHe9xvcnJskfsPXnLgDUclwxuZaWpABeqacFu541760GStGtsKKg8FZayfNwBm-P6UafdZxQDNE-jVoP6gQyDEIgaXYChoOhalHiKdF3nWPFlG3uWRpCXxdgLQBTlVTyUsgrOHfOW_HGIHYBGO58o5cKWUCuOpcaym-0y0UzzrF47V94CO5Tx6UFSXkZunRPNLqoSH52gqVHZLsyQX7wFIC2kAc6VYaRecBX9Lfn3iF-S3W_ZiU1-rqrF6q12tKOOCbP-OA"/>
+</div>
+<span class="text-[10px] uppercase tracking-widest font-black text-tertiary mb-2 block">Efficiency</span>
+<h3 class="text-lg font-bold text-on-surface leading-tight group-hover:text-primary transition-colors">The art of the async update: Avoiding meeting bloat</h3>
+<p class="text-xs text-outline mt-2">April 28, 2026 · 5 min read</p>
+</div>
+<!-- Related Card 3 -->
+<div class="group cursor-pointer">
+<div class="aspect-video w-full rounded-xl overflow-hidden mb-4 bg-surface-container-highest">
+<img alt="Article Thumbnail" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="top down view of a notebook with sketches of complex systems on a light wood desk" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCPIvgt7GxVSeJEyhjm2hw4TsSfvTwQ_agPsAk8DMYOAnKKAmmowOaLeKLhwybotuh-mn_DgncOxN9llsbLth4TjBaLoUNpvSPKxJcusZFvu3rqFbzdfkfxjtfympyecOevOMFVIIvRaRuT8IxV0wfmPzBKImY8mWBrtKZFVBO-aHJweMMiGSA29riKrODFsCzOiMKhs7FP1wo-GOAnZg_ApLcm3gj47Ba8d7UnnpqkHH0Up8CZuatLq7fWiVEudWZ9xkCzYENpPiw"/>
+</div>
+<span class="text-[10px] uppercase tracking-widest font-black text-tertiary mb-2 block">Systems</span>
+<h3 class="text-lg font-bold text-on-surface leading-tight group-hover:text-primary transition-colors">Mapping the invisible: A guide to network analysis</h3>
+<p class="text-xs text-outline mt-2">April 20, 2026 · 12 min read</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Newsletter -->
+<section class="px-6 -mb-12 relative z-10">
+<div class="max-w-xl mx-auto bg-primary-container p-10 rounded-2xl shadow-2xl overflow-hidden relative">
+<div class="absolute top-0 right-0 w-32 h-32 bg-primary/20 rounded-full -mr-16 -mt-16 blur-3xl"></div>
+<div class="relative z-10 text-center">
+<h2 class="text-2xl font-bold text-on-primary-container mb-4">Get ideas like this in your inbox.</h2>
+<form class="space-y-4">
+<input class="w-full px-6 py-4 rounded-xl bg-surface-container-lowest border-none focus:ring-2 focus:ring-on-primary-container text-on-surface" placeholder="Enter your email" type="email"/>
+<button class="w-full bg-primary py-4 px-8 rounded-xl text-on-primary font-bold text-lg shadow-lg hover:shadow-primary/40 transition-all" type="submit">Subscribe</button>
+</form>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="w-full mt-24 bg-[#f0f3ff] dark:bg-[#1e2532]">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-12 px-12 py-20 max-w-screen-xl mx-auto text-left">
+<div>
+<div class="text-lg font-black text-[#151c27] dark:text-[#f9f9ff] mb-4">OrgSphere</div>
+<p class="font-['Inter'] text-sm tracking-wide leading-6 text-[#151c27] dark:text-[#f9f9ff] opacity-60">
+                    Architectural Editorial Design. Building the systems that power modern collaboration.
+                </p>
+</div>
+<div class="grid grid-cols-2 gap-8">
+<div class="space-y-4">
+<p class="font-bold text-[#151c27] dark:text-[#f9f9ff]">Company</p>
+<nav class="flex flex-col gap-2">
+<a class="font-['Inter'] text-sm tracking-wide leading-6 text-[#151c27] dark:text-[#f9f9ff] opacity-60 hover:opacity-100 hover:text-[#4F46E5] transition-opacity" href="#">Insights</a>
+<a class="font-['Inter'] text-sm tracking-wide leading-6 text-[#151c27] dark:text-[#f9f9ff] opacity-60 hover:opacity-100 hover:text-[#4F46E5] transition-opacity" href="#">Philosophy</a>
+</nav>
+</div>
+<div class="space-y-4">
+<p class="font-bold text-[#151c27] dark:text-[#f9f9ff]">Explore</p>
+<nav class="flex flex-col gap-2">
+<a class="font-['Inter'] text-sm tracking-wide leading-6 text-[#151c27] dark:text-[#f9f9ff] opacity-60 hover:opacity-100 hover:text-[#4F46E5] transition-opacity" href="#">Archive</a>
+<a class="font-['Inter'] text-sm tracking-wide leading-6 text-[#151c27] dark:text-[#f9f9ff] opacity-60 hover:opacity-100 hover:text-[#4F46E5] transition-opacity" href="#">Contact</a>
+</nav>
+</div>
+</div>
+<div class="md:col-span-2 pt-12 border-t border-outline-variant/20">
+<p class="font-['Inter'] text-xs tracking-wide leading-6 text-[#151c27] dark:text-[#f9f9ff] opacity-40">
+                    © 2024 OrgSphere. Architectural Editorial Design.
+                </p>
+</div>
+</div>
+</footer>
+</body></html>

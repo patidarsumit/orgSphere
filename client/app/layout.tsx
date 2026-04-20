@@ -8,6 +8,7 @@ const inter = Inter({ subsets: ['latin'] })
 export const metadata: Metadata = {
   title: 'OrgSphere',
   description: 'Know your organization from every angle',
+  manifest: '/manifest.json',
   icons: {
     icon: '/icon.svg',
   },

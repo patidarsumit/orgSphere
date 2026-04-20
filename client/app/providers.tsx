@@ -5,6 +5,7 @@ import { NuqsAdapter } from 'nuqs/adapters/next/app'
 import { useState } from 'react'
 import { Provider } from 'react-redux'
 import { Toaster } from 'sonner'
+import { AuthBootstrap } from '@/components/shared/AuthBootstrap'
 import { ToastProvider } from '@/components/shared/ToastProvider'
 import { store } from '@/store'
 
@@ -25,6 +26,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
     <NuqsAdapter>
       <Provider store={store}>
         <QueryClientProvider client={queryClient}>
+          <AuthBootstrap />
           {children}
           <ToastProvider />
           <Toaster richColors closeButton position="top-right" />

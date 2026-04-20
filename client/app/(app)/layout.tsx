@@ -2,38 +2,23 @@
 
 import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { useDispatch, useSelector } from 'react-redux'
-import api from '@/lib/axios'
+import { useSelector } from 'react-redux'
 import { DocumentTitle } from '@/components/layout/DocumentTitle'
 import { Header } from '@/components/layout/Header'
 import { Sidebar } from '@/components/layout/Sidebar'
 import { ErrorBoundary } from '@/components/shared/ErrorBoundary'
 import { LoadingBar } from '@/components/shared/LoadingBar'
 import { RootState } from '@/store'
-import { setCredentials, setLoading } from '@/store/slices/authSlice'
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
-  const dispatch = useDispatch()
   const router = useRouter()
   const { isAuthenticated, isLoading } = useSelector((state: RootState) => state.auth)
 
   useEffect(() => {
-    const restoreSession = async () => {
-      try {
-        const { data } = await api.post('/auth/refresh')
-        dispatch(setCredentials(data))
-      } catch {
-        dispatch(setLoading(false))
-        router.push('/login')
-      }
+    if (!isLoading && !isAuthenticated) {
+      router.push('/login')
     }
-
-    if (!isAuthenticated) {
-      void restoreSession()
-    } else {
-      dispatch(setLoading(false))
-    }
-  }, [dispatch, isAuthenticated, router])
+  }, [isAuthenticated, isLoading, router])
 
   if (isLoading) {
     return (

@@ -50,7 +50,7 @@ const trustNotes = [
 export default function LoginPage() {
   const dispatch = useDispatch()
   const router = useRouter()
-  const isAuthenticated = useSelector((state: RootState) => state.auth.isAuthenticated)
+  const { isAuthenticated, isLoading } = useSelector((state: RootState) => state.auth)
   const [showPassword, setShowPassword] = useState(false)
   const [checkingSession, setCheckingSession] = useState(true)
 
@@ -87,28 +87,10 @@ export default function LoginPage() {
       return
     }
 
-    let active = true
-
-    const restoreSession = async () => {
-      try {
-        const { data } = await api.post('/auth/refresh')
-        if (active) {
-          dispatch(setCredentials(data))
-          router.replace('/dashboard')
-        }
-      } catch {
-        if (active) {
-          setCheckingSession(false)
-        }
-      }
+    if (!isLoading) {
+      setCheckingSession(false)
     }
-
-    void restoreSession()
-
-    return () => {
-      active = false
-    }
-  }, [dispatch, isAuthenticated, router])
+  }, [isAuthenticated, isLoading, router])
 
   if (checkingSession) {
     return (

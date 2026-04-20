@@ -7,7 +7,8 @@ import {
   ShieldCheck,
   UsersRound,
 } from 'lucide-react'
-import { PublicAccountMenu } from '@/components/public/PublicAccountMenu'
+import { BlogSection } from '@/components/blog/BlogSection'
+import { PublicNav } from '@/components/public/PublicNav'
 
 const stats = [
   { value: '500+', label: 'Companies' },
@@ -46,17 +47,9 @@ const footerGroups = [
 export default function LandingPage() {
   return (
     <main id="top" className="min-h-screen bg-gray-50 text-gray-900">
-      <header className="fixed inset-x-0 top-0 z-30 border-b border-gray-100 bg-white">
-        <div className="mx-auto flex h-14 max-w-[1200px] items-center justify-between px-5">
-          <Link href="/" className="flex items-center gap-3">
-            <span className="h-4 w-4 rounded-full bg-indigo-600" />
-            <span className="text-lg font-semibold">OrgSphere</span>
-          </Link>
-          <PublicAccountMenu />
-        </div>
-      </header>
+      <PublicNav />
 
-      <section className="px-5 pb-20 pt-32">
+      <section className="px-5 pb-20 pt-24">
         <div className="mx-auto max-w-[1200px] text-center">
           <div className="inline-flex rounded-full bg-indigo-600 px-4 py-2 text-xs font-semibold uppercase tracking-wide text-white">
             Now in private beta
@@ -163,6 +156,8 @@ export default function LandingPage() {
         </div>
       </section>
 
+      <BlogSection />
+
       <section className="px-5 py-20">
         <div className="mx-auto flex max-w-[1200px] flex-col gap-8 rounded-xl bg-indigo-600 p-8 md:flex-row md:items-center md:justify-between">
           <div>
@@ -215,7 +210,7 @@ export default function LandingPage() {
                   {group.links.map((link) => (
                     <Link
                       key={link}
-                      href="#top"
+                      href={link === 'Blog' ? '/blog' : '#top'}
                       className="block text-sm text-gray-500 hover:text-gray-900"
                     >
                       {link}

@@ -12,6 +12,7 @@
     "seed:projects": "ts-node --transpile-only src/seeds/projects.seed.ts",
     "seed:workspace": "ts-node --transpile-only src/seeds/tasks-notes.seed.ts",
     "seed:activity": "ts-node --transpile-only src/seeds/activity.seed.ts",
+    "seed:blog": "ts-node --transpile-only src/seeds/posts.seed.ts",
     "migration:generate": "typeorm migration:generate",
     "migration:run": "typeorm-ts-node-commonjs migration:run -d src/data-source.ts",
     "migration:revert": "typeorm-ts-node-commonjs migration:revert -d src/data-source.ts"

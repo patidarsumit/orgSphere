@@ -8,6 +8,7 @@ import authRoutes from './routes/auth.routes'
 import dashboardRoutes from './routes/dashboard.routes'
 import employeeRoutes from './routes/employee.routes'
 import noteRoutes from './routes/note.routes'
+import postRoutes from './routes/post.routes'
 import projectRoutes from './routes/project.routes'
 import searchRoutes from './routes/search.routes'
 import settingsRoutes from './routes/settings.routes'
@@ -38,6 +39,7 @@ app.use('/api/settings', settingsRoutes)
 app.use('/api/teams', teamRoutes)
 app.use('/api/tasks', taskRoutes)
 app.use('/api/notes', noteRoutes)
+app.use('/api/posts', postRoutes)
 
 app.get('/api/health', (_req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() })

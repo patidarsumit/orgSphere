@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { ChevronDown } from 'lucide-react'
@@ -8,45 +8,13 @@ import { useDispatch, useSelector } from 'react-redux'
 import api from '@/lib/axios'
 import { Avatar } from '@/components/shared/Avatar'
 import { RootState } from '@/store'
-import { clearAuth, setCredentials } from '@/store/slices/authSlice'
+import { clearAuth } from '@/store/slices/authSlice'
 
 export function PublicAccountMenu() {
   const dispatch = useDispatch()
   const router = useRouter()
-  const user = useSelector((state: RootState) => state.auth.user)
-  const isAuthenticated = useSelector((state: RootState) => state.auth.isAuthenticated)
+  const { isLoading, user } = useSelector((state: RootState) => state.auth)
   const [menuOpen, setMenuOpen] = useState(false)
-  const [checkingSession, setCheckingSession] = useState(true)
-
-  useEffect(() => {
-    if (isAuthenticated) {
-      setCheckingSession(false)
-      return
-    }
-
-    let active = true
-
-    const restoreSession = async () => {
-      try {
-        const { data } = await api.post('/auth/refresh')
-        if (active) {
-          dispatch(setCredentials(data))
-        }
-      } catch {
-        // Public pages can remain anonymous when no refresh cookie is available.
-      } finally {
-        if (active) {
-          setCheckingSession(false)
-        }
-      }
-    }
-
-    void restoreSession()
-
-    return () => {
-      active = false
-    }
-  }, [dispatch, isAuthenticated])
 
   const handleLogout = async () => {
     try {
@@ -58,7 +26,7 @@ export function PublicAccountMenu() {
     }
   }
 
-  if (checkingSession) {
+  if (isLoading) {
     return <div className="h-9 w-24 animate-pulse rounded-lg bg-gray-100" />
   }
 
