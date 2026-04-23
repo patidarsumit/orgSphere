@@ -16,6 +16,13 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
+      const logoutRedirect = window.sessionStorage.getItem('orgsphere:logout-redirect')
+      if (logoutRedirect === 'home') {
+        window.sessionStorage.removeItem('orgsphere:logout-redirect')
+        router.push('/')
+        return
+      }
+
       router.push('/login')
     }
   }, [isAuthenticated, isLoading, router])

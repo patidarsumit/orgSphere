@@ -1,8 +1,8 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
+import axios from 'axios'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
 import { useDispatch, useSelector } from 'react-redux'
 import { Bell, BookOpen, ChevronDown, Home, LogOut, PanelLeft, Search, UserCircle } from 'lucide-react'
 import { ActivityFeedItem } from '@/components/activity/ActivityFeedItem'
@@ -10,7 +10,6 @@ import { Breadcrumb } from '@/components/layout/Breadcrumb'
 import { GlobalSearch } from '@/components/search/GlobalSearch'
 import { Avatar } from '@/components/shared/Avatar'
 import { useActivityFeed, useMarkAllRead, useUnreadCount } from '@/hooks/useActivity'
-import api from '@/lib/axios'
 import { appToast } from '@/lib/toast'
 import { RootState } from '@/store'
 import { clearAuth } from '@/store/slices/authSlice'
@@ -20,7 +19,6 @@ const useAppSelector = useSelector.withTypes<RootState>()
 
 export function Header() {
   const dispatch = useDispatch()
-  const router = useRouter()
   const user = useAppSelector((state) => state.auth.user)
   const [menuOpen, setMenuOpen] = useState(false)
   const [bellOpen, setBellOpen] = useState(false)
@@ -79,10 +77,11 @@ export function Header() {
 
   const handleLogout = async () => {
     try {
-      await api.post('/auth/logout')
+      await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/auth/logout`, {}, { withCredentials: true })
     } finally {
+      window.sessionStorage.setItem('orgsphere:logout-redirect', 'home')
       dispatch(clearAuth())
-      router.push('/login')
+      window.location.replace('/')
     }
   }
 

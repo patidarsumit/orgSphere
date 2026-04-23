@@ -1,8 +1,9 @@
 'use client'
 
 import { useEffect } from 'react'
+import axios from 'axios'
 import Link from 'next/link'
-import { usePathname, useRouter } from 'next/navigation'
+import { usePathname } from 'next/navigation'
 import { useDispatch, useSelector } from 'react-redux'
 import {
   CheckSquare,
@@ -18,7 +19,6 @@ import {
   UsersRound,
 } from 'lucide-react'
 import { UserResponse } from '@orgsphere/schemas'
-import api from '@/lib/axios'
 import { Avatar } from '@/components/shared/Avatar'
 import { OrgSphereMark } from '@/components/shared/OrgSphereMark'
 import { usePermissions } from '@/hooks/usePermissions'
@@ -218,17 +218,17 @@ function SidebarPanel({
 
 export function Sidebar() {
   const dispatch = useDispatch()
-  const router = useRouter()
   const user = useSelector((state: RootState) => state.auth.user)
   const sidebarOpen = useSelector((state: RootState) => state.ui.sidebarOpen)
   const sidebarCollapsed = useSelector((state: RootState) => state.ui.sidebarCollapsed)
 
   const handleLogout = async () => {
     try {
-      await api.post('/auth/logout')
+      await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/auth/logout`, {}, { withCredentials: true })
     } finally {
+      window.sessionStorage.setItem('orgsphere:logout-redirect', 'home')
       dispatch(clearAuth())
-      router.push('/login')
+      window.location.replace('/')
     }
   }
 
