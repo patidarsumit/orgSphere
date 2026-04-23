@@ -1,11 +1,12 @@
 import Link from 'next/link'
+import { OrgSphereMark } from '@/components/shared/OrgSphereMark'
 
 export default function NotFound() {
   return (
     <main className="flex min-h-screen items-center justify-center bg-gray-50 px-5">
       <section className="w-full max-w-md rounded-xl bg-white p-8 text-center ring-1 ring-gray-100">
         <div className="mx-auto flex items-center justify-center gap-3">
-          <span className="h-4 w-4 rounded-full bg-indigo-600" />
+          <OrgSphereMark className="h-5 w-5" />
           <span className="text-xl font-semibold text-gray-900">OrgSphere</span>
         </div>
         <h1 className="mt-8 text-2xl font-semibold text-gray-900">404 - Page not found</h1>

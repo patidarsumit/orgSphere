@@ -29,28 +29,30 @@ export function BlogIndexClient({ initialTag }: BlogIndexClientProps) {
   }
 
   return (
-    <div className="space-y-10">
-      <div className="mx-auto flex max-w-4xl flex-col items-center gap-3 text-center">
+    <div className="space-y-12">
+      <div className="mx-auto flex max-w-4xl flex-col items-center text-center">
         {initialTag ? (
-          <Link href="/blog" className="inline-flex w-fit items-center gap-2 text-sm font-bold text-indigo-600">
+          <Link href="/blog" className="mb-5 inline-flex w-fit items-center gap-2 text-sm font-bold text-indigo-600">
             <ArrowLeft size={16} /> All articles
           </Link>
         ) : null}
-        <p className="text-xs font-black uppercase tracking-[0.2em] text-indigo-600">OrgSphere Blog</p>
-        <h1 className="text-4xl font-black tracking-tight text-gray-950">
-          {initialTag ? `Articles tagged: ${initialTag}` : 'OrgSphere Blog'}
+        <div className="inline-flex rounded-full bg-indigo-600 px-4 py-2 text-xs font-semibold uppercase tracking-wide text-white">
+          OrgSphere Blog
+        </div>
+        <h1 className="mx-auto mt-7 max-w-3xl text-5xl font-bold leading-tight tracking-tight text-gray-900">
+          {initialTag ? `Articles tagged: ${initialTag}` : 'Insights for modern teams.'}
         </h1>
-        <p className="max-w-2xl text-lg leading-8 text-gray-500">
-          Insights on organizational design, team performance, and the future of work.
+        <p className="mx-auto mt-6 max-w-[620px] text-lg leading-8 text-gray-500">
+          Strategies, stories, and ideas on organizational design, collaboration, and workplace clarity.
         </p>
       </div>
 
       {!initialTag ? (
-        <div className="flex flex-wrap justify-center gap-2">
+        <div className="flex flex-wrap justify-center gap-3">
           <button
             type="button"
             onClick={() => void chooseTag('')}
-            className={`rounded-full px-4 py-2 text-sm font-bold ${!activeTag ? 'bg-indigo-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-indigo-50'}`}
+            className={`rounded-full px-5 py-2.5 text-sm font-bold transition ${!activeTag ? 'bg-indigo-600 text-white' : 'bg-white text-gray-700 ring-1 ring-gray-100 hover:bg-indigo-50'}`}
           >
             All
           </button>
@@ -59,7 +61,7 @@ export function BlogIndexClient({ initialTag }: BlogIndexClientProps) {
               key={tag}
               type="button"
               onClick={() => void chooseTag(tag)}
-              className={`rounded-full px-4 py-2 text-sm font-bold ${activeTag === tag ? 'bg-indigo-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-indigo-50'}`}
+              className={`rounded-full px-5 py-2.5 text-sm font-bold transition ${activeTag === tag ? 'bg-indigo-600 text-white' : 'bg-white text-gray-700 ring-1 ring-gray-100 hover:bg-indigo-50'}`}
             >
               {tag}
             </button>

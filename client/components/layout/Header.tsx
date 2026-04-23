@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useDispatch, useSelector } from 'react-redux'
-import { Bell, ChevronDown, PanelLeft, Search } from 'lucide-react'
+import { Bell, BookOpen, ChevronDown, Home, LogOut, PanelLeft, Search, UserCircle } from 'lucide-react'
 import { ActivityFeedItem } from '@/components/activity/ActivityFeedItem'
 import { Breadcrumb } from '@/components/layout/Breadcrumb'
 import { GlobalSearch } from '@/components/search/GlobalSearch'
@@ -16,14 +16,17 @@ import { RootState } from '@/store'
 import { clearAuth } from '@/store/slices/authSlice'
 import { toggleSidebar } from '@/store/slices/uiSlice'
 
+const useAppSelector = useSelector.withTypes<RootState>()
+
 export function Header() {
   const dispatch = useDispatch()
   const router = useRouter()
-  const user = useSelector((state: RootState) => state.auth.user)
+  const user = useAppSelector((state) => state.auth.user)
   const [menuOpen, setMenuOpen] = useState(false)
   const [bellOpen, setBellOpen] = useState(false)
   const [searchOpen, setSearchOpen] = useState(false)
   const bellRef = useRef<HTMLDivElement>(null)
+  const accountRef = useRef<HTMLDivElement>(null)
   const { data: unreadData } = useUnreadCount()
   const { data: feed } = useActivityFeed(1, 8)
   const markAllRead = useMarkAllRead()
@@ -34,6 +37,9 @@ export function Header() {
     const closeOnOutsideClick = (event: MouseEvent) => {
       if (bellRef.current && !bellRef.current.contains(event.target as Node)) {
         setBellOpen(false)
+      }
+      if (accountRef.current && !accountRef.current.contains(event.target as Node)) {
+        setMenuOpen(false)
       }
     }
 
@@ -185,34 +191,80 @@ export function Header() {
             </div>
           ) : null}
         </div>
-        <div className="relative">
+        <div ref={accountRef} className="relative">
           <button
             type="button"
             onClick={() => setMenuOpen((value) => !value)}
-            className="flex items-center gap-2 rounded-lg p-1 hover:bg-gray-50"
+            className="flex items-center gap-2 rounded-full bg-gray-50 p-1 pr-2 ring-1 ring-gray-100 transition hover:bg-white hover:shadow-sm"
+            aria-label="Open account menu"
+            aria-expanded={menuOpen}
           >
             <Avatar name={user?.name || 'OrgSphere User'} avatarPath={user?.avatar_path} size="sm" />
-            <span className="hidden text-[13px] font-medium text-gray-900 sm:inline">
+            <span className="hidden max-w-36 truncate text-[13px] font-bold text-gray-900 sm:inline">
               {user?.name}
             </span>
-            <ChevronDown className="text-gray-400" size={12} />
+            <ChevronDown className={`text-gray-400 transition-transform ${menuOpen ? 'rotate-180' : ''}`} size={12} />
           </button>
           {menuOpen ? (
-            <div className="absolute right-0 top-11 z-30 w-40 rounded-lg bg-white p-1 shadow-[var(--shadow-modal)] ring-1 ring-gray-100">
-              <Link
-                href={user ? `/employees/${user.id}` : '/my/dashboard'}
-                className="block rounded-md px-3 py-2 text-sm text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-                onClick={() => setMenuOpen(false)}
-              >
-                Profile
-              </Link>
+            <div className="absolute right-0 top-12 z-30 w-72 overflow-hidden rounded-2xl bg-white shadow-[0_24px_70px_-28px_rgba(15,23,42,0.45)] ring-1 ring-gray-100">
+              <div className="bg-gradient-to-br from-indigo-50 via-white to-slate-50 p-4">
+                <div className="flex items-center gap-3">
+                  <Avatar name={user?.name || 'OrgSphere User'} avatarPath={user?.avatar_path} size="lg" />
+                  <div className="min-w-0">
+                    <p className="truncate text-sm font-black text-gray-950">{user?.name || 'OrgSphere User'}</p>
+                    <p className="truncate text-xs font-medium text-gray-500">{user?.email || 'Signed in workspace member'}</p>
+                  </div>
+                </div>
+                <div className="mt-3 inline-flex rounded-full bg-indigo-600/10 px-2.5 py-1 text-[11px] font-black uppercase tracking-wide text-indigo-700">
+                  {user?.role?.replace('_', ' ') || 'member'}
+                </div>
+              </div>
+
+              <div className="p-2">
+                <Link
+                  href="/"
+                  className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-bold text-gray-700 transition hover:bg-indigo-50 hover:text-indigo-700"
+                  onClick={() => setMenuOpen(false)}
+                >
+                  <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-gray-100 text-gray-500">
+                    <Home size={16} />
+                  </span>
+                  Home
+                </Link>
+                <Link
+                  href="/blog"
+                  className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-bold text-gray-700 transition hover:bg-indigo-50 hover:text-indigo-700"
+                  onClick={() => setMenuOpen(false)}
+                >
+                  <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-gray-100 text-gray-500">
+                    <BookOpen size={16} />
+                  </span>
+                  Blog
+                </Link>
+                <Link
+                  href={user ? `/employees/${user.id}` : '/my/dashboard'}
+                  className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-bold text-gray-700 transition hover:bg-indigo-50 hover:text-indigo-700"
+                  onClick={() => setMenuOpen(false)}
+                >
+                  <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-gray-100 text-gray-500">
+                    <UserCircle size={16} />
+                  </span>
+                  Profile
+                </Link>
+              </div>
+
+              <div className="border-t border-gray-100 p-2">
               <button
                 type="button"
                 onClick={handleLogout}
-                className="block w-full rounded-md px-3 py-2 text-left text-sm text-red-600 hover:bg-red-50"
+                className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm font-bold text-red-600 transition hover:bg-red-50"
               >
+                <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-red-50 text-red-500">
+                  <LogOut size={16} />
+                </span>
                 Logout
               </button>
+              </div>
             </div>
           ) : null}
         </div>

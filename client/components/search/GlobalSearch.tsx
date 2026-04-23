@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { Clock, Loader2, Search, UsersRound, X } from 'lucide-react'
 import { Avatar } from '@/components/shared/Avatar'
+import { OrgSphereMark } from '@/components/shared/OrgSphereMark'
 import { StatusBadge } from '@/components/shared/StatusBadge'
 import { TechStackChip } from '@/components/shared/TechStackChip'
 import { useSearch } from '@/hooks/useSearch'
@@ -74,7 +75,7 @@ function ResultRow({
           {result.name.charAt(0)}
         </span>
       ) : (
-        <span className="h-3 w-3 shrink-0 rounded-full bg-indigo-600" />
+        <OrgSphereMark className="h-4 w-4" />
       )}
       <div className="min-w-0 flex-1">
         <p className="truncate text-sm font-semibold text-gray-900">{result.name}</p>

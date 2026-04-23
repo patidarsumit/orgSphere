@@ -1,13 +1,13 @@
 import Link from 'next/link'
 import {
   ArrowRight,
-  CheckCircle2,
   FolderKanban,
   House,
   ShieldCheck,
   UsersRound,
 } from 'lucide-react'
 import { BlogSection } from '@/components/blog/BlogSection'
+import { PublicFooter } from '@/components/public/PublicFooter'
 import { PublicNav } from '@/components/public/PublicNav'
 
 const stats = [
@@ -35,13 +35,6 @@ const features = [
     body: 'A focused sanctuary for individual contributors. Tailored views that pull relevant data from across your various team assignments.',
     link: 'View demo',
   },
-]
-
-const footerGroups = [
-  { title: 'Product', links: ['Features', 'Integrations', 'Pricing', 'Changelog'] },
-  { title: 'Company', links: ['About Us', 'Careers', 'Blog', 'Contact'] },
-  { title: 'Support', links: ['Documentation', 'Help Center', 'API Status'] },
-  { title: 'Legal', links: ['Privacy', 'Terms', 'Cookies'] },
 ]
 
 export default function LandingPage() {
@@ -157,75 +150,55 @@ export default function LandingPage() {
       </section>
 
       <BlogSection />
-
+{/* 
       <section className="px-5 py-20">
-        <div className="mx-auto flex max-w-[1200px] flex-col gap-8 rounded-xl bg-indigo-600 p-8 md:flex-row md:items-center md:justify-between">
-          <div>
-            <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-sm font-medium text-white">
-              <ShieldCheck size={16} /> Private workspace ready
-            </div>
-            <h2 className="text-3xl font-semibold text-white">
-              Ready to unify your workspace?
-            </h2>
-            <p className="mt-3 max-w-xl text-base leading-7 text-white/80">
-              Join hundreds of organizations transforming their culture through
-              radical clarity and connection.
-            </p>
-          </div>
-          <div className="flex flex-col gap-3 sm:flex-row">
-            <Link
-              href="/login"
-              className="inline-flex h-11 items-center justify-center rounded-lg bg-white px-5 text-sm font-semibold text-indigo-600 hover:bg-indigo-50"
-            >
-              Create Your Space
-            </Link>
-            <a
-              href="mailto:sales@orgsphere.local"
-              className="inline-flex h-11 items-center justify-center rounded-lg border border-white px-5 text-sm font-semibold text-white hover:bg-white/10"
-            >
-              Contact Sales
-            </a>
-          </div>
-        </div>
-      </section>
+        <div className="relative mx-auto max-w-[1200px] overflow-hidden rounded-3xl bg-white p-8 shadow-[0_24px_80px_-48px_rgba(79,70,229,0.45)] ring-1 ring-indigo-100 sm:p-10">
+          <div className="absolute -left-24 -top-24 h-72 w-72 rounded-full bg-indigo-100 blur-3xl" />
+          <div className="absolute -bottom-24 right-0 h-72 w-72 rounded-full bg-cyan-50 blur-3xl" />
 
-      <footer className="border-t border-gray-100 bg-white px-5 py-12">
-        <div className="mx-auto grid max-w-[1200px] gap-10 lg:grid-cols-[1fr_2fr]">
-          <div>
-            <div className="flex items-center gap-3">
-              <span className="h-4 w-4 rounded-full bg-indigo-600" />
-              <span className="text-lg font-semibold text-gray-900">OrgSphere</span>
-            </div>
-            <p className="mt-4 max-w-sm text-sm leading-6 text-gray-500">
-              The architectural curator for modern organizational excellence.
-            </p>
-          </div>
-          <div className="grid grid-cols-2 gap-8 md:grid-cols-4">
-            {footerGroups.map((group) => (
-              <div key={group.title}>
-                <h3 className="text-xs font-semibold uppercase tracking-wide text-gray-400">
-                  {group.title}
-                </h3>
-                <div className="mt-4 space-y-3">
-                  {group.links.map((link) => (
-                    <Link
-                      key={link}
-                      href={link === 'Blog' ? '/blog' : '#top'}
-                      className="block text-sm text-gray-500 hover:text-gray-900"
-                    >
-                      {link}
-                    </Link>
-                  ))}
-                </div>
+          <div className="relative grid gap-8 lg:grid-cols-[1fr_340px] lg:items-center">
+            <div>
+              <div className="mb-5 inline-flex items-center gap-2 rounded-full bg-indigo-50 px-3 py-1 text-sm font-bold text-indigo-600 ring-1 ring-indigo-100">
+                <ShieldCheck size={16} /> Private workspace ready
               </div>
-            ))}
+              <h2 className="max-w-2xl text-4xl font-black tracking-tight text-gray-950 sm:text-5xl">
+                Ready to unify your workspace?
+              </h2>
+              <p className="mt-4 max-w-2xl text-base leading-7 text-gray-500">
+                Bring people, projects, and decisions into one calm operating layer built for clarity at scale.
+              </p>
+              <div className="mt-6 flex flex-wrap gap-3 text-sm font-semibold text-gray-600">
+                <span className="rounded-full bg-gray-50 px-3 py-1 ring-1 ring-gray-100">No cloud required</span>
+                <span className="rounded-full bg-gray-50 px-3 py-1 ring-1 ring-gray-100">Role-aware access</span>
+                <span className="rounded-full bg-gray-50 px-3 py-1 ring-1 ring-gray-100">Local-first data</span>
+              </div>
+            </div>
+
+            <div className="rounded-2xl bg-gray-50 p-5 ring-1 ring-gray-100">
+              <p className="text-sm font-bold text-gray-950">Start with a private workspace</p>
+              <p className="mt-2 text-sm leading-6 text-gray-500">
+                Create your space or talk through the rollout with the OrgSphere team.
+              </p>
+              <div className="mt-5 grid gap-3">
+                <Link
+                  href="/login"
+                  className="inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-indigo-600 px-5 text-sm font-bold text-white transition hover:bg-indigo-700"
+                >
+                  Create Your Space <ArrowRight size={16} />
+                </Link>
+                <a
+                  href="mailto:sales@orgsphere.local"
+                  className="inline-flex h-11 items-center justify-center rounded-xl bg-white px-5 text-sm font-bold text-gray-600 ring-1 ring-gray-200 transition hover:text-gray-950"
+                >
+                  Contact Sales
+                </a>
+              </div>
+            </div>
           </div>
         </div>
-        <div className="mx-auto mt-12 flex max-w-[1200px] items-center gap-2 border-t border-gray-100 pt-6 text-sm text-gray-400">
-          <CheckCircle2 size={16} />
-          © 2025 OrgSphere Technologies Inc. All rights reserved.
-        </div>
-      </footer>
+      </section> */}
+
+      <PublicFooter />
     </main>
   )
 }

@@ -20,6 +20,7 @@ import {
 import { UserResponse } from '@orgsphere/schemas'
 import api from '@/lib/axios'
 import { Avatar } from '@/components/shared/Avatar'
+import { OrgSphereMark } from '@/components/shared/OrgSphereMark'
 import { usePermissions } from '@/hooks/usePermissions'
 import { RootState } from '@/store'
 import { clearAuth } from '@/store/slices/authSlice'
@@ -152,7 +153,7 @@ function SidebarPanel({
 
       <div className={collapsed ? 'px-0' : 'px-5'}>
         <div className={`flex h-16 items-center ${collapsed ? 'justify-center' : 'gap-3'}`}>
-          <span className="h-6 w-6 rounded-full bg-indigo-600" />
+          <OrgSphereMark className="h-7 w-7" />
           {collapsed ? null : (
             <span className="min-w-0">
               <span className="block text-lg font-semibold leading-5 text-gray-900">

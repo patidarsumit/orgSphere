@@ -1,5 +1,6 @@
 import { Metadata } from 'next'
 import { BlogArticleClient } from '@/components/blog/BlogArticleClient'
+import { PublicFooter } from '@/components/public/PublicFooter'
 import { PublicNav } from '@/components/public/PublicNav'
 import { BlogPost } from '@/types'
 
@@ -46,11 +47,12 @@ export default async function BlogArticlePage({ params }: ArticlePageProps) {
   const { slug } = await params
 
   return (
-    <main className="min-h-screen bg-white text-gray-950">
+    <main className="min-h-screen bg-gray-50 text-gray-950">
       <PublicNav />
-      <section className="px-5 py-14">
+      <section className="px-5 pb-20 pt-16">
         <BlogArticleClient slug={slug} />
       </section>
+      <PublicFooter />
     </main>
   )
 }

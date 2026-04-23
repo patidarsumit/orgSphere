@@ -1,11 +1,12 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation } from '@tanstack/react-query'
 import { AxiosError } from 'axios'
-import { ArrowRight, CheckCircle2, Eye, EyeOff, Loader2, ShieldCheck, Sparkles, UsersRound } from 'lucide-react'
+import { ArrowRight, CheckCircle2, Eye, EyeOff, Loader2, ShieldCheck, UsersRound } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import { useDispatch, useSelector } from 'react-redux'
 import { LoginInput, loginSchema, UserResponse } from '@orgsphere/schemas'
@@ -13,6 +14,7 @@ import api from '@/lib/axios'
 import { appToast } from '@/lib/toast'
 import { RootState } from '@/store'
 import { setCredentials } from '@/store/slices/authSlice'
+import { OrgSphereMark } from '@/components/shared/OrgSphereMark'
 
 interface LoginResponse {
   user: UserResponse
@@ -111,12 +113,10 @@ export default function LoginPage() {
       <div className="mx-auto grid min-h-[calc(100vh-4rem)] w-full max-w-6xl overflow-hidden rounded-2xl bg-white shadow-[var(--shadow-card)] ring-1 ring-[color:var(--color-border)] lg:grid-cols-[1.05fr_0.95fr]">
         <section className="hidden bg-[color:var(--color-text-primary)] p-10 text-white lg:flex lg:flex-col lg:justify-between">
           <div>
-            <div className="flex items-center gap-3">
-              <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-white/10 ring-1 ring-white/15">
-                <Sparkles size={18} />
-              </span>
+            <Link href="/" className="flex w-fit items-center gap-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-white/30">
+              <OrgSphereMark className="h-9 w-9 ring-1 ring-white/15" />
               <span className="text-lg font-semibold">OrgSphere</span>
-            </div>
+            </Link>
 
             <div className="mt-16 max-w-md">
               <div className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-white/80 ring-1 ring-white/15">
@@ -155,10 +155,10 @@ export default function LoginPage() {
           <div className="w-full max-w-[430px]">
             <div className="mb-8">
               <div className="mb-8 flex items-center justify-between lg:hidden">
-                <div className="flex items-center gap-3">
-                  <span className="h-3 w-3 rounded-full bg-[color:var(--color-primary)]" />
+                <Link href="/" className="flex items-center gap-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-[color:var(--color-primary)]/20">
+                  <OrgSphereMark className="h-5 w-5" />
                   <span className="text-xl font-semibold text-[color:var(--color-text-primary)]">OrgSphere</span>
-                </div>
+                </Link>
                 <span className="rounded-full bg-[color:var(--color-primary-light)] px-3 py-1 text-xs font-bold text-[color:var(--color-primary)]">
                   Secure
                 </span>

@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { Menu, X } from 'lucide-react'
 import { useState } from 'react'
+import { OrgSphereMark } from '@/components/shared/OrgSphereMark'
 import { PublicAccountMenu } from './PublicAccountMenu'
 
 export function PublicNav() {
@@ -16,7 +17,7 @@ export function PublicNav() {
     <header className="sticky inset-x-0 top-0 z-40 border-b border-gray-100 bg-white/95 backdrop-blur">
       <div className="mx-auto flex h-14 max-w-[1200px] items-center justify-between px-5">
         <Link href="/" className="flex items-center gap-3">
-          <span className="h-4 w-4 rounded-full bg-indigo-600" />
+          <OrgSphereMark className="h-5 w-5" />
           <span className="text-lg font-semibold text-gray-950">OrgSphere</span>
         </Link>
 
