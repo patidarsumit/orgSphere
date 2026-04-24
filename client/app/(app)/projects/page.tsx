@@ -6,10 +6,12 @@ import { parseAsInteger, parseAsString, useQueryState } from 'nuqs'
 import {
   ChevronLeft,
   ChevronRight,
+  Eye,
   FolderKanban,
-  MoreHorizontal,
+  Pencil,
   Plus,
   Search,
+  Trash2,
 } from 'lucide-react'
 import { ProjectFormModal } from '@/components/projects/ProjectFormModal'
 import {
@@ -119,42 +121,37 @@ function ProjectActions({
   canEdit: boolean
   canDelete: boolean
 }) {
-  const hasMenuActions = canEdit || canDelete
-
   return (
-    <div className="flex items-center justify-end gap-2">
+    <div className="inline-flex items-center justify-end gap-1">
       <Link
         href={`/projects/${project.id}`}
-        className="rounded-lg px-3 py-1.5 text-sm font-bold text-[color:var(--color-primary)] hover:bg-[color:var(--color-surface-card)]"
+        aria-label={`View ${project.name}`}
+        title="View project"
+        className="rounded-lg p-2 text-[color:var(--color-primary)] hover:bg-[color:var(--color-surface-card)]"
       >
-        View
+        <Eye size={16} />
       </Link>
-      {hasMenuActions ? (
-        <details className="relative">
-          <summary className="flex h-8 w-8 cursor-pointer list-none items-center justify-center rounded-lg text-[color:var(--color-text-tertiary)] hover:bg-[color:var(--color-surface-card)]">
-            <MoreHorizontal size={16} />
-          </summary>
-          <div className="absolute right-0 z-10 mt-2 w-36 rounded-xl bg-white/90 p-1 text-left shadow-[var(--shadow-modal)] backdrop-blur-md">
-            {canEdit ? (
-              <button
-                type="button"
-                onClick={() => onEdit(project)}
-                className="block w-full rounded-lg px-3 py-2 text-left text-sm text-[color:var(--color-text-secondary)] hover:bg-[color:var(--color-surface-low)]"
-              >
-                Edit
-              </button>
-            ) : null}
-            {canDelete ? (
-              <button
-                type="button"
-                onClick={() => onDelete(project)}
-                className="block w-full rounded-lg px-3 py-2 text-left text-sm text-red-600 hover:bg-red-50"
-              >
-                Delete
-              </button>
-            ) : null}
-          </div>
-        </details>
+      {canEdit ? (
+        <button
+          type="button"
+          onClick={() => onEdit(project)}
+          aria-label={`Edit ${project.name}`}
+          title="Edit project"
+          className="rounded-lg p-2 text-[color:var(--color-text-secondary)] hover:bg-[color:var(--color-surface-card)]"
+        >
+          <Pencil size={16} />
+        </button>
+      ) : null}
+      {canDelete ? (
+        <button
+          type="button"
+          onClick={() => onDelete(project)}
+          aria-label={`Delete ${project.name}`}
+          title="Delete project"
+          className="rounded-lg p-2 text-red-600 hover:bg-red-50"
+        >
+          <Trash2 size={16} />
+        </button>
       ) : null}
     </div>
   )

@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { MoreHorizontal } from 'lucide-react'
+import { Eye, Pencil, UserX } from 'lucide-react'
 import { Avatar } from '@/components/shared/Avatar'
 import { StatusBadge } from '@/components/shared/StatusBadge'
 import { Employee } from '@/types'
@@ -56,8 +56,6 @@ export function EmployeeTable({
               const skills = visibleSkills(employee.skills)
               const canEdit = canEditEmployee(employee)
               const canDeactivate = canDeactivateEmployee(employee)
-              const hasMenuActions = canEdit || canDeactivate
-
               return (
                 <tr
                   key={employee.id}
@@ -109,39 +107,36 @@ export function EmployeeTable({
                     <StatusBadge status={employee.is_active ? 'active' : 'archived'} />
                   </td>
                   <td className="rounded-r-xl px-5 py-3 text-right">
-                    <div className="flex items-center justify-end gap-2">
+                    <div className="inline-flex items-center justify-end gap-1">
                       <Link
                         href={`/employees/${employee.id}`}
-                        className="rounded-lg px-3 py-1.5 text-sm font-bold text-[color:var(--color-primary)] hover:bg-[color:var(--color-surface-card)]"
+                        aria-label={`View ${employee.name}`}
+                        title="View employee"
+                        className="rounded-lg p-2 text-[color:var(--color-primary)] hover:bg-[color:var(--color-surface-card)]"
                       >
-                        View
+                        <Eye size={16} />
                       </Link>
-                      {hasMenuActions ? (
-                        <details className="relative">
-                          <summary className="flex h-8 w-8 cursor-pointer list-none items-center justify-center rounded-lg text-[color:var(--color-text-tertiary)] hover:bg-[color:var(--color-surface-card)]">
-                            <MoreHorizontal size={16} />
-                          </summary>
-                          <div className="absolute right-0 z-10 mt-2 w-36 rounded-xl bg-white/90 p-1 text-left shadow-[var(--shadow-modal)] backdrop-blur-md">
-                            {canEdit ? (
-                              <button
-                                type="button"
-                                onClick={() => onEdit(employee)}
-                                className="block w-full rounded-lg px-3 py-2 text-left text-sm text-[color:var(--color-text-secondary)] hover:bg-[color:var(--color-surface-low)]"
-                              >
-                                Edit
-                              </button>
-                            ) : null}
-                          {canDeactivate ? (
-                            <button
-                              type="button"
-                              onClick={() => onDeactivate(employee)}
-                              className="block w-full rounded-lg px-3 py-2 text-left text-sm text-red-600 hover:bg-red-50"
-                            >
-                              Deactivate
-                            </button>
-                          ) : null}
-                          </div>
-                        </details>
+                      {canEdit ? (
+                        <button
+                          type="button"
+                          onClick={() => onEdit(employee)}
+                          aria-label={`Edit ${employee.name}`}
+                          title="Edit employee"
+                          className="rounded-lg p-2 text-[color:var(--color-text-secondary)] hover:bg-[color:var(--color-surface-card)]"
+                        >
+                          <Pencil size={16} />
+                        </button>
+                      ) : null}
+                      {canDeactivate ? (
+                        <button
+                          type="button"
+                          onClick={() => onDeactivate(employee)}
+                          aria-label={`Deactivate ${employee.name}`}
+                          title="Deactivate employee"
+                          className="rounded-lg p-2 text-red-600 hover:bg-red-50"
+                        >
+                          <UserX size={16} />
+                        </button>
                       ) : null}
                     </div>
                   </td>

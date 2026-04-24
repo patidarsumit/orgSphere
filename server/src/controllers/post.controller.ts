@@ -56,11 +56,11 @@ export const getFeatured = async (_req: Request, res: Response): Promise<void> =
   }
 }
 
-export const getAllAdmin = async (req: Request, res: Response): Promise<void> => {
+export const getAllAdmin = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const query = parseQuery(req, res)
     if (!query) return
-    res.json(await PostService.findAll(query))
+    res.json(await PostService.findAll(query, req.user))
   } catch {
     sendServerError(res, 'Failed to fetch posts')
   }

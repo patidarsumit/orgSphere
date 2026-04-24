@@ -4,6 +4,7 @@ import { Project } from '../entities/Project'
 import { Team } from '../entities/Team'
 import { Task } from '../entities/Task'
 import { Note } from '../entities/Note'
+import { Post } from '../entities/Post'
 import { User } from '../entities/User'
 import { UserRole } from '../entities/User'
 import { can, isUserRole, PermissionAction } from '../permissions'
@@ -236,4 +237,41 @@ export const canManageNote = async (
   }
 
   forbidden(res, 'Notes are private to their owner', 'notes.manage_own')
+}
+
+export const canAccessPosts = requirePermission('posts.access')
+export const canPublishPosts = requirePermission('posts.publish')
+
+export const canManagePost = async (
+  req: AuthRequest,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  const role = getRole(req)
+
+  if (!req.user || !role) {
+    res.status(401).json({ message: 'Unauthorized' })
+    return
+  }
+
+  if (role === 'admin') {
+    next()
+    return
+  }
+
+  const post = await AppDataSource.getRepository(Post).findOne({
+    where: { id: req.params.id },
+  })
+
+  if (!post) {
+    res.status(404).json({ message: 'Post not found' })
+    return
+  }
+
+  if (post.author_id === req.user.id) {
+    next()
+    return
+  }
+
+  forbidden(res, 'Only the author or admin can manage this post', 'posts.access')
 }

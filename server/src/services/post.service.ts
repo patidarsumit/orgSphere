@@ -1,8 +1,10 @@
 import { PostQuery, CreatePostInput, UpdatePostInput } from '@orgsphere/schemas'
 import { AppDataSource } from '../data-source'
 import { Post } from '../entities/Post'
+import { UserRole } from '../entities/User'
 import * as ActivityService from './activity.service'
 import { calculateReadingTime, generateUniqueSlug } from '../utils/slug'
+import { can } from '../permissions'
 
 const repo = () => AppDataSource.getRepository(Post)
 
@@ -96,9 +98,15 @@ export const getFeatured = async () => {
     .getOne()
 }
 
-export const findAll = async (query: PostQuery) => {
+export const findAll = async (
+  query: PostQuery,
+  actor?: { id?: string; role?: string }
+) => {
   const { page, limit, status, search } = query
   const skip = (page - 1) * limit
+  const actorRole = actor?.role as UserRole | undefined
+  const canPublish = actorRole ? can(actorRole, 'posts.publish') : false
+  const actorId = actor?.id
 
   let qb = repo()
     .createQueryBuilder('post')
@@ -107,6 +115,13 @@ export const findAll = async (query: PostQuery) => {
     .orderBy('post.created_at', 'DESC')
     .skip(skip)
     .take(limit)
+
+  if (!canPublish) {
+    qb = qb.andWhere('(post.author_id = :actorId OR post.status = :publishedStatus)', {
+      actorId: actorId ?? '__anonymous__',
+      publishedStatus: 'published',
+    })
+  }
 
   if (status) qb = qb.andWhere('post.status = :status', { status })
   if (search) {

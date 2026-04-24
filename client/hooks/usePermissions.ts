@@ -16,6 +16,8 @@ const rolePermissions: Record<
     createProject: boolean
     deleteProject: boolean
     manageAnyTask: boolean
+    accessBlog: boolean
+    publishBlog: boolean
     accessSettings: boolean
   }
 > = {
@@ -28,6 +30,8 @@ const rolePermissions: Record<
     createProject: true,
     deleteProject: true,
     manageAnyTask: true,
+    accessBlog: true,
+    publishBlog: true,
     accessSettings: true,
   },
   hr: {
@@ -39,6 +43,8 @@ const rolePermissions: Record<
     createProject: false,
     deleteProject: false,
     manageAnyTask: false,
+    accessBlog: true,
+    publishBlog: false,
     accessSettings: false,
   },
   manager: {
@@ -50,6 +56,8 @@ const rolePermissions: Record<
     createProject: true,
     deleteProject: false,
     manageAnyTask: false,
+    accessBlog: true,
+    publishBlog: true,
     accessSettings: false,
   },
   tech_lead: {
@@ -61,6 +69,8 @@ const rolePermissions: Record<
     createProject: false,
     deleteProject: false,
     manageAnyTask: false,
+    accessBlog: true,
+    publishBlog: true,
     accessSettings: false,
   },
   employee: {
@@ -72,6 +82,8 @@ const rolePermissions: Record<
     createProject: false,
     deleteProject: false,
     manageAnyTask: false,
+    accessBlog: true,
+    publishBlog: false,
     accessSettings: false,
   },
   viewer: {
@@ -83,6 +95,8 @@ const rolePermissions: Record<
     createProject: false,
     deleteProject: false,
     manageAnyTask: false,
+    accessBlog: false,
+    publishBlog: false,
     accessSettings: false,
   },
 }
@@ -137,6 +151,8 @@ export function usePermissions() {
             typeof taskOrAssignedTo === 'string' ? taskOrAssignedTo : taskOrAssignedTo.assigned_to
           return Boolean(user && ((currentPermissions?.manageAnyTask ?? false) || assignedTo === user.id))
         },
+        accessBlog: currentPermissions?.accessBlog ?? false,
+        publishBlog: currentPermissions?.publishBlog ?? false,
         accessSettings: currentPermissions?.accessSettings ?? false,
       },
     }

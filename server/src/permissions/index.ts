@@ -1,6 +1,8 @@
 import { UserRole } from '../entities/User'
 
 export type PermissionAction =
+  | 'posts.access'
+  | 'posts.publish'
   | 'employees.create'
   | 'employees.edit_any'
   | 'employees.edit_own'
@@ -21,6 +23,8 @@ export const hasMinRole = (userRole: UserRole, minRole: UserRole): boolean =>
   ROLE_HIERARCHY.indexOf(userRole) >= ROLE_HIERARCHY.indexOf(minRole)
 
 export const PERMISSIONS: Record<PermissionAction, UserRole[]> = {
+  'posts.access': ['admin', 'hr', 'manager', 'tech_lead', 'employee'],
+  'posts.publish': ['admin', 'manager', 'tech_lead'],
   'employees.create': ['admin', 'manager', 'hr'],
   'employees.edit_any': ['admin', 'hr'],
   'employees.edit_own': ['admin', 'hr', 'manager', 'tech_lead', 'employee', 'viewer'],

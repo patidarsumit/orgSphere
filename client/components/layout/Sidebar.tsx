@@ -6,6 +6,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useDispatch, useSelector } from 'react-redux'
 import {
+  BookOpen,
   CheckSquare,
   ChevronLeft,
   ChevronRight,
@@ -44,6 +45,8 @@ const workspaceItems: NavItem[] = [
   { href: '/my/tasks', label: 'My Tasks', icon: CheckSquare },
   { href: '/my/notes', label: 'My Notes', icon: FileText },
 ]
+
+const otherItems: NavItem[] = [{ href: '/content/blog', label: 'Blog', icon: BookOpen }]
 
 const SIDEBAR_COLLAPSED_KEY = 'orgsphere.sidebarCollapsed'
 
@@ -180,6 +183,14 @@ function SidebarPanel({
           onNavigate={onNavigate}
           collapsed={collapsed}
         />
+        {can.accessBlog ? (
+          <NavSection
+            label="Other"
+            items={otherItems}
+            onNavigate={onNavigate}
+            collapsed={collapsed}
+          />
+        ) : null}
         {can.accessSettings ? (
           <NavSection
             label="Admin"

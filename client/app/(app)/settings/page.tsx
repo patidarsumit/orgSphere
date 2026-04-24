@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation'
 import { useDispatch, useSelector } from 'react-redux'
 import {
   Building2,
-  BookOpen,
   CheckCircle2,
   Database,
   FolderKanban,
@@ -15,7 +14,6 @@ import {
   Users,
   UsersRound,
 } from 'lucide-react'
-import { BlogManagement } from '@/components/blog/BlogManagement'
 import { roleLabels } from '@/components/employees/constants'
 import { Avatar } from '@/components/shared/Avatar'
 import { StatusBadge } from '@/components/shared/StatusBadge'
@@ -32,12 +30,11 @@ import { RootState } from '@/store'
 import { setCredentials } from '@/store/slices/authSlice'
 import { User as UserType, UserRole } from '@/types'
 
-type SettingsTab = 'general' | 'roles' | 'blog' | 'account'
+type SettingsTab = 'general' | 'roles' | 'account'
 
 const tabs: Array<{ id: SettingsTab; label: string; icon: typeof User }> = [
   { id: 'general', label: 'General', icon: Building2 },
   { id: 'roles', label: 'Roles & Permissions', icon: Shield },
-  { id: 'blog', label: 'Blog', icon: BookOpen },
   { id: 'account', label: 'My Account', icon: KeyRound },
 ]
 
@@ -358,7 +355,6 @@ export default function SettingsPage() {
   const content = useMemo(() => {
     if (activeTab === 'general') return <GeneralTab />
     if (activeTab === 'roles') return <RolesTab />
-    if (activeTab === 'blog') return <BlogManagement />
     return <AccountTab />
   }, [activeTab])
 
@@ -370,7 +366,8 @@ export default function SettingsPage() {
         <p className="text-xs font-black uppercase tracking-[0.18em] text-indigo-500">Workspace Admin</p>
         <h1 className="mt-2 text-3xl font-black tracking-tight text-gray-950 sm:text-4xl">Organization Settings</h1>
         <p className="mt-2 max-w-2xl text-sm leading-6 text-gray-500">
-          Configure workspace defaults, roles, and account controls for the team.
+          Configure workspace defaults, roles, and account controls for the team. Editorial work now
+          lives in the dedicated Blog workspace instead of Settings.
         </p>
       </header>
       <div className="flex flex-col gap-8 lg:flex-row lg:gap-10">

@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useMemo, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { createPostSchema, CreatePostInput } from '@orgsphere/schemas'
@@ -9,6 +10,7 @@ import { useSelector } from 'react-redux'
 import { TiptapEditor } from '@/components/notes/TiptapEditor'
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog'
 import { Avatar } from '@/components/shared/Avatar'
+import { usePermissions } from '@/hooks/usePermissions'
 import {
   useBlogTags,
   useCreatePost,
@@ -43,6 +45,7 @@ const estimateReadingTime = (content: Record<string, unknown>) => {
 }
 
 export function PostEditorModal({ open, onClose, postId }: PostEditorModalProps) {
+  const router = useRouter()
   const [currentPostId, setCurrentPostId] = useState(postId ?? '')
   const [content, setContent] = useState<Record<string, unknown>>(emptyDoc)
   const [tags, setTags] = useState<string[]>([])
@@ -51,6 +54,7 @@ export function PostEditorModal({ open, onClose, postId }: PostEditorModalProps)
   const [confirmClose, setConfirmClose] = useState(false)
   const [saveStatus, setSaveStatus] = useState<SaveStatus>('idle')
   const currentUser = useSelector((state: RootState) => state.auth.user)
+  const { can } = usePermissions()
   const post = usePostByIdAdmin(currentPostId)
   const existingTags = useBlogTags()
   const createPost = useCreatePost()
@@ -143,7 +147,7 @@ export function PostEditorModal({ open, onClose, postId }: PostEditorModalProps)
     reading_time: readingTime,
   })
 
-  const saveDraft = async (silent = false) => {
+  const persistDraft = async (silent = false) => {
     const payload = buildPayload('draft')
     if (payload.title.length < 3) {
       if (!silent) appToast.warning('Add a title with at least 3 characters')
@@ -171,15 +175,23 @@ export function PostEditorModal({ open, onClose, postId }: PostEditorModalProps)
     if (!open || !dirty || title.trim().length < 3) return
 
     const timeout = window.setTimeout(() => {
-      void saveDraft(true)
+      void persistDraft(true)
     }, 2000)
 
     return () => window.clearTimeout(timeout)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [content, dirty, open, subtitle, tags, title, coverImageUrl])
 
+  const saveDraftAndReturn = async () => {
+    const saved = await persistDraft()
+    if (!saved) return
+
+    onClose()
+    router.push('/content/blog')
+  }
+
   const publish = async () => {
-    const saved = currentPostId ? await saveDraft(true) : await saveDraft()
+    const saved = await persistDraft(true)
     const targetId = saved?.id ?? currentPostId
     if (!targetId) return
 
@@ -188,6 +200,8 @@ export function PostEditorModal({ open, onClose, postId }: PostEditorModalProps)
       setValue('status', 'published')
       setDirty(false)
       appToast.success('Post published')
+      onClose()
+      router.push('/content/blog')
     } catch (error) {
       appToast.error(getToastErrorMessage(error, 'Unable to publish post'))
     }
@@ -228,18 +242,20 @@ export function PostEditorModal({ open, onClose, postId }: PostEditorModalProps)
               </span>
               <button
                 type="button"
-                onClick={() => void saveDraft()}
+                onClick={() => void saveDraftAndReturn()}
                 className="rounded-lg px-3 py-2 text-sm font-bold text-gray-600 hover:bg-gray-50"
               >
                 Save Draft
               </button>
-              <button
-                type="button"
-                onClick={() => void publish()}
-                className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-bold text-white hover:bg-indigo-700"
-              >
-                Publish
-              </button>
+              {can.publishBlog ? (
+                <button
+                  type="button"
+                  onClick={() => void publish()}
+                  className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-bold text-white hover:bg-indigo-700"
+                >
+                  Publish
+                </button>
+              ) : null}
             </div>
           </header>
 
