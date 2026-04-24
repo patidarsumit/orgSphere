@@ -53,7 +53,7 @@ export function BlogSection() {
             href="/blog"
             className="inline-flex items-center justify-center gap-2 text-sm font-black text-indigo-600"
           >
-            View all articles <ArrowRight size={16} />
+            View all posts <ArrowRight size={16} />
           </Link>
         </div>
 

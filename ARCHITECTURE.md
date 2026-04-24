@@ -101,7 +101,7 @@ client/app/
 │   ├── login/page.tsx
 │   └── blog/
 │       ├── page.tsx              # Blog index
-│       └── [slug]/page.tsx       # Public article
+│       └── [slug]/page.tsx       # Public post
 └── (app)/
     ├── layout.tsx                # Protected shell
     ├── dashboard/page.tsx
@@ -618,7 +618,7 @@ npm run migration:run --workspace=server
 /                  Landing page
 /login             Sign in
 /blog              Blog index
-/blog/[slug]       Public article
+/blog/[slug]       Public post
 ```
 
 ### Authenticated app

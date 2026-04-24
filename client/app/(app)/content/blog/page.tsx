@@ -28,7 +28,7 @@ export default function BlogManagementPage() {
           Blog Workspace
         </h1>
         <p className="mt-2 max-w-2xl text-sm leading-6 text-gray-500">
-          Draft and review OrgSphere articles in a dedicated content area. Publishing stays limited
+          Draft and review OrgSphere posts in a dedicated content area. Publishing stays limited
           to approved roles, while broader internal authors can contribute drafts.
         </p>
       </div>

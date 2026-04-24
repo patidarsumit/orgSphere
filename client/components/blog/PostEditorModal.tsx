@@ -386,7 +386,7 @@ export function PostEditorModal({ open, onClose, postId }: PostEditorModalProps)
               <div className="mt-3 rounded-xl bg-white p-4 ring-1 ring-gray-100">
                 <p className="line-clamp-1 text-sm font-black text-blue-700">{title || 'Post title'}</p>
                 <p className="mt-1 text-xs text-green-700">orgsphere.local/blog/{slugPreview || 'post-slug'}</p>
-                <p className="mt-2 line-clamp-2 text-xs leading-5 text-gray-500">{subtitle || 'Subtitle or first article excerpt appears here.'}</p>
+                <p className="mt-2 line-clamp-2 text-xs leading-5 text-gray-500">{subtitle || 'Subtitle or first post excerpt appears here.'}</p>
               </div>
             </section>
           </div>

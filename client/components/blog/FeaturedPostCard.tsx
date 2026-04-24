@@ -15,14 +15,14 @@ export function FeaturedPostCard({ post }: { post: BlogPost }) {
         <div className="absolute inset-0 bg-black/8" />
         <div className="relative text-center">
           <span className="rounded-full bg-white/75 px-5 py-2 text-xs font-black uppercase tracking-[0.2em] text-[color:var(--color-text-primary)]">
-            Featured Article
+            Featured Post
           </span>
           <p className="mt-6 text-4xl font-semibold tracking-tight text-white">{tag}</p>
         </div>
       </div>
       <div className="flex flex-col justify-center bg-[color:var(--color-surface-card)] p-8 sm:p-10">
         <span className="mb-3 text-[11px] font-black uppercase tracking-[0.24em] text-[color:var(--color-primary)]">
-          Featured Article
+          Featured Post
         </span>
         <h3 className="text-3xl font-semibold leading-tight tracking-[-0.03em] text-[color:var(--color-text-primary)] transition-colors group-hover:text-[color:var(--color-primary)] sm:text-[2.05rem]">
           {post.title}

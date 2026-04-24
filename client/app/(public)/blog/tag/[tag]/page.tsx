@@ -14,7 +14,7 @@ export async function generateMetadata({ params }: TagPageProps): Promise<Metada
 
   return {
     title: `${decodedTag} | OrgSphere Blog`,
-    description: `Articles about ${decodedTag} from the OrgSphere blog.`,
+    description: `Posts about ${decodedTag} from the OrgSphere blog.`,
   }
 }
 

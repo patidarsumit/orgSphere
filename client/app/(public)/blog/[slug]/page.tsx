@@ -1,10 +1,10 @@
 import { Metadata } from 'next'
-import { BlogArticleClient } from '@/components/blog/BlogArticleClient'
+import { BlogPostClient } from '@/components/blog/BlogPostClient'
 import { PublicFooter } from '@/components/public/PublicFooter'
 import { PublicNav } from '@/components/public/PublicNav'
 import { BlogPost } from '@/types'
 
-interface ArticlePageProps {
+interface PostPageProps {
   params: Promise<{ slug: string }>
 }
 
@@ -20,13 +20,13 @@ async function fetchPost(slug: string): Promise<BlogPost | null> {
   }
 }
 
-export async function generateMetadata({ params }: ArticlePageProps): Promise<Metadata> {
+export async function generateMetadata({ params }: PostPageProps): Promise<Metadata> {
   const { slug } = await params
   const post = await fetchPost(slug)
 
   if (!post) {
     return {
-      title: 'Article not found | OrgSphere Blog',
+      title: 'Post not found | OrgSphere Blog',
     }
   }
 
@@ -43,14 +43,14 @@ export async function generateMetadata({ params }: ArticlePageProps): Promise<Me
   }
 }
 
-export default async function BlogArticlePage({ params }: ArticlePageProps) {
+export default async function BlogPostPage({ params }: PostPageProps) {
   const { slug } = await params
 
   return (
     <main className="min-h-screen bg-gray-50 text-gray-950">
       <PublicNav />
       <section className="px-5 pb-20 pt-16">
-        <BlogArticleClient slug={slug} />
+        <BlogPostClient slug={slug} />
       </section>
       <PublicFooter />
     </main>

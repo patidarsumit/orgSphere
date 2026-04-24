@@ -10,7 +10,7 @@ import { BlogContentRenderer } from './BlogContentRenderer'
 import { BlogPostCard } from './BlogPostCard'
 import { authorName, firstTag, formatDate } from './blogUtils'
 
-export function BlogArticleClient({ slug }: { slug: string }) {
+export function BlogPostClient({ slug }: { slug: string }) {
   const { data: post, isLoading, isError } = usePostBySlug(slug)
   const user = useSelector((state: RootState) => state.auth.user)
   const related = usePublishedPosts({
@@ -31,8 +31,8 @@ export function BlogArticleClient({ slug }: { slug: string }) {
   if (isError || !post) {
     return (
       <div className="mx-auto max-w-[680px] rounded-2xl bg-white p-10 text-center shadow-[var(--shadow-card)] ring-1 ring-gray-100">
-        <h1 className="text-3xl font-black text-gray-950">Article not found</h1>
-        <p className="mt-3 text-gray-500">The article may have been unpublished or moved.</p>
+        <h1 className="text-3xl font-black text-gray-950">Post not found</h1>
+        <p className="mt-3 text-gray-500">The post may have been unpublished or moved.</p>
         <Link
           href="/blog"
           className="mt-6 inline-flex items-center gap-2 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-black text-white"
@@ -141,7 +141,7 @@ export function BlogArticleClient({ slug }: { slug: string }) {
 
       {relatedPosts.length > 0 ? (
         <section className="mt-12">
-          <h2 className="text-2xl font-black text-gray-950">More articles</h2>
+          <h2 className="text-2xl font-black text-gray-950">More posts</h2>
           <div className="mt-5 grid gap-6 sm:grid-cols-3">
             {relatedPosts.map((item) => (
               <BlogPostCard key={item.id} post={item} />

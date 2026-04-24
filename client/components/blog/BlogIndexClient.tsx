@@ -37,14 +37,14 @@ export function BlogIndexClient({ initialTag }: BlogIndexClientProps) {
       <div className="mx-auto flex max-w-[1200px] flex-col items-center border-b border-[color:var(--color-border)] pb-16 text-center">
         {initialTag ? (
           <Link href="/blog" className="mb-5 inline-flex w-fit items-center gap-2 text-sm font-bold text-[color:var(--color-primary)]">
-            <ArrowLeft size={16} /> All articles
+            <ArrowLeft size={16} /> All posts
           </Link>
         ) : null}
         <div className="inline-flex rounded-full bg-[color:var(--color-primary)] px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-white">
           OrgSphere Blog
         </div>
         <h1 className="mx-auto mt-7 max-w-3xl text-5xl font-bold leading-tight text-[color:var(--color-text-primary)]">
-          {initialTag ? `Articles tagged: ${initialTag}` : 'Insights for modern teams.'}
+          {initialTag ? `Posts tagged: ${initialTag}` : 'Insights for modern teams.'}
         </h1>
         <p className="mx-auto mt-6 max-w-[520px] text-lg leading-8 text-[color:var(--color-text-secondary)]">
           Strategies, stories, and ideas on organizational design, collaboration, and workplace clarity.
@@ -114,7 +114,7 @@ export function BlogIndexClient({ initialTag }: BlogIndexClientProps) {
                     disabled={posts.isFetchingNextPage}
                     className="inline-flex items-center gap-2 rounded-full border border-[color:var(--color-border)] px-6 py-3 text-sm font-black text-[color:var(--color-text-primary)] transition hover:border-[color:var(--color-primary)] hover:text-[color:var(--color-primary)] disabled:cursor-wait disabled:opacity-70"
                   >
-                    {posts.isFetchingNextPage ? 'Loading...' : 'More articles'} <ArrowRight size={16} />
+                    {posts.isFetchingNextPage ? 'Loading...' : 'More posts'} <ArrowRight size={16} />
                   </button>
                 </div>
               ) : null}
@@ -122,16 +122,16 @@ export function BlogIndexClient({ initialTag }: BlogIndexClientProps) {
           ) : (
             <div className="bg-[color:var(--color-surface-card)] p-10 text-center">
               <h2 className="text-2xl font-semibold text-[color:var(--color-text-primary)]">
-                No articles {activeTag ? `tagged "${activeTag}"` : 'yet'}
+                No posts {activeTag ? `tagged "${activeTag}"` : 'yet'}
               </h2>
               <p className="mt-3 text-sm text-[color:var(--color-text-secondary)]">
-                Browse all articles or check back soon.
+                Browse all posts or check back soon.
               </p>
               <Link
                 href="/blog"
                 className="mt-6 inline-flex rounded-full bg-[color:var(--color-primary)] px-5 py-2.5 text-sm font-black text-white"
               >
-                Browse all articles
+                Browse all posts
               </Link>
             </div>
           )}

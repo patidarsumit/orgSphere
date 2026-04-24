@@ -105,7 +105,7 @@ export function BlogManagement() {
               Blog Management
             </h2>
             <p className="mt-1 text-sm text-[color:var(--color-text-tertiary)]">
-              Draft, review, and publish public OrgSphere articles. Authors can manage their own
+              Draft, review, and publish public OrgSphere posts. Authors can manage their own
               posts, while approved roles control publishing.
             </p>
           </div>
@@ -174,7 +174,7 @@ export function BlogManagement() {
                         </p>
                       )}
                       <span className="block max-w-[260px] truncate text-xs text-[color:var(--color-text-tertiary)]">
-                        {post.subtitle || 'Public article for the OrgSphere editorial stream.'}
+                        {post.subtitle || 'Public post for the OrgSphere editorial stream.'}
                       </span>
                     </td>
                     <td className="px-5 py-4">
@@ -268,7 +268,7 @@ export function BlogManagement() {
           <div className="grid place-items-center p-12 text-center">
             <BookOpen className="h-10 w-10 text-indigo-300" />
             <h3 className="mt-4 text-xl font-black text-gray-950">No blog posts yet</h3>
-            <p className="mt-2 text-sm text-gray-500">Write your first public OrgSphere article.</p>
+            <p className="mt-2 text-sm text-gray-500">Write your first public OrgSphere post.</p>
             <button
               type="button"
               onClick={() => openEditor()}
