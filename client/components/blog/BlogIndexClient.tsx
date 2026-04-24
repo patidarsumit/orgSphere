@@ -1,11 +1,12 @@
 'use client'
 
 import Link from 'next/link'
-import { parseAsInteger, useQueryState } from 'nuqs'
+import { useQueryState } from 'nuqs'
 import { ArrowLeft, ArrowRight } from 'lucide-react'
-import { useBlogTags, useFeaturedPost, usePublishedPosts } from '@/hooks/useBlog'
+import { useBlogTags, useFeaturedPost, useInfinitePublishedPosts } from '@/hooks/useBlog'
 import { BlogPostCard } from './BlogPostCard'
 import { FeaturedPostCard } from './FeaturedPostCard'
+import { formatDate } from './blogUtils'
 
 interface BlogIndexClientProps {
   initialTag?: string
@@ -13,100 +14,122 @@ interface BlogIndexClientProps {
 
 export function BlogIndexClient({ initialTag }: BlogIndexClientProps) {
   const [queryTag, setQueryTag] = useQueryState('tag', { defaultValue: initialTag ?? '' })
-  const [page, setPage] = useQueryState('page', parseAsInteger.withDefault(1))
   const activeTag = initialTag ?? queryTag
-  const posts = usePublishedPosts({ page, limit: 9, tag: activeTag })
+  const posts = useInfinitePublishedPosts({ limit: 9, tag: activeTag })
   const featured = useFeaturedPost()
   const tags = useBlogTags()
-
-  const articles = posts.data?.data ?? []
   const tagList = tags.data ?? []
   const showFeatured = !activeTag && featured.data
+  const articles = posts.data?.pages.flatMap((page) => page.data) ?? []
+  const gridArticles = showFeatured
+    ? articles.filter((post) => post.id !== featured.data?.id)
+    : articles
+  const recentPosts = showFeatured
+    ? [featured.data!, ...gridArticles].slice(0, 5)
+    : articles.slice(0, 5)
 
   const chooseTag = async (tag: string) => {
-    await setPage(1)
     await setQueryTag(tag)
   }
 
   return (
-    <div className="space-y-12">
-      <div className="mx-auto flex max-w-4xl flex-col items-center text-center">
+    <div className="space-y-0">
+      <div className="mx-auto flex max-w-[1200px] flex-col items-center border-b border-[color:var(--color-border)] pb-16 text-center">
         {initialTag ? (
-          <Link href="/blog" className="mb-5 inline-flex w-fit items-center gap-2 text-sm font-bold text-indigo-600">
+          <Link href="/blog" className="mb-5 inline-flex w-fit items-center gap-2 text-sm font-bold text-[color:var(--color-primary)]">
             <ArrowLeft size={16} /> All articles
           </Link>
         ) : null}
-        <div className="inline-flex rounded-full bg-indigo-600 px-4 py-2 text-xs font-semibold uppercase tracking-wide text-white">
+        <div className="inline-flex rounded-full bg-[color:var(--color-primary)] px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-white">
           OrgSphere Blog
         </div>
-        <h1 className="mx-auto mt-7 max-w-3xl text-5xl font-bold leading-tight tracking-tight text-gray-900">
+        <h1 className="mx-auto mt-7 max-w-3xl text-5xl font-bold leading-tight text-[color:var(--color-text-primary)]">
           {initialTag ? `Articles tagged: ${initialTag}` : 'Insights for modern teams.'}
         </h1>
-        <p className="mx-auto mt-6 max-w-[620px] text-lg leading-8 text-gray-500">
+        <p className="mx-auto mt-6 max-w-[520px] text-lg leading-8 text-[color:var(--color-text-secondary)]">
           Strategies, stories, and ideas on organizational design, collaboration, and workplace clarity.
         </p>
       </div>
 
       {!initialTag ? (
-        <div className="flex flex-wrap justify-center gap-3">
+        <div className="flex items-center justify-center gap-5 overflow-x-auto border-b border-[color:var(--color-border)] py-6 text-center">
           <button
             type="button"
             onClick={() => void chooseTag('')}
-            className={`rounded-full px-5 py-2.5 text-sm font-bold transition ${!activeTag ? 'bg-indigo-600 text-white' : 'bg-white text-gray-700 ring-1 ring-gray-100 hover:bg-indigo-50'}`}
+            className={`shrink-0 text-xs font-black uppercase tracking-[0.24em] ${
+              !activeTag
+                ? 'text-[color:var(--color-primary)] underline decoration-2 underline-offset-[10px]'
+                : 'text-[color:var(--color-text-tertiary)] hover:text-[color:var(--color-text-primary)]'
+            }`}
           >
             All
           </button>
           {tagList.map((tag) => (
-            <button
-              key={tag}
-              type="button"
-              onClick={() => void chooseTag(tag)}
-              className={`rounded-full px-5 py-2.5 text-sm font-bold transition ${activeTag === tag ? 'bg-indigo-600 text-white' : 'bg-white text-gray-700 ring-1 ring-gray-100 hover:bg-indigo-50'}`}
-            >
-              {tag}
-            </button>
+            <div key={tag} className="flex shrink-0 items-center gap-5">
+              <span className="h-4 w-px bg-[color:var(--color-border)]" />
+              <button
+                type="button"
+                onClick={() => void chooseTag(tag)}
+                className={`text-xs font-black uppercase tracking-[0.24em] ${
+                  activeTag === tag
+                    ? 'text-[color:var(--color-primary)] underline decoration-2 underline-offset-[10px]'
+                    : 'text-[color:var(--color-text-tertiary)] hover:text-[color:var(--color-text-primary)]'
+                }`}
+              >
+                {tag}
+              </button>
+            </div>
           ))}
         </div>
       ) : null}
 
-      {showFeatured ? <FeaturedPostCard post={featured.data!} /> : null}
+      <div className="grid gap-12 py-12 xl:grid-cols-[minmax(0,1fr)_280px]">
+        <section className="xl:border-r xl:border-[color:var(--color-border)] xl:pr-12">
+          {showFeatured ? <FeaturedPostCard post={featured.data!} /> : null}
 
-      <div className="grid gap-8 xl:grid-cols-[1fr_280px]">
-        <section>
           {posts.isLoading ? (
             <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
               {Array.from({ length: 6 }).map((_, index) => (
                 <div key={index} className="h-80 animate-pulse rounded-xl bg-gray-100" />
               ))}
             </div>
-          ) : articles.length > 0 ? (
+          ) : gridArticles.length > 0 ? (
             <>
-              <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-                {articles.map((post) => (
-                  <BlogPostCard key={post.id} post={post} />
+              <div className="grid gap-x-12 gap-y-16 md:grid-cols-2">
+                {gridArticles.map((post, index) => (
+                  <div key={post.id} className="contents">
+                    <BlogPostCard post={post} />
+                    {index % 2 === 1 && index !== gridArticles.length - 1 ? (
+                      <div className="col-span-2 h-px bg-[color:var(--color-border)]" />
+                    ) : null}
+                  </div>
                 ))}
+                {gridArticles.length % 2 === 1 ? <div /> : null}
               </div>
-              {posts.data && page < posts.data.totalPages ? (
-                <div className="mt-10 text-center">
+              {posts.hasNextPage ? (
+                <div className="mt-14 text-center">
                   <button
                     type="button"
-                    onClick={() => void setPage(page + 1)}
-                    className="inline-flex items-center gap-2 rounded-lg border border-indigo-200 px-5 py-3 text-sm font-black text-indigo-600 hover:bg-indigo-50"
+                    onClick={() => void posts.fetchNextPage()}
+                    disabled={posts.isFetchingNextPage}
+                    className="inline-flex items-center gap-2 rounded-full border border-[color:var(--color-border)] px-6 py-3 text-sm font-black text-[color:var(--color-text-primary)] transition hover:border-[color:var(--color-primary)] hover:text-[color:var(--color-primary)] disabled:cursor-wait disabled:opacity-70"
                   >
-                    Load more articles <ArrowRight size={16} />
+                    {posts.isFetchingNextPage ? 'Loading...' : 'More articles'} <ArrowRight size={16} />
                   </button>
                 </div>
               ) : null}
             </>
           ) : (
-            <div className="rounded-2xl bg-white p-10 text-center shadow-[var(--shadow-card)] ring-1 ring-gray-100">
-              <h2 className="text-2xl font-black text-gray-950">
+            <div className="bg-[color:var(--color-surface-card)] p-10 text-center">
+              <h2 className="text-2xl font-semibold text-[color:var(--color-text-primary)]">
                 No articles {activeTag ? `tagged "${activeTag}"` : 'yet'}
               </h2>
-              <p className="mt-3 text-sm text-gray-500">Browse all articles or check back soon.</p>
+              <p className="mt-3 text-sm text-[color:var(--color-text-secondary)]">
+                Browse all articles or check back soon.
+              </p>
               <Link
                 href="/blog"
-                className="mt-6 inline-flex rounded-lg bg-indigo-600 px-4 py-2 text-sm font-black text-white"
+                className="mt-6 inline-flex rounded-full bg-[color:var(--color-primary)] px-5 py-2.5 text-sm font-black text-white"
               >
                 Browse all articles
               </Link>
@@ -114,27 +137,40 @@ export function BlogIndexClient({ initialTag }: BlogIndexClientProps) {
           )}
         </section>
 
-        <aside className="space-y-6">
-          <div className="rounded-xl bg-white p-5 shadow-[var(--shadow-card)] ring-1 ring-gray-100">
-            <h2 className="text-sm font-black uppercase tracking-wide text-gray-400">Popular Tags</h2>
-            <div className="mt-4 flex flex-wrap gap-2">
+        <aside className="space-y-10">
+          <div>
+            <h2 className="text-sm font-black uppercase tracking-[0.22em] text-[color:var(--color-text-tertiary)]">
+              Popular Tags
+            </h2>
+            <div className="mt-5 flex flex-wrap gap-2.5">
               {tagList.map((tag) => (
                 <Link
                   key={tag}
                   href={`/blog/tag/${encodeURIComponent(tag)}`}
-                  className="rounded-full bg-indigo-50 px-3 py-1 text-xs font-black text-indigo-600"
+                  className="rounded-full bg-[color:var(--color-primary-light)] px-3 py-1.5 text-[11px] font-black uppercase tracking-[0.18em] text-[color:var(--color-primary)] transition hover:bg-[color:var(--color-on-primary-container)]"
                 >
                   {tag}
                 </Link>
               ))}
             </div>
           </div>
-          <div className="rounded-xl bg-white p-5 shadow-[var(--shadow-card)] ring-1 ring-gray-100">
-            <h2 className="text-sm font-black uppercase tracking-wide text-gray-400">Recent Posts</h2>
-            <div className="mt-4 space-y-3">
-              {articles.slice(0, 5).map((post) => (
-                <Link key={post.id} href={`/blog/${post.slug}`} className="block text-sm font-bold leading-6 text-gray-700 hover:text-indigo-600">
-                  {post.title}
+          <div>
+            <h2 className="text-sm font-black uppercase tracking-[0.22em] text-[color:var(--color-text-tertiary)]">
+              Recent Posts
+            </h2>
+            <div className="mt-5 space-y-0 border-y border-[color:var(--color-border)]">
+              {recentPosts.map((post) => (
+                <Link
+                  key={post.id}
+                  href={`/blog/${post.slug}`}
+                  className="block border-b border-[color:var(--color-border)] py-4 last:border-b-0"
+                >
+                  <p className="text-sm font-bold leading-6 text-[color:var(--color-text-primary)] transition hover:text-[color:var(--color-primary)]">
+                    {post.title}
+                  </p>
+                  <p className="mt-2 text-xs uppercase tracking-[0.18em] text-[color:var(--color-text-tertiary)]">
+                    {formatDate(post.published_at, { month: 'short', day: 'numeric' })} · {post.reading_time} min read
+                  </p>
                 </Link>
               ))}
             </div>

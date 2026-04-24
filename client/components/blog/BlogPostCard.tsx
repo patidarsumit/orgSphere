@@ -1,5 +1,4 @@
 import Link from 'next/link'
-import { ArrowUpRight } from 'lucide-react'
 import { Avatar } from '@/components/shared/Avatar'
 import { BlogPost } from '@/types'
 import { authorName, firstTag, formatDate, tagTone } from './blogUtils'
@@ -8,38 +7,33 @@ export function BlogPostCard({ post }: { post: BlogPost }) {
   const tag = firstTag(post)
 
   return (
-    <Link
-      href={`/blog/${post.slug}`}
-      className="group block overflow-hidden rounded-xl bg-white shadow-[0_12px_32px_-24px_rgba(21,28,39,0.3)] ring-1 ring-gray-100 transition duration-200 hover:-translate-y-0.5 hover:shadow-[var(--shadow-card)]"
-    >
-      <div className={`grid h-48 place-items-center bg-gradient-to-br ${tagTone(tag)}`}>
-        <span className="rounded-full bg-white/70 px-4 py-2 text-xs font-black uppercase tracking-[0.18em]">
-          {tag}
-        </span>
-      </div>
-      <div className="p-5">
-        <span className="rounded-full bg-indigo-50 px-3 py-1 text-[11px] font-black uppercase tracking-wide text-indigo-600">
-          {tag}
-        </span>
-        <h3 className="mt-4 line-clamp-2 text-base font-black leading-6 text-gray-950 group-hover:text-indigo-600">
+    <article className="flex flex-col gap-4">
+      <Link
+        href={`/blog/${post.slug}`}
+        className="group block overflow-hidden bg-[color:var(--color-surface-container)]"
+      >
+        <div className={`aspect-[16/9] bg-gradient-to-br ${tagTone(tag)} transition duration-500 group-hover:scale-[1.02]`} />
+      </Link>
+      <span className="w-fit bg-[color:var(--color-primary-light)] px-2 py-0.5 text-[10px] font-black uppercase tracking-[0.24em] text-[color:var(--color-primary)]">
+        {tag}
+      </span>
+      <Link href={`/blog/${post.slug}`} className="group">
+        <h3 className="line-clamp-2 text-[1.45rem] font-semibold leading-tight tracking-[-0.02em] text-[color:var(--color-text-primary)] transition-colors group-hover:text-[color:var(--color-primary)]">
           {post.title}
         </h3>
-        <p className="mt-2 line-clamp-2 text-sm leading-6 text-gray-500">
-          {post.subtitle || 'Practical thinking for modern teams.'}
-        </p>
-        <div className="mt-5 flex items-center justify-between gap-3 text-xs text-gray-400">
-          <div className="flex min-w-0 items-center gap-2">
-            <Avatar name={authorName(post)} avatarPath={post.author?.avatar_path} size="sm" />
-            <span className="truncate font-semibold text-gray-600">{authorName(post)}</span>
-          </div>
-          <span className="shrink-0">
-            {formatDate(post.published_at)} · {post.reading_time} min
+      </Link>
+      <p className="line-clamp-2 text-sm leading-7 text-[color:var(--color-text-secondary)]">
+        {post.subtitle || 'Practical thinking for modern teams.'}
+      </p>
+      <div className="flex items-center justify-between gap-3 pt-2 text-xs text-[color:var(--color-text-tertiary)]">
+        <div className="flex min-w-0 items-center gap-2.5">
+          <Avatar name={authorName(post)} avatarPath={post.author?.avatar_path} size="sm" />
+          <span className="truncate font-medium text-[color:var(--color-text-secondary)]">
+            {authorName(post)}
           </span>
         </div>
-        <span className="mt-4 inline-flex items-center gap-1 text-sm font-bold text-indigo-600">
-          Read article <ArrowUpRight size={14} />
-        </span>
+        <span className="shrink-0">{formatDate(post.published_at)}</span>
       </div>
-    </Link>
+    </article>
   )
 }

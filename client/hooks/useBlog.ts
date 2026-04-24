@@ -1,6 +1,6 @@
 'use client'
 
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import api from '@/lib/axios'
 import { BlogPaginatedResponse, BlogPost, PostStatus } from '@/types'
 
@@ -32,6 +32,37 @@ export function usePublishedPosts(filters: BlogFilters = {}) {
         params: cleanFilters(normalizedFilters),
       })
       return data
+    },
+    placeholderData: (previousData) => previousData,
+    staleTime: 60_000,
+  })
+}
+
+export function useInfinitePublishedPosts(filters: Omit<BlogFilters, 'page'> = {}) {
+  const normalizedFilters = {
+    limit: filters.limit ?? 9,
+    tag: filters.tag || '',
+    search: filters.search || '',
+  }
+
+  return useInfiniteQuery<BlogPaginatedResponse>({
+    initialPageParam: 1,
+    queryKey: ['blog-posts-infinite', normalizedFilters],
+    queryFn: async ({ pageParam }) => {
+      const { data } = await api.get<BlogPaginatedResponse>('/posts/public', {
+        params: cleanFilters({
+          ...normalizedFilters,
+          page: Number(pageParam),
+        }),
+      })
+      return data
+    },
+    getNextPageParam: (lastPage) => {
+      if (lastPage.page >= lastPage.totalPages) {
+        return undefined
+      }
+
+      return lastPage.page + 1
     },
     staleTime: 60_000,
   })
