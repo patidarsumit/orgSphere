@@ -14,9 +14,12 @@ import {
   UserRound,
   UsersRound,
 } from 'lucide-react'
-import { GraphNode, GraphNodeKind, GraphNodeTone } from '@/components/graph/types'
-
-type HierarchyReactFlowNode = Node<GraphNode & Record<string, unknown>, 'hierarchy'>
+import {
+  GraphNode,
+  GraphNodeKind,
+  GraphNodeTone,
+  graphNodeDimensions,
+} from '@/components/graph/types'
 
 export interface HierarchyGraphNodeActions {
   collapsedNodeIds: Set<string>
@@ -24,14 +27,12 @@ export interface HierarchyGraphNodeActions {
   onToggleCollapse: (nodeId: string) => void
 }
 
-const nodeSizeClassName: Record<GraphNodeKind, string> = {
-  project: 'h-[142px] w-[300px]',
-  person: 'h-[126px] w-[240px]',
-  team: 'h-[132px] w-[260px]',
-  group: 'h-[118px] w-[240px]',
-  metric: 'h-[142px] w-[250px]',
-  status: 'h-[112px] w-[220px]',
-}
+export type HierarchyNodeData = GraphNode &
+  Record<string, unknown> & {
+    actions?: HierarchyGraphNodeActions
+  }
+
+type HierarchyReactFlowNode = Node<HierarchyNodeData, 'hierarchy'>
 
 const toneClassName: Record<GraphNodeTone, string> = {
   primary: 'border-[color:var(--color-primary)]/25 bg-[color:var(--color-primary-light)] text-[color:var(--color-primary)]',
@@ -64,6 +65,7 @@ function GraphNodeContent({
   const childCount = actions?.childCounts.get(data.id) ?? 0
   const canCollapse = Boolean(data.collapsible && childCount > 0 && actions)
   const isCollapsed = actions?.collapsedNodeIds.has(data.id) ?? false
+  const size = data.size ?? graphNodeDimensions[data.kind]
   const tooltip = [data.eyebrow, data.title, data.subtitle, data.details]
     .filter(Boolean)
     .join('\n')
@@ -74,25 +76,16 @@ function GraphNodeContent({
   return (
     <div
       title={tooltip || data.title}
-      className={`${nodeSizeClassName[data.kind]} relative overflow-hidden rounded-xl border border-[color:var(--color-border)] bg-white p-4 shadow-[0_18px_40px_-32px_rgba(15,23,42,0.85)] transition-shadow hover:shadow-[0_22px_48px_-34px_rgba(15,23,42,0.95)] ${
-        canCollapse ? 'cursor-pointer' : ''
-      }`}
-      onClick={(event) => {
-        if (!canCollapse) return
-        event.preventDefault()
-        event.stopPropagation()
-        toggleCollapse()
-      }}
+      style={{ width: size.width, height: size.height }}
+      className="relative overflow-hidden rounded-xl border border-[color:var(--color-border)] bg-white p-4 shadow-[0_18px_40px_-32px_rgba(15,23,42,0.85)] transition-shadow hover:shadow-[0_22px_48px_-34px_rgba(15,23,42,0.95)]"
     >
       {canCollapse ? (
         <button
           type="button"
           onPointerDown={(event) => {
-            event.preventDefault()
             event.stopPropagation()
           }}
           onMouseDown={(event) => {
-            event.preventDefault()
             event.stopPropagation()
           }}
           onClick={(event) => {
@@ -185,8 +178,6 @@ export const HierarchyGraphNode = memo(function HierarchyGraphNode({
   data,
   isConnectable,
 }: NodeProps<HierarchyReactFlowNode>) {
-  const actions = data.actions as HierarchyGraphNodeActions | undefined
-
   return (
     <>
       <Handle
@@ -196,7 +187,7 @@ export const HierarchyGraphNode = memo(function HierarchyGraphNode({
         className="opacity-0"
         style={{ pointerEvents: 'none' }}
       />
-      <GraphNodeContent data={data} actions={actions} />
+      <GraphNodeContent data={data} actions={data.actions} />
       <Handle
         type="source"
         position={Position.Bottom}

@@ -17,6 +17,10 @@ const taskStatusTones: Record<TaskStatus, GraphNode['tone']> = {
 
 const MAX_VISIBLE_MEMBERS = 10
 
+interface ProjectHierarchyGraphOptions {
+  taskTotal?: number
+}
+
 function pushEdge(edges: GraphEdge[], source: string, target: string, label?: string) {
   edges.push({
     id: `${source}-${target}`,
@@ -31,9 +35,15 @@ function roleSubtitle(member: ProjectMember) {
   return `${member.role} - ${department}`
 }
 
-export function buildProjectHierarchyGraph(project: Project, tasks: Task[]): GraphModel {
+export function buildProjectHierarchyGraph(
+  project: Project,
+  tasks: Task[],
+  options: ProjectHierarchyGraphOptions = {}
+): GraphModel {
   const nodes: GraphNode[] = []
   const edges: GraphEdge[] = []
+  const taskTotal = options.taskTotal ?? tasks.length
+  const hasPartialTasks = taskTotal > tasks.length
   const completedTasks = tasks.filter((task) => task.status === 'done').length
   const progress = tasks.length > 0 ? Math.round((completedTasks / tasks.length) * 100) : 0
 
@@ -50,7 +60,7 @@ export function buildProjectHierarchyGraph(project: Project, tasks: Task[]): Gra
     order: 0,
     stats: [
       { label: 'Members', value: project.project_members.length },
-      { label: 'Tasks', value: tasks.length },
+      { label: 'Tasks', value: taskTotal },
     ],
     collapsible: true,
   })
@@ -113,15 +123,25 @@ export function buildProjectHierarchyGraph(project: Project, tasks: Task[]): Gra
     id: taskSummaryId,
     kind: 'metric',
     title: 'Delivery Progress',
-    subtitle: tasks.length > 0 ? `${completedTasks} of ${tasks.length} tasks complete` : 'No tasks linked yet',
+    subtitle:
+      taskTotal === 0
+        ? 'No tasks linked yet'
+        : hasPartialTasks
+          ? `${completedTasks} done in ${tasks.length} loaded of ${taskTotal} total tasks`
+          : `${completedTasks} of ${taskTotal} tasks complete`,
     eyebrow: 'Execution',
     tone: progress >= 75 ? 'green' : progress >= 35 ? 'amber' : 'slate',
     level: 1,
     order: 3,
-    stats: [
-      { label: 'Progress', value: `${progress}%` },
-      { label: 'Open', value: Math.max(tasks.length - completedTasks, 0) },
-    ],
+    stats: hasPartialTasks
+      ? [
+          { label: 'Loaded', value: tasks.length },
+          { label: 'Total', value: taskTotal },
+        ]
+      : [
+          { label: 'Progress', value: `${progress}%` },
+          { label: 'Open', value: Math.max(taskTotal - completedTasks, 0) },
+        ],
     collapsible: true,
   })
   pushEdge(edges, `project-${project.id}`, taskSummaryId)
@@ -173,7 +193,9 @@ export function buildProjectHierarchyGraph(project: Project, tasks: Task[]): Gra
       id,
       kind: 'status',
       title: taskStatusLabels[status],
-      subtitle: `${statusCounts[status]} task${statusCounts[status] === 1 ? '' : 's'}`,
+      subtitle: `${statusCounts[status]} ${hasPartialTasks ? 'loaded ' : ''}task${
+        statusCounts[status] === 1 ? '' : 's'
+      }`,
       eyebrow: 'Task Status',
       tone: taskStatusTones[status],
       level: 2,

@@ -71,10 +71,12 @@ export function layoutLayeredGraph(
   }
 
   const nodesByLevel = Array.from(levels.entries())
-    .toSorted(([firstLevel], [secondLevel]) => firstLevel - secondLevel)
+    .sort(([firstLevel], [secondLevel]) => firstLevel - secondLevel)
     .map(([level, nodes]) => [
       level,
-      nodes.toSorted((first, second) => first.order - second.order || first.title.localeCompare(second.title)),
+      [...nodes].sort(
+        (first, second) => first.order - second.order || first.title.localeCompare(second.title)
+      ),
     ] as const)
 
   const levelY = new Map<number, number>()

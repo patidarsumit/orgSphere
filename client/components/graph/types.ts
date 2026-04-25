@@ -19,6 +19,15 @@ export interface GraphNodeSize {
   height: number
 }
 
+export const graphNodeDimensions: Record<GraphNodeKind, GraphNodeSize> = {
+  project: { width: 300, height: 142 },
+  person: { width: 240, height: 126 },
+  team: { width: 260, height: 132 },
+  group: { width: 240, height: 118 },
+  metric: { width: 250, height: 142 },
+  status: { width: 220, height: 112 },
+}
+
 export interface GraphNode {
   id: string
   kind: GraphNodeKind

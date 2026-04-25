@@ -12,7 +12,10 @@ export function ProjectHierarchyTab({ project }: { project: Project }) {
   const [collapsedNodeIds, setCollapsedNodeIds] = useState<Set<string>>(() => new Set())
   const { data, isLoading } = useProjectTasks(project.id, { limit: 100 })
   const tasks = useMemo(() => data?.data ?? [], [data?.data])
-  const graph = useMemo(() => buildProjectHierarchyGraph(project, tasks), [project, tasks])
+  const graph = useMemo(
+    () => buildProjectHierarchyGraph(project, tasks, { taskTotal: data?.total }),
+    [data?.total, project, tasks]
+  )
   const visibleGraph = useMemo(() => getVisibleGraph(graph, collapsedNodeIds), [graph, collapsedNodeIds])
   const childCounts = useMemo(() => getGraphNodeChildCounts(graph), [graph])
   const actions = useMemo(

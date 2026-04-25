@@ -6,6 +6,7 @@ import {
   BackgroundVariant,
   Controls,
   MarkerType,
+  MiniMap,
   ReactFlow,
   type Edge,
   type NodeMouseHandler,
@@ -14,13 +15,14 @@ import {
 } from '@xyflow/react'
 import '@xyflow/react/dist/style.css'
 import { layoutLayeredGraph } from '@/components/graph/layout'
-import { GraphModel, GraphNode, GraphNodeKind, GraphNodeSize } from '@/components/graph/types'
+import { GraphModel, GraphNode, graphNodeDimensions } from '@/components/graph/types'
 import {
   HierarchyGraphNode,
   HierarchyGraphNodeActions,
+  HierarchyNodeData,
 } from '@/components/graph/react-flow/nodes/HierarchyGraphNode'
 
-type HierarchyFlowNode = Node<GraphNode & Record<string, unknown>, 'hierarchy'>
+type HierarchyFlowNode = Node<HierarchyNodeData, 'hierarchy'>
 type HierarchyFlowEdge = Edge<{ label?: string }>
 
 const nodeTypes = {
@@ -29,17 +31,18 @@ const nodeTypes = {
 
 const LAYOUT_PADDING = 420
 
-const nodeDimensions: Record<GraphNodeKind, GraphNodeSize> = {
-  project: { width: 300, height: 142 },
-  person: { width: 240, height: 126 },
-  team: { width: 260, height: 132 },
-  group: { width: 240, height: 118 },
-  metric: { width: 250, height: 142 },
-  status: { width: 220, height: 112 },
-}
+const miniMapNodeColorByTone = {
+  primary: '#3525cd',
+  blue: '#2563eb',
+  green: '#16a34a',
+  amber: '#d97706',
+  purple: '#7c3aed',
+  slate: '#64748b',
+  red: '#dc2626',
+} satisfies Record<NonNullable<GraphNode['tone']>, string>
 
 function dimensionsFor(node: GraphNode) {
-  return node.size ?? nodeDimensions[node.kind]
+  return node.size ?? graphNodeDimensions[node.kind]
 }
 
 function getTranslateExtent(bounds: ReturnType<typeof layoutLayeredGraph>['bounds']) {
@@ -57,7 +60,7 @@ function toFlowNodes(
     return {
       id: node.id,
       type: 'hierarchy' as const,
-      data: { ...node, actions } as GraphNode & Record<string, unknown>,
+      data: { ...node, actions },
       position,
       initialWidth: size.width,
       initialHeight: size.height,
@@ -133,6 +136,22 @@ export function ReactFlowHierarchyCanvas({
       >
         <Background color="#dbe3ef" gap={20} variant={BackgroundVariant.Dots} />
         <Controls showInteractive={false} />
+        <MiniMap
+          position="bottom-right"
+          pannable
+          zoomable
+          nodeColor={(node) => {
+            const tone = node.data.tone as GraphNode['tone'] | undefined
+            return miniMapNodeColorByTone[tone ?? 'slate']
+          }}
+          nodeStrokeColor="#ffffff"
+          nodeStrokeWidth={2}
+          nodeBorderRadius={8}
+          maskColor="rgba(15, 23, 42, 0.08)"
+          maskStrokeColor="#94a3b8"
+          maskStrokeWidth={1}
+          className="overflow-hidden rounded-xl border border-[color:var(--color-border)] bg-white shadow-[0_18px_40px_-28px_rgba(15,23,42,0.65)]"
+        />
       </ReactFlow>
     </div>
   )
