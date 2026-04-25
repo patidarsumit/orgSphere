@@ -21,6 +21,7 @@ import { ActivityFeed } from '@/components/activity/ActivityFeed'
 import { roleLabels } from '@/components/employees/constants'
 import { AddProjectMemberSearch } from '@/components/projects/AddProjectMemberSearch'
 import { ProjectFormModal } from '@/components/projects/ProjectFormModal'
+import { ProjectHierarchyTab } from '@/components/projects/hierarchy/ProjectHierarchyTab'
 import { formatProjectDate } from '@/components/projects/projectUtils'
 import { Avatar } from '@/components/shared/Avatar'
 import { EmptyState } from '@/components/shared/EmptyState'
@@ -40,10 +41,11 @@ import { useProjectTasks, useUpdateTask } from '@/hooks/useTasks'
 import { appToast, getToastErrorMessage } from '@/lib/toast'
 import { Project, ProjectMember, TaskStatus } from '@/types'
 
-type ProjectTab = 'overview' | 'team' | 'tasks' | 'notes' | 'activity'
+type ProjectTab = 'overview' | 'hierarchy' | 'team' | 'tasks' | 'notes' | 'activity'
 
 const tabs: Array<{ id: ProjectTab; label: string }> = [
   { id: 'overview', label: 'Overview' },
+  { id: 'hierarchy', label: 'Hierarchy' },
   { id: 'team', label: 'Team' },
   { id: 'tasks', label: 'Tasks' },
   { id: 'notes', label: 'Notes' },
@@ -728,6 +730,7 @@ export default function ProjectDetailPage() {
         {activeTab === 'overview' ? (
           <OverviewTab project={project} onTeamTab={() => setActiveTab('team')} />
         ) : null}
+        {activeTab === 'hierarchy' ? <ProjectHierarchyTab project={project} /> : null}
         {activeTab === 'team' ? <TeamTab project={project} canEdit={canEdit} /> : null}
         {activeTab === 'tasks' ? <ProjectTasksTab projectId={project.id} /> : null}
         {activeTab === 'notes' ? <ProjectNotesTab projectId={project.id} /> : null}
