@@ -3,6 +3,7 @@ import { AuthRequest } from '../middleware/auth'
 import * as ActivityService from '../services/activity.service'
 import { formatMany } from '../utils/activity.formatter'
 import { ActivityEntityType } from '../entities/ActivityLog'
+import { routeParam } from '../utils/request'
 
 const sendServerError = (res: Response, message: string) => {
   res.status(500).json({ message })
@@ -29,8 +30,8 @@ export const getEntityFeed = async (req: Request, res: Response): Promise<void> 
   try {
     const limit = Number.parseInt(String(req.query.limit || '20'), 10)
     const logs = await ActivityService.getEntityActivity(
-      req.params.entity_type as ActivityEntityType,
-      req.params.entity_id,
+      routeParam(req.params.entity_type) as ActivityEntityType,
+      routeParam(req.params.entity_id),
       Number.isNaN(limit) ? 20 : Math.min(limit, 100)
     )
     res.json(formatMany(logs))

@@ -8,6 +8,7 @@ import { Post } from '../entities/Post'
 import { User } from '../entities/User'
 import { UserRole } from '../entities/User'
 import { can, isUserRole, PermissionAction } from '../permissions'
+import { routeParam } from '../utils/request'
 import { AuthRequest } from './auth'
 
 const forbidden = (res: Response, message = 'Insufficient permissions', action?: PermissionAction): void => {
@@ -69,7 +70,7 @@ export const canEditEmployee = (req: AuthRequest, res: Response, next: NextFunct
     return
   }
 
-  if (can(role, 'employees.edit_any') || req.params.id === req.user.id) {
+  if (can(role, 'employees.edit_any') || routeParam(req.params.id) === req.user.id) {
     next()
     return
   }
@@ -94,12 +95,12 @@ export const canDeactivateEmployee = async (
     return
   }
 
-  if (req.params.id === req.user.id) {
+  if (routeParam(req.params.id) === req.user.id) {
     res.status(400).json({ message: 'Cannot deactivate your own account' })
     return
   }
 
-  const target = await AppDataSource.getRepository(User).findOne({ where: { id: req.params.id } })
+  const target = await AppDataSource.getRepository(User).findOne({ where: { id: routeParam(req.params.id) } })
 
   if (!target) {
     res.status(404).json({ message: 'Employee not found' })
@@ -132,7 +133,7 @@ export const canManageProject = async (
   }
 
   const project = await AppDataSource.getRepository(Project).findOne({
-    where: { id: req.params.id },
+    where: { id: routeParam(req.params.id) },
   })
 
   if (!project) {
@@ -166,7 +167,7 @@ export const canManageTeam = async (
   }
 
   const team = await AppDataSource.getRepository(Team).findOne({
-    where: { id: req.params.id },
+    where: { id: routeParam(req.params.id) },
   })
 
   if (!team) {
@@ -199,7 +200,7 @@ export const canManageTask = async (
     return
   }
 
-  const task = await AppDataSource.getRepository(Task).findOne({ where: { id: req.params.id } })
+  const task = await AppDataSource.getRepository(Task).findOne({ where: { id: routeParam(req.params.id) } })
 
   if (!task) {
     res.status(404).json({ message: 'Task not found' })
@@ -224,7 +225,7 @@ export const canManageNote = async (
     return
   }
 
-  const note = await AppDataSource.getRepository(Note).findOne({ where: { id: req.params.id } })
+  const note = await AppDataSource.getRepository(Note).findOne({ where: { id: routeParam(req.params.id) } })
 
   if (!note) {
     res.status(404).json({ message: 'Note not found' })
@@ -260,7 +261,7 @@ export const canManagePost = async (
   }
 
   const post = await AppDataSource.getRepository(Post).findOne({
-    where: { id: req.params.id },
+    where: { id: routeParam(req.params.id) },
   })
 
   if (!post) {

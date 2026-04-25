@@ -5,6 +5,7 @@ import { Project } from '../entities/Project'
 import { Team } from '../entities/Team'
 import { User } from '../entities/User'
 import { AuthRequest } from '../middleware/auth'
+import { routeParam } from '../utils/request'
 
 const safeUser = (user: User) => ({
   id: user.id,
@@ -69,12 +70,12 @@ export const updateRole = async (req: AuthRequest, res: Response): Promise<void>
       return
     }
 
-    if (req.params.userId === req.user!.id && role !== 'admin') {
+    if (routeParam(req.params.userId) === req.user!.id && role !== 'admin') {
       res.status(400).json({ message: 'Cannot change your own admin role' })
       return
     }
 
-    const result = await AppDataSource.getRepository(User).update({ id: req.params.userId }, { role })
+    const result = await AppDataSource.getRepository(User).update({ id: routeParam(req.params.userId) }, { role })
     if (!result.affected) {
       res.status(404).json({ message: 'User not found' })
       return

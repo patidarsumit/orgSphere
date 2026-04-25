@@ -3,6 +3,7 @@ import { ZodError } from 'zod'
 import { postQuerySchema } from '@orgsphere/schemas'
 import { AuthRequest } from '../middleware/auth'
 import * as PostService from '../services/post.service'
+import { routeParam } from '../utils/request'
 
 const sendServerError = (res: Response, message: string) => {
   res.status(500).json({ message })
@@ -29,7 +30,7 @@ export const getPublished = async (req: Request, res: Response): Promise<void> =
 
 export const getBySlug = async (req: Request, res: Response): Promise<void> => {
   try {
-    const post = await PostService.findBySlug(req.params.slug)
+    const post = await PostService.findBySlug(routeParam(req.params.slug))
     if (!post) {
       res.status(404).json({ message: 'Post not found' })
       return
@@ -68,7 +69,7 @@ export const getAllAdmin = async (req: AuthRequest, res: Response): Promise<void
 
 export const getById = async (req: Request, res: Response): Promise<void> => {
   try {
-    const post = await PostService.findById(req.params.id)
+    const post = await PostService.findById(routeParam(req.params.id))
     if (!post) {
       res.status(404).json({ message: 'Post not found' })
       return
@@ -93,7 +94,7 @@ export const create = async (req: AuthRequest, res: Response): Promise<void> => 
 
 export const update = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    res.json(await PostService.update(req.params.id, req.body, req.user?.id))
+    res.json(await PostService.update(routeParam(req.params.id), req.body, req.user?.id))
   } catch (error) {
     if (error instanceof Error && error.message === 'NOT_FOUND') {
       res.status(404).json({ message: 'Post not found' })
@@ -105,7 +106,7 @@ export const update = async (req: AuthRequest, res: Response): Promise<void> => 
 
 export const remove = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    await PostService.remove(req.params.id, req.user?.id)
+    await PostService.remove(routeParam(req.params.id), req.user?.id)
     res.json({ message: 'Post deleted' })
   } catch (error) {
     if (error instanceof Error && error.message === 'NOT_FOUND') {
@@ -118,7 +119,7 @@ export const remove = async (req: AuthRequest, res: Response): Promise<void> => 
 
 export const publish = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    res.json(await PostService.publish(req.params.id, req.user?.id))
+    res.json(await PostService.publish(routeParam(req.params.id), req.user?.id))
   } catch (error) {
     if (error instanceof Error && error.message === 'NOT_FOUND') {
       res.status(404).json({ message: 'Post not found' })
@@ -130,7 +131,7 @@ export const publish = async (req: AuthRequest, res: Response): Promise<void> =>
 
 export const unpublish = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    res.json(await PostService.unpublish(req.params.id, req.user?.id))
+    res.json(await PostService.unpublish(routeParam(req.params.id), req.user?.id))
   } catch (error) {
     if (error instanceof Error && error.message === 'NOT_FOUND') {
       res.status(404).json({ message: 'Post not found' })

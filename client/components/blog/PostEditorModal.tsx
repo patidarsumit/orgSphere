@@ -5,7 +5,8 @@ import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { createPostSchema, CreatePostInput } from '@orgsphere/schemas'
-import { ArrowLeft, Check, Plus, X } from 'lucide-react'
+import type { z } from 'zod'
+import { ArrowLeft, Plus, X } from 'lucide-react'
 import { useSelector } from 'react-redux'
 import { TiptapEditor } from '@/components/notes/TiptapEditor'
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog'
@@ -31,6 +32,7 @@ interface PostEditorModalProps {
 }
 
 type SaveStatus = 'idle' | 'saving' | 'saved'
+type CreatePostFormInput = z.input<typeof createPostSchema>
 
 const estimateReadingTime = (content: Record<string, unknown>) => {
   const extract = (node: unknown): string => {
@@ -68,7 +70,7 @@ export function PostEditorModal({ open, onClose, postId }: PostEditorModalProps)
     getValues,
     setValue,
     formState: { errors },
-  } = useForm<CreatePostInput>({
+  } = useForm<CreatePostFormInput, unknown, CreatePostInput>({
     resolver: zodResolver(createPostSchema),
     defaultValues: {
       title: '',

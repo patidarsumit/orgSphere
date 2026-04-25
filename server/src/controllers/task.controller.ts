@@ -3,6 +3,7 @@ import { ZodError } from 'zod'
 import { taskQuerySchema } from '@orgsphere/schemas'
 import { AuthRequest } from '../middleware/auth'
 import * as TaskService from '../services/task.service'
+import { routeParam } from '../utils/request'
 
 const sendServerError = (res: Response, message: string) => {
   res.status(500).json({ message })
@@ -24,8 +25,8 @@ export const getMyTasks = async (req: AuthRequest, res: Response): Promise<void>
 
 export const getProjectTasks = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    const query = taskQuerySchema.parse({ ...req.query, project_id: req.params.projectId })
-    const result = await TaskService.findByProject(req.params.projectId, query)
+    const query = taskQuerySchema.parse({ ...req.query, project_id: routeParam(req.params.projectId) })
+    const result = await TaskService.findByProject(routeParam(req.params.projectId), query)
     res.json(result)
   } catch (error) {
     if (error instanceof ZodError) {
@@ -47,7 +48,7 @@ export const getToday = async (req: AuthRequest, res: Response): Promise<void> =
 
 export const getOne = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    const task = await TaskService.findById(req.params.id, req.user!.id, req.user!.role)
+    const task = await TaskService.findById(routeParam(req.params.id), req.user!.id, req.user!.role)
     if (!task) {
       res.status(404).json({ message: 'Task not found' })
       return
@@ -69,7 +70,7 @@ export const create = async (req: AuthRequest, res: Response): Promise<void> => 
 
 export const update = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    const task = await TaskService.update(req.params.id, req.user!.id, req.body, req.user!.role)
+    const task = await TaskService.update(routeParam(req.params.id), req.user!.id, req.body, req.user!.role)
     res.json(task)
   } catch (error) {
     if (error instanceof Error && error.message === 'NOT_FOUND') {
@@ -82,7 +83,7 @@ export const update = async (req: AuthRequest, res: Response): Promise<void> => 
 
 export const remove = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    await TaskService.remove(req.params.id, req.user!.id, req.user!.role)
+    await TaskService.remove(routeParam(req.params.id), req.user!.id, req.user!.role)
     res.json({ message: 'Task deleted' })
   } catch (error) {
     if (error instanceof Error && error.message === 'NOT_FOUND') {

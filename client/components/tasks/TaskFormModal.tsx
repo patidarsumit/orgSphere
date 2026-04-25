@@ -4,6 +4,7 @@ import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { createTaskSchema, CreateTaskInput } from '@orgsphere/schemas'
+import type { z } from 'zod'
 import { X } from 'lucide-react'
 import { useSelector } from 'react-redux'
 import { useCreateTask, useUpdateTask } from '@/hooks/useTasks'
@@ -28,6 +29,8 @@ const emptyValues: CreateTaskInput = {
   project_id: null,
 }
 
+type CreateTaskFormInput = z.input<typeof createTaskSchema>
+
 export function TaskFormModal({ open, onClose, task, defaults }: TaskFormModalProps) {
   const currentUser = useSelector((state: RootState) => state.auth.user)
   const { data: userProjects = [] } = useUserProjects(currentUser?.id || '')
@@ -35,7 +38,7 @@ export function TaskFormModal({ open, onClose, task, defaults }: TaskFormModalPr
   const updateTask = useUpdateTask()
   const isEditing = Boolean(task)
 
-  const form = useForm<CreateTaskInput>({
+  const form = useForm<CreateTaskFormInput, unknown, CreateTaskInput>({
     resolver: zodResolver(createTaskSchema),
     defaultValues: emptyValues,
   })

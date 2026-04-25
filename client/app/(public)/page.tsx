@@ -3,7 +3,6 @@ import {
   ArrowRight,
   FolderKanban,
   House,
-  ShieldCheck,
   UsersRound,
 } from 'lucide-react'
 import { BlogSection } from '@/components/blog/BlogSection'

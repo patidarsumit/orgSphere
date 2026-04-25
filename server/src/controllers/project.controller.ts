@@ -3,6 +3,7 @@ import { ZodError, z } from 'zod'
 import { projectQuerySchema } from '@orgsphere/schemas'
 import { AuthRequest } from '../middleware/auth'
 import * as ProjectService from '../services/project.service'
+import { routeParam } from '../utils/request'
 
 const memberRoleSchema = z.object({
   role: z.string().min(1).max(100),
@@ -28,7 +29,7 @@ export const getAll = async (req: Request, res: Response): Promise<void> => {
 
 export const getOne = async (req: Request, res: Response): Promise<void> => {
   try {
-    const project = await ProjectService.findById(req.params.id)
+    const project = await ProjectService.findById(routeParam(req.params.id))
     if (!project) {
       res.status(404).json({ message: 'Project not found' })
       return
@@ -41,7 +42,7 @@ export const getOne = async (req: Request, res: Response): Promise<void> => {
 
 export const getByUser = async (req: Request, res: Response): Promise<void> => {
   try {
-    const projects = await ProjectService.findByUserId(req.params.userId)
+    const projects = await ProjectService.findByUserId(routeParam(req.params.userId))
     res.json(projects)
   } catch {
     sendServerError(res, 'Failed to fetch user projects')
@@ -50,7 +51,7 @@ export const getByUser = async (req: Request, res: Response): Promise<void> => {
 
 export const getByTeam = async (req: Request, res: Response): Promise<void> => {
   try {
-    const projects = await ProjectService.findByTeamId(req.params.teamId)
+    const projects = await ProjectService.findByTeamId(routeParam(req.params.teamId))
     res.json(projects)
   } catch {
     sendServerError(res, 'Failed to fetch team projects')
@@ -81,7 +82,7 @@ export const create = async (req: AuthRequest, res: Response): Promise<void> => 
 
 export const update = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    const project = await ProjectService.update(req.params.id, req.body, req.user?.id, req.user?.role)
+    const project = await ProjectService.update(routeParam(req.params.id), req.body, req.user?.id, req.user?.role)
     res.json(project)
   } catch (error) {
     if (error instanceof Error && error.message === 'NOT_FOUND') {
@@ -98,7 +99,7 @@ export const update = async (req: AuthRequest, res: Response): Promise<void> => 
 
 export const remove = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    await ProjectService.remove(req.params.id, req.user?.id, req.user?.role)
+    await ProjectService.remove(routeParam(req.params.id), req.user?.id, req.user?.role)
     res.json({ message: 'Project deleted successfully' })
   } catch (error) {
     if (error instanceof Error && error.message === 'NOT_FOUND') {
@@ -115,7 +116,7 @@ export const remove = async (req: AuthRequest, res: Response): Promise<void> => 
 
 export const addMember = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    const project = await ProjectService.addMember(req.params.id, req.body, req.user?.id, req.user?.role)
+    const project = await ProjectService.addMember(routeParam(req.params.id), req.body, req.user?.id, req.user?.role)
     res.status(201).json(project)
   } catch (error) {
     const message = error instanceof Error ? error.message : 'UNKNOWN_ERROR'
@@ -134,7 +135,7 @@ export const addMember = async (req: AuthRequest, res: Response): Promise<void> 
 
 export const removeMember = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    await ProjectService.removeMember(req.params.id, req.params.userId, req.user?.id, req.user?.role)
+    await ProjectService.removeMember(routeParam(req.params.id), routeParam(req.params.userId), req.user?.id, req.user?.role)
     res.json({ message: 'Member removed successfully' })
   } catch (error) {
     if (error instanceof Error && error.message === 'PROJECT_NOT_FOUND') {
@@ -157,8 +158,8 @@ export const updateMemberRole = async (req: AuthRequest, res: Response): Promise
   try {
     const payload = memberRoleSchema.parse(req.body)
     const project = await ProjectService.updateMemberRole(
-      req.params.id,
-      req.params.userId,
+      routeParam(req.params.id),
+      routeParam(req.params.userId),
       payload.role,
       req.user?.id,
       req.user?.role

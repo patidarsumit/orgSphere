@@ -8,7 +8,7 @@ import Underline from '@tiptap/extension-underline'
 import Link from '@tiptap/extension-link'
 import CharacterCount from '@tiptap/extension-character-count'
 import CodeBlockLowlight from '@tiptap/extension-code-block-lowlight'
-import { lowlight } from 'lowlight'
+import { common, createLowlight } from 'lowlight'
 import type { AnyExtension } from '@tiptap/core'
 import {
   Bold,
@@ -21,6 +21,8 @@ import {
   UnderlineIcon,
 } from 'lucide-react'
 import { emptyDoc } from './noteUtils'
+
+const lowlight = createLowlight(common)
 
 interface TiptapEditorProps {
   content: Record<string, unknown>

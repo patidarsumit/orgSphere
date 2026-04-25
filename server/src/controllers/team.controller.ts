@@ -3,6 +3,7 @@ import { ZodError } from 'zod'
 import { teamQuerySchema } from '@orgsphere/schemas'
 import { AuthRequest } from '../middleware/auth'
 import * as TeamService from '../services/team.service'
+import { routeParam } from '../utils/request'
 
 const sendServerError = (res: Response, message: string) => {
   res.status(500).json({ message })
@@ -24,7 +25,7 @@ export const getAll = async (req: Request, res: Response): Promise<void> => {
 
 export const getOne = async (req: Request, res: Response): Promise<void> => {
   try {
-    const team = await TeamService.findById(req.params.id)
+    const team = await TeamService.findById(routeParam(req.params.id))
     if (!team) {
       res.status(404).json({ message: 'Team not found' })
       return
@@ -56,7 +57,7 @@ export const create = async (req: AuthRequest, res: Response): Promise<void> => 
 
 export const update = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    const team = await TeamService.update(req.params.id, req.body, req.user?.id, req.user?.role)
+    const team = await TeamService.update(routeParam(req.params.id), req.body, req.user?.id, req.user?.role)
     res.json(team)
   } catch (error) {
     if (error instanceof Error && error.message === 'NOT_FOUND') {
@@ -73,7 +74,7 @@ export const update = async (req: AuthRequest, res: Response): Promise<void> => 
 
 export const remove = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    await TeamService.remove(req.params.id, req.user?.id, req.user?.role)
+    await TeamService.remove(routeParam(req.params.id), req.user?.id, req.user?.role)
     res.json({ message: 'Team deleted successfully' })
   } catch (error) {
     if (error instanceof Error && error.message === 'NOT_FOUND') {
@@ -90,7 +91,7 @@ export const remove = async (req: AuthRequest, res: Response): Promise<void> => 
 
 export const addMember = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    const team = await TeamService.addMember(req.params.id, req.body.user_id, req.user?.id, req.user?.role)
+    const team = await TeamService.addMember(routeParam(req.params.id), req.body.user_id, req.user?.id, req.user?.role)
     res.json(team)
   } catch (error) {
     const message = error instanceof Error ? error.message : 'UNKNOWN_ERROR'
@@ -109,7 +110,7 @@ export const addMember = async (req: AuthRequest, res: Response): Promise<void> 
 
 export const removeMember = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    await TeamService.removeMember(req.params.id, req.params.userId, req.user?.id, req.user?.role)
+    await TeamService.removeMember(routeParam(req.params.id), routeParam(req.params.userId), req.user?.id, req.user?.role)
     res.json({ message: 'Member removed successfully' })
   } catch (error) {
     if (error instanceof Error && error.message === 'TEAM_NOT_FOUND') {
@@ -126,7 +127,7 @@ export const removeMember = async (req: AuthRequest, res: Response): Promise<voi
 
 export const getByUser = async (req: Request, res: Response): Promise<void> => {
   try {
-    const teams = await TeamService.getTeamsByUserId(req.params.userId)
+    const teams = await TeamService.getTeamsByUserId(routeParam(req.params.userId))
     res.json(teams)
   } catch {
     sendServerError(res, 'Failed to fetch user teams')

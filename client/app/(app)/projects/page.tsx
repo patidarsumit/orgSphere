@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { useEffect, useMemo, useState, useTransition } from 'react'
+import { type MouseEvent, useEffect, useMemo, useState, useTransition } from 'react'
 import { parseAsInteger, parseAsString, useQueryState } from 'nuqs'
 import {
   ChevronLeft,
@@ -92,7 +92,7 @@ function ProjectAvatarStack({ project }: { project: Project }) {
         <Link
           key={person.id}
           href={`/employees/${person.id}`}
-          onClick={(event) => event.stopPropagation()}
+          onClick={(event: MouseEvent<HTMLAnchorElement>) => event.stopPropagation()}
           className="rounded-full transition-transform hover:z-10 hover:-translate-y-0.5"
           title={person.name}
         >

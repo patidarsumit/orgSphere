@@ -5,7 +5,7 @@ export const postStatusEnum = z.enum(['draft', 'published', 'archived'])
 export const createPostSchema = z.object({
   title: z.string().min(3, 'Title must be at least 3 characters').max(255),
   subtitle: z.string().max(500).nullable().optional(),
-  content: z.record(z.unknown()).default({}),
+  content: z.record(z.string(), z.unknown()).default({}),
   cover_image_url: z.string().url().nullable().optional(),
   tags: z.array(z.string()).default([]),
   status: postStatusEnum.default('draft'),
@@ -15,7 +15,7 @@ export const createPostSchema = z.object({
 export const updatePostSchema = z.object({
   title: z.string().min(3).max(255).optional(),
   subtitle: z.string().max(500).nullable().optional(),
-  content: z.record(z.unknown()).optional(),
+  content: z.record(z.string(), z.unknown()).optional(),
   cover_image_url: z.string().url().nullable().optional(),
   tags: z.array(z.string()).optional(),
   status: postStatusEnum.optional(),

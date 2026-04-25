@@ -3,6 +3,7 @@ import { ZodError } from 'zod'
 import { employeeQuerySchema } from '@orgsphere/schemas'
 import { AuthRequest } from '../middleware/auth'
 import * as EmployeeService from '../services/employee.service'
+import { routeParam } from '../utils/request'
 
 const sendServerError = (res: Response, message: string) => {
   res.status(500).json({ message })
@@ -24,7 +25,7 @@ export const getAll = async (req: Request, res: Response): Promise<void> => {
 
 export const getOne = async (req: Request, res: Response): Promise<void> => {
   try {
-    const user = await EmployeeService.findById(req.params.id)
+    const user = await EmployeeService.findById(routeParam(req.params.id))
 
     if (!user) {
       res.status(404).json({ message: 'Employee not found' })
@@ -56,7 +57,7 @@ export const create = async (req: AuthRequest, res: Response): Promise<void> => 
 
 export const update = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    const user = await EmployeeService.update(req.params.id, req.body, req.user?.id)
+    const user = await EmployeeService.update(routeParam(req.params.id), req.body, req.user?.id)
     res.json(EmployeeService.sanitize(user))
   } catch (error) {
     if (error instanceof Error && error.message === 'NOT_FOUND') {
@@ -79,7 +80,7 @@ export const uploadAvatar = async (req: AuthRequest, res: Response): Promise<voi
     }
 
     const avatarPath = `uploads/avatars/${req.file.filename}`
-    await EmployeeService.updateAvatar(req.params.id, avatarPath, req.user?.id)
+    await EmployeeService.updateAvatar(routeParam(req.params.id), avatarPath, req.user?.id)
     res.json({ avatar_path: avatarPath, url: `http://localhost:4000/${avatarPath}` })
   } catch (error) {
     if (error instanceof Error && error.message === 'NOT_FOUND') {
@@ -96,12 +97,12 @@ export const uploadAvatar = async (req: AuthRequest, res: Response): Promise<voi
 
 export const remove = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    if (req.params.id === req.user?.id) {
+    if (routeParam(req.params.id) === req.user?.id) {
       res.status(400).json({ message: 'Cannot deactivate your own account' })
       return
     }
 
-    await EmployeeService.remove(req.params.id, req.user?.id)
+    await EmployeeService.remove(routeParam(req.params.id), req.user?.id)
     res.json({ message: 'Employee deactivated successfully' })
   } catch (error) {
     if (error instanceof Error && error.message === 'NOT_FOUND') {
