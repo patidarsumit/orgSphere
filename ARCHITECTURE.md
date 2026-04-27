@@ -38,6 +38,8 @@ Two blog surfaces exist intentionally:
 | Server state | TanStack Query |
 | Forms | React Hook Form + Zod |
 | Rich text editor | Tiptap |
+| Node graph UI | React Flow (`@xyflow/react`) |
+| Charts / insights UI | Recharts |
 | Routing/query state | Next App Router + `nuqs` |
 | HTTP client | Axios |
 | Icons | `lucide-react` |
@@ -113,10 +115,12 @@ client/app/
     │   └── [id]/page.tsx
     ├── projects/
     │   ├── page.tsx
+    │   ├── insights/page.tsx
     │   └── [id]/page.tsx
     ├── my/
     │   ├── dashboard/page.tsx
     │   ├── tasks/page.tsx
+    │   ├── tasks/insights/page.tsx
     │   └── notes/page.tsx
     ├── settings/page.tsx
     └── content/
@@ -131,7 +135,10 @@ client/
 ├── components/
 │   ├── activity/
 │   ├── blog/
+│   ├── charts/
 │   ├── employees/
+│   ├── graph/
+│   ├── insights/
 │   ├── layout/
 │   ├── notes/
 │   ├── projects/
@@ -157,6 +164,7 @@ client/
 - TanStack Query:
   - API-backed resources and mutations
   - cache invalidation after create/update/delete
+  - aggregate insights and chart data
 - React Hook Form + Zod:
   - forms and client-side validation
 - `nuqs`:
@@ -219,6 +227,7 @@ The backend follows a simple layered structure:
   - HTTP status handling
 - services:
   - business logic and database access
+  - aggregate read models such as insights/chart data
 - middleware:
   - auth
   - validation
@@ -244,6 +253,42 @@ Mounted in `server/src/app.ts`:
 /api/notes
 /api/posts
 ```
+
+### 5.4 Operational hardening
+
+The server includes a lightweight hardening layer before route mounting:
+
+- request IDs and request logging via `server/src/middleware/requestLogger.ts`
+- local fixed-window rate limiting via `server/src/middleware/rateLimit.ts`
+- centralized 404/error plumbing via `server/src/middleware/errorHandler.ts`
+
+Current rate-limited surfaces:
+
+- `POST /api/auth/login`
+- `POST /api/auth/register`
+- `/api/search`
+- `/api/posts/public`
+
+The current rate limiter is intentionally in-memory. It is appropriate for the current single-service setup,
+but should be replaced with a shared store such as Redis if the API runs multiple instances. When the API is
+behind a trusted reverse proxy, set `TRUST_PROXY=true` so Express derives `req.ip` correctly.
+
+### 5.5 Database performance foundation
+
+PostgreSQL remains the primary scaling layer today. Phase 13 adds indexes for:
+
+- directory and org hierarchy filters on users
+- project status, owner, team, technology, and search queries
+- task assignment, status, due-date, project, and insights aggregations
+- notes by owner/project chronology
+- activity feed chronology
+- blog publish state, title search, and tags
+
+Rules:
+- add indexes based on query patterns, not speculation
+- prefer aggregate APIs over deriving analytics from paginated list responses
+- prefer PostgreSQL query/index improvements before adding cache infrastructure
+- introduce Redis only when cross-instance caching, distributed rate limiting, or background workflow state becomes necessary
 
 ---
 
@@ -462,8 +507,10 @@ DELETE /api/employees/:id
 ```text
 GET    /api/projects
 GET    /api/projects/recent
+GET    /api/projects/insights
 GET    /api/projects/user/:userId
 GET    /api/projects/team/:teamId
+GET    /api/projects/:id/insights
 GET    /api/projects/:id
 POST   /api/projects
 PUT    /api/projects/:id
@@ -489,6 +536,7 @@ DELETE /api/teams/:id/members/:userId
 ```text
 GET    /api/tasks
 GET    /api/tasks/today
+GET    /api/tasks/my/insights
 GET    /api/tasks/project/:projectId
 GET    /api/tasks/:id
 POST   /api/tasks
@@ -523,6 +571,7 @@ GET /api/search
 ### Dashboard
 ```text
 GET /api/dashboard/stats
+GET /api/dashboard/insights
 ```
 
 ### Settings
@@ -559,6 +608,12 @@ The app is organized around reusable domain components rather than a single gene
 Examples:
 - `components/layout`
   - sidebar, header, breadcrumb
+- `components/graph`
+  - generic graph model, layout, visibility helpers, and React Flow adapters
+- `components/charts`
+  - generic Recharts-based chart primitives
+- `components/insights`
+  - domain-specific insight sections built from reusable chart primitives
 - `components/shared`
   - avatar, badges, dialogs, empty states
 - `components/projects`
@@ -576,6 +631,11 @@ Current UI direction:
 - rounded cards
 - light, layered public marketing pages
 - stronger data-dense layouts inside the authenticated app
+
+Graph and chart boundary:
+- React Flow is used for relationship and hierarchy views, such as project ownership/team/task hierarchy.
+- Recharts is used for aggregate analytics, chart surfaces, and insights pages.
+- Chart data should come from aggregate backend APIs, not paginated list responses.
 
 ---
 
@@ -630,9 +690,11 @@ npm run migration:run --workspace=server
 /teams
 /teams/[id]
 /projects
+/projects/insights
 /projects/[id]
 /my/dashboard
 /my/tasks
+/my/tasks/insights
 /my/notes
 /content/blog
 /settings
@@ -667,4 +729,6 @@ npm run migration:run --workspace=server
 7. Keep Settings focused on configuration and administration, not editorial work.
 8. New list/detail modules should follow the current domain-component structure, not ad hoc page-local sprawl.
 9. Maintain activity logging for create/update/delete workflows where the feature already participates in the activity feed.
-10. Update this file when architectural decisions materially change.
+10. Keep relationship visualizations in React Flow and aggregate analytics in Recharts.
+11. Build charts from dedicated aggregate APIs rather than paginated list responses.
+12. Update this file when architectural decisions materially change.
