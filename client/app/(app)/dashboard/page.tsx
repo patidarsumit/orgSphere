@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import dynamic from 'next/dynamic'
 import { useQuery } from '@tanstack/react-query'
 import { useSelector } from 'react-redux'
 import {
@@ -13,7 +14,7 @@ import {
   Users,
 } from 'lucide-react'
 import { ActivityFeed } from '@/components/activity/ActivityFeed'
-import { DashboardInsightsSection } from '@/components/insights/DashboardInsightsSection'
+import { InsightsGridSkeleton } from '@/components/insights/InsightsGridSkeleton'
 import { AvatarStack } from '@/components/shared/AvatarStack'
 import { EmptyState } from '@/components/shared/EmptyState'
 import { StatusBadge } from '@/components/shared/StatusBadge'
@@ -23,6 +24,14 @@ import { useRecentProjects } from '@/hooks/useProjects'
 import api from '@/lib/axios'
 import { RootState } from '@/store'
 import { ActivityItem, Project } from '@/types'
+
+const DashboardInsightsSection = dynamic(
+  () => import('@/components/insights/DashboardInsightsSection').then((mod) => mod.DashboardInsightsSection),
+  {
+    ssr: false,
+    loading: () => <InsightsGridSkeleton cards={5} />,
+  }
+)
 
 interface DashboardStats {
   totalProjects: number

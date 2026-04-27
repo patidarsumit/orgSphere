@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import dynamic from 'next/dynamic'
 import { useParams, useRouter } from 'next/navigation'
 import { useState } from 'react'
 import {
@@ -19,7 +20,7 @@ import {
 } from 'lucide-react'
 import { ActivityFeed } from '@/components/activity/ActivityFeed'
 import { roleLabels } from '@/components/employees/constants'
-import { ProjectHealthInsights } from '@/components/insights/ProjectHealthInsights'
+import { InsightsGridSkeleton } from '@/components/insights/InsightsGridSkeleton'
 import { AddProjectMemberSearch } from '@/components/projects/AddProjectMemberSearch'
 import { ProjectFormModal } from '@/components/projects/ProjectFormModal'
 import { ProjectHierarchyTab } from '@/components/projects/hierarchy/ProjectHierarchyTab'
@@ -41,6 +42,16 @@ import {
 import { useProjectTasks, useUpdateTask } from '@/hooks/useTasks'
 import { appToast, getToastErrorMessage } from '@/lib/toast'
 import { Project, ProjectMember, TaskStatus } from '@/types'
+
+const ProjectHealthInsights = dynamic(
+  () => import('@/components/insights/ProjectHealthInsights').then((mod) => mod.ProjectHealthInsights),
+  {
+    ssr: false,
+    loading: () => (
+      <InsightsGridSkeleton cards={4} className="grid grid-cols-1 gap-6 md:grid-cols-2" />
+    ),
+  }
+)
 
 type ProjectTab = 'overview' | 'hierarchy' | 'team' | 'tasks' | 'notes' | 'activity'
 

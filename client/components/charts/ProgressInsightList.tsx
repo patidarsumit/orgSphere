@@ -1,5 +1,7 @@
 'use client'
 
+import { ChartEmptyState } from './MeasuredChartFrame'
+
 export interface ProgressInsightDatum {
   key: string
   label: string
@@ -15,11 +17,7 @@ export function ProgressInsightList({
   emptyLabel?: string
 }) {
   if (data.length === 0) {
-    return (
-      <div className="flex min-h-[240px] items-center justify-center rounded-lg bg-[color:var(--color-surface-low)] text-sm font-semibold text-[color:var(--color-text-tertiary)]">
-        {emptyLabel}
-      </div>
-    )
+    return <ChartEmptyState label={emptyLabel} height={240} />
   }
 
   return (

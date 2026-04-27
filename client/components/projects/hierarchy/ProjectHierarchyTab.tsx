@@ -1,12 +1,28 @@
 'use client'
 
+import dynamic from 'next/dynamic'
 import { useCallback, useMemo, useState } from 'react'
 import { GitBranch, Loader2 } from 'lucide-react'
 import { getGraphNodeChildCounts, getVisibleGraph } from '@/components/graph/visibility'
-import { ReactFlowHierarchyCanvas } from '@/components/graph/react-flow/ReactFlowHierarchyCanvas'
+import type { ReactFlowHierarchyCanvasProps } from '@/components/graph/react-flow/ReactFlowHierarchyCanvas'
 import { useProjectTasks } from '@/hooks/useTasks'
 import { Project } from '@/types'
 import { buildProjectHierarchyGraph } from './buildProjectHierarchyGraph'
+
+const ReactFlowHierarchyCanvas = dynamic<ReactFlowHierarchyCanvasProps>(
+  () =>
+    import('@/components/graph/react-flow/ReactFlowHierarchyCanvas').then(
+      (mod) => mod.ReactFlowHierarchyCanvas
+    ),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="flex h-[680px] w-full items-center justify-center rounded-xl border border-[color:var(--color-border)] bg-[color:var(--color-surface-low)] text-sm font-bold text-[color:var(--color-text-tertiary)]">
+        Loading hierarchy
+      </div>
+    ),
+  }
+)
 
 export function ProjectHierarchyTab({ project }: { project: Project }) {
   const [collapsedNodeIds, setCollapsedNodeIds] = useState<Set<string>>(() => new Set())

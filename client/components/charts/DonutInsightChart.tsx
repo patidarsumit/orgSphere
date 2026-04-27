@@ -2,6 +2,7 @@
 
 import { Cell, Pie, PieChart, Tooltip } from 'recharts'
 import { colorForKey, titleize } from './chartTokens'
+import { ChartEmptyState } from './MeasuredChartFrame'
 
 export interface DonutInsightDatum {
   key: string
@@ -19,11 +20,7 @@ export function DonutInsightChart({
   const total = data.reduce((sum, item) => sum + item.value, 0)
 
   if (total === 0) {
-    return (
-      <div className="flex h-[240px] items-center justify-center rounded-lg bg-[color:var(--color-surface-low)] text-sm font-semibold text-[color:var(--color-text-tertiary)]">
-        {emptyLabel}
-      </div>
-    )
+    return <ChartEmptyState label={emptyLabel} height={240} />
   }
 
   return (

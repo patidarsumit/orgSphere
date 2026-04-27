@@ -92,13 +92,15 @@ function toFlowEdges(graph: GraphModel): HierarchyFlowEdge[] {
   }))
 }
 
+export interface ReactFlowHierarchyCanvasProps {
+  graph: GraphModel
+  actions?: HierarchyGraphNodeActions
+}
+
 export function ReactFlowHierarchyCanvas({
   graph,
   actions,
-}: {
-  graph: GraphModel
-  actions?: HierarchyGraphNodeActions
-}) {
+}: ReactFlowHierarchyCanvasProps) {
   const layout = useMemo(
     () =>
       layoutLayeredGraph(graph, {

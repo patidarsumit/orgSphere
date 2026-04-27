@@ -636,6 +636,8 @@ Graph and chart boundary:
 - React Flow is used for relationship and hierarchy views, such as project ownership/team/task hierarchy.
 - Recharts is used for aggregate analytics, chart surfaces, and insights pages.
 - Chart data should come from aggregate backend APIs, not paginated list responses.
+- Heavy graph/chart surfaces should be dynamically loaded when they are not needed for the first page shell.
+- Recharts primitives should render inside measured containers so charts never mount with invalid dimensions.
 
 ---
 
