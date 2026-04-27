@@ -2,6 +2,7 @@ import { Response } from 'express'
 import { ZodError } from 'zod'
 import { taskQuerySchema } from '@orgsphere/schemas'
 import { AuthRequest } from '../middleware/auth'
+import * as InsightsService from '../services/insights.service'
 import * as TaskService from '../services/task.service'
 import { routeParam } from '../utils/request'
 
@@ -43,6 +44,15 @@ export const getToday = async (req: AuthRequest, res: Response): Promise<void> =
     res.json(tasks)
   } catch {
     sendServerError(res, 'Failed to fetch today tasks')
+  }
+}
+
+export const getMyInsights = async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    const insights = await InsightsService.getMyTaskInsights(req.user!.id)
+    res.json(insights)
+  } catch {
+    sendServerError(res, 'Failed to fetch task insights')
   }
 }
 

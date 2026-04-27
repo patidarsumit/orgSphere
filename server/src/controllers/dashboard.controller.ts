@@ -5,6 +5,7 @@ import { Team } from '../entities/Team'
 import { User } from '../entities/User'
 import { AuthRequest } from '../middleware/auth'
 import { getRecentGlobal } from '../services/activity.service'
+import * as InsightsService from '../services/insights.service'
 import * as TaskService from '../services/task.service'
 import { formatMany } from '../utils/activity.formatter'
 
@@ -30,5 +31,14 @@ export const getStats = async (req: AuthRequest, res: Response): Promise<void> =
     })
   } catch {
     res.status(500).json({ message: 'Failed to fetch stats' })
+  }
+}
+
+export const getInsights = async (_req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    const insights = await InsightsService.getDashboardInsights()
+    res.json(insights)
+  } catch {
+    res.status(500).json({ message: 'Failed to fetch dashboard insights' })
   }
 }

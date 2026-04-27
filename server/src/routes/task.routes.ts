@@ -3,6 +3,7 @@ import { createTaskSchema, updateTaskSchema } from '@orgsphere/schemas'
 import {
   create,
   getMyTasks,
+  getMyInsights,
   getOne,
   getProjectTasks,
   getToday,
@@ -18,6 +19,7 @@ const router = Router()
 router.use(authMiddleware)
 
 router.get('/today', getToday)
+router.get('/my/insights', getMyInsights)
 router.get('/project/:projectId', getProjectTasks)
 router.get('/', getMyTasks)
 router.get('/:id', canManageTask, getOne)

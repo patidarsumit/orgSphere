@@ -2,6 +2,7 @@ import { Request, Response } from 'express'
 import { ZodError, z } from 'zod'
 import { projectQuerySchema } from '@orgsphere/schemas'
 import { AuthRequest } from '../middleware/auth'
+import * as InsightsService from '../services/insights.service'
 import * as ProjectService from '../services/project.service'
 import { routeParam } from '../utils/request'
 
@@ -64,6 +65,29 @@ export const getRecent = async (_req: Request, res: Response): Promise<void> => 
     res.json(projects)
   } catch {
     sendServerError(res, 'Failed to fetch recent projects')
+  }
+}
+
+export const getInsights = async (_req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    const insights = await InsightsService.getProjectsInsights()
+    res.json(insights)
+  } catch {
+    sendServerError(res, 'Failed to fetch project insights')
+  }
+}
+
+export const getProjectInsights = async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    const project = await ProjectService.findById(routeParam(req.params.id))
+    if (!project) {
+      res.status(404).json({ message: 'Project not found' })
+      return
+    }
+    const insights = await InsightsService.getProjectInsights(routeParam(req.params.id))
+    res.json(insights)
+  } catch {
+    sendServerError(res, 'Failed to fetch project insights')
   }
 }
 

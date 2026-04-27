@@ -13,6 +13,7 @@ import {
   Users,
 } from 'lucide-react'
 import { ActivityFeed } from '@/components/activity/ActivityFeed'
+import { DashboardInsightsSection } from '@/components/insights/DashboardInsightsSection'
 import { AvatarStack } from '@/components/shared/AvatarStack'
 import { EmptyState } from '@/components/shared/EmptyState'
 import { StatusBadge } from '@/components/shared/StatusBadge'
@@ -227,6 +228,8 @@ export default function DashboardPage() {
             icon={CheckSquare}
           />
         </div>
+
+        <DashboardInsightsSection />
 
         <div className="grid grid-cols-1 items-start gap-8 lg:grid-cols-10">
           <section className="space-y-6 lg:col-span-6">

@@ -5,7 +5,9 @@ import {
   getAll,
   getByTeam,
   getByUser,
+  getInsights,
   getOne,
+  getProjectInsights,
   getRecent,
   remove,
   removeMember,
@@ -22,10 +24,12 @@ const router = Router()
 router.use(authMiddleware)
 
 router.get('/recent', getRecent)
+router.get('/insights', getInsights)
 router.get('/user/:userId', getByUser)
 router.get('/team/:teamId', getByTeam)
 
 router.get('/', getAll)
+router.get('/:id/insights', getProjectInsights)
 router.get('/:id', getOne)
 router.post('/', canCreateProject, validate(createProjectSchema), create)
 router.put('/:id', canManageProject, validate(updateProjectSchema), update)

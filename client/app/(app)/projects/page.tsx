@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { type MouseEvent, useEffect, useMemo, useState, useTransition } from 'react'
 import { parseAsInteger, parseAsString, useQueryState } from 'nuqs'
 import {
+  BarChart3,
   ChevronLeft,
   ChevronRight,
   Eye,
@@ -333,19 +334,28 @@ export default function ProjectsPage() {
               Track delivery, owners, teams, and technology choices across {totalProjects} projects.
             </p>
           </div>
-          {can.createProject ? (
-            <button
-              type="button"
-              onClick={() => {
-                setEditingProject(undefined)
-                setModalOpen(true)
-              }}
-              className="primary-gradient inline-flex items-center justify-center gap-2 rounded-xl px-6 py-3 text-sm font-bold text-white shadow-[0_14px_30px_-16px_rgba(53,37,205,0.8)] active:scale-95"
+          <div className="flex flex-col gap-3 sm:flex-row">
+            <Link
+              href="/projects/insights"
+              className="inline-flex items-center justify-center gap-2 rounded-xl border border-[color:var(--color-border)] bg-white px-5 py-3 text-sm font-bold text-[color:var(--color-text-primary)] shadow-sm hover:text-[color:var(--color-primary)]"
             >
-              <Plus size={18} />
-              Add Project
-            </button>
-          ) : null}
+              <BarChart3 size={18} />
+              Insights
+            </Link>
+            {can.createProject ? (
+              <button
+                type="button"
+                onClick={() => {
+                  setEditingProject(undefined)
+                  setModalOpen(true)
+                }}
+                className="primary-gradient inline-flex items-center justify-center gap-2 rounded-xl px-6 py-3 text-sm font-bold text-white shadow-[0_14px_30px_-16px_rgba(53,37,205,0.8)] active:scale-95"
+              >
+                <Plus size={18} />
+                Add Project
+              </button>
+            ) : null}
+          </div>
         </header>
 
         <section className="rounded-3xl bg-[color:var(--color-surface-card)] p-4 shadow-[var(--shadow-card)]">

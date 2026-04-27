@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { useMemo, useState, useTransition } from 'react'
 import { parseAsString, useQueryState } from 'nuqs'
 import {
+  BarChart3,
   CheckSquare,
   Grid2X2,
   ListChecks,
@@ -324,7 +325,7 @@ export default function MyTasksPage() {
             Plan, review, and close the work assigned to you.
           </p>
         </div>
-        <div className="flex flex-wrap items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
           <div className="flex rounded-lg border border-[color:var(--color-border)] bg-white p-1">
             <button
               type="button"
@@ -343,6 +344,13 @@ export default function MyTasksPage() {
               <Grid2X2 size={18} />
             </button>
           </div>
+          <Link
+            href="/my/tasks/insights"
+            className="inline-flex items-center gap-2 rounded-lg border border-[color:var(--color-border)] bg-white px-4 py-2 text-sm font-bold text-[color:var(--color-text-primary)] shadow-sm hover:text-[color:var(--color-primary)]"
+          >
+            <BarChart3 size={17} />
+            Insights
+          </Link>
           <button
             type="button"
             onClick={() => openAdd()}

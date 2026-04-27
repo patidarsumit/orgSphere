@@ -19,6 +19,7 @@ import {
 } from 'lucide-react'
 import { ActivityFeed } from '@/components/activity/ActivityFeed'
 import { roleLabels } from '@/components/employees/constants'
+import { ProjectHealthInsights } from '@/components/insights/ProjectHealthInsights'
 import { AddProjectMemberSearch } from '@/components/projects/AddProjectMemberSearch'
 import { ProjectFormModal } from '@/components/projects/ProjectFormModal'
 import { ProjectHierarchyTab } from '@/components/projects/hierarchy/ProjectHierarchyTab'
@@ -137,6 +138,7 @@ function OverviewTab({ project, onTeamTab }: { project: Project; onTeamTab: () =
   return (
     <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
       <div className="space-y-8 lg:col-span-2">
+        <ProjectHealthInsights projectId={project.id} />
         <section className="rounded-3xl bg-white p-6 shadow-[var(--shadow-card)]">
           <h2 className="text-2xl font-black tracking-tight text-[color:var(--color-text-primary)]">Project Mission</h2>
           <p className="mt-5 rounded-2xl bg-[color:var(--color-surface-low)] p-6 text-sm leading-7 text-[color:var(--color-text-secondary)]">
