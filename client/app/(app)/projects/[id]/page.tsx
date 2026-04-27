@@ -434,7 +434,8 @@ function TeamTab({ project, canEdit }: { project: Project; canEdit: boolean }) {
   )
 }
 
-function ProjectTasksTab({ projectId }: { projectId: string }) {
+function ProjectTasksTab({ project }: { project: Project }) {
+  const projectId = project.id
   const { can } = usePermissions()
   const [filter, setFilter] = useState<TaskStatus | ''>('')
   const [modalOpen, setModalOpen] = useState(false)
@@ -548,6 +549,8 @@ function ProjectTasksTab({ projectId }: { projectId: string }) {
         open={modalOpen}
         onClose={() => setModalOpen(false)}
         defaults={{ project_id: projectId }}
+        projectContext={{ id: projectId, name: project.name }}
+        lockProject
       />
     </section>
   )
@@ -745,7 +748,7 @@ export default function ProjectDetailPage() {
         ) : null}
         {activeTab === 'hierarchy' ? <ProjectHierarchyTab project={project} /> : null}
         {activeTab === 'team' ? <TeamTab project={project} canEdit={canEdit} /> : null}
-        {activeTab === 'tasks' ? <ProjectTasksTab projectId={project.id} /> : null}
+        {activeTab === 'tasks' ? <ProjectTasksTab project={project} /> : null}
         {activeTab === 'notes' ? <ProjectNotesTab projectId={project.id} /> : null}
         {activeTab === 'activity' ? <ProjectActivityTab project={project} /> : null}
       </div>

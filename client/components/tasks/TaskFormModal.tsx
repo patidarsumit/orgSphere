@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, useMemo } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { createTaskSchema, CreateTaskInput } from '@orgsphere/schemas'
@@ -18,6 +18,11 @@ interface TaskFormModalProps {
   onClose: () => void
   task?: Task | null
   defaults?: Partial<CreateTaskInput>
+  projectContext?: {
+    id: string
+    name: string
+  }
+  lockProject?: boolean
 }
 
 const emptyValues: CreateTaskInput = {
@@ -31,12 +36,31 @@ const emptyValues: CreateTaskInput = {
 
 type CreateTaskFormInput = z.input<typeof createTaskSchema>
 
-export function TaskFormModal({ open, onClose, task, defaults }: TaskFormModalProps) {
+export function TaskFormModal({
+  open,
+  onClose,
+  task,
+  defaults,
+  projectContext,
+  lockProject = false,
+}: TaskFormModalProps) {
   const currentUser = useSelector((state: RootState) => state.auth.user)
   const { data: userProjects = [] } = useUserProjects(currentUser?.id || '')
   const createTask = useCreateTask()
   const updateTask = useUpdateTask()
   const isEditing = Boolean(task)
+  const projectOptions = useMemo(() => {
+    const options = userProjects.map((membership) => ({
+      id: membership.project.id,
+      name: membership.project.name,
+    }))
+
+    if (projectContext && !options.some((project) => project.id === projectContext.id)) {
+      return [projectContext, ...options]
+    }
+
+    return options
+  }, [projectContext, userProjects])
 
   const form = useForm<CreateTaskFormInput, unknown, CreateTaskInput>({
     resolver: zodResolver(createTaskSchema),
@@ -171,17 +195,26 @@ export function TaskFormModal({ open, onClose, task, defaults }: TaskFormModalPr
               <span className="text-xs font-bold uppercase text-[color:var(--color-text-tertiary)]">
                 Project
               </span>
-              <select
-                {...form.register('project_id')}
-                className="mt-2 w-full rounded-lg border border-[color:var(--color-border-strong)] bg-white px-3 py-2.5 text-sm outline-none focus:border-[color:var(--color-primary)] focus:ring-2 focus:ring-[color:var(--color-primary)]/15"
-              >
-                <option value="">No project</option>
-                {userProjects.map((membership) => (
-                  <option key={membership.project.id} value={membership.project.id}>
-                    {membership.project.name}
-                  </option>
-                ))}
-              </select>
+              {lockProject && projectContext ? (
+                <>
+                  <input type="hidden" {...form.register('project_id')} />
+                  <div className="mt-2 rounded-lg border border-[color:var(--color-border-strong)] bg-[color:var(--color-surface-low)] px-3 py-2.5 text-sm font-semibold text-[color:var(--color-text-primary)]">
+                    {projectContext.name}
+                  </div>
+                </>
+              ) : (
+                <select
+                  {...form.register('project_id')}
+                  className="mt-2 w-full rounded-lg border border-[color:var(--color-border-strong)] bg-white px-3 py-2.5 text-sm outline-none focus:border-[color:var(--color-primary)] focus:ring-2 focus:ring-[color:var(--color-primary)]/15"
+                >
+                  <option value="">No project</option>
+                  {projectOptions.map((project) => (
+                    <option key={project.id} value={project.id}>
+                      {project.name}
+                    </option>
+                  ))}
+                </select>
+              )}
             </label>
           </div>
 
