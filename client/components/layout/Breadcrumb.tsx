@@ -16,10 +16,15 @@ const staticLabels: Record<string, string> = {
   employees: 'Employees',
   teams: 'Teams',
   settings: 'Settings',
+  content: 'Content Workspace',
+  blog: 'Blog',
   my: 'My Workspace',
   tasks: 'My Tasks',
   notes: 'My Notes',
+  insights: 'Insights',
 }
+
+const nonNavigablePaths = new Set(['/my', '/content'])
 
 export function Breadcrumb() {
   const pathname = usePathname()
@@ -45,7 +50,10 @@ export function Breadcrumb() {
       label = 'My Dashboard'
     }
 
-    return { label, href: index === segments.length - 1 ? undefined : href }
+    return {
+      label,
+      href: index === segments.length - 1 || nonNavigablePaths.has(href) ? undefined : href,
+    }
   })
 
   if (crumbs.length === 0) {
