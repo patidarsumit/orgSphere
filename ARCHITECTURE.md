@@ -650,6 +650,14 @@ Project health rules:
 - Health scoring must return plain-language reasons so users can understand why a project needs attention.
 - Completed and archived projects should not be penalized for normal inactivity.
 
+Activity navigation rules:
+- Activity responses include backend-generated `href` and `is_navigable` fields.
+- Frontend activity rows must use `href`; they should not infer routes from `entity_type`.
+- Task activity links to the personal task view only when the task is assigned to the viewer.
+- Private note activity links only for the note owner.
+- Deleted entity activity should not link to deleted detail pages.
+- The header bell currently uses activity as a notification-like stream; a dedicated notification model should replace that before comments and mentions.
+
 ---
 
 ## 13. Local Development

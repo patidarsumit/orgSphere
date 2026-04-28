@@ -1,4 +1,5 @@
 import { ActivityLog } from '../entities/ActivityLog'
+import { AppDataSource } from '../data-source'
 
 export interface FormattedActivity {
   id: string
@@ -11,8 +12,21 @@ export interface FormattedActivity {
   entity_name: string | null
   action: string
   color: 'blue' | 'green' | 'red' | 'purple' | 'amber' | 'teal'
+  href: string | null
+  is_navigable: boolean
   created_at: string
   time_ago: string
+}
+
+export interface ActivityViewer {
+  id: string
+  role: string
+}
+
+type NavigationContext = {
+  taskTargets: Map<string, { assignedTo: string; projectId: string | null }>
+  noteOwners: Map<string, string>
+  postTargets: Map<string, { slug: string; status: string }>
 }
 
 const actionColors: Record<string, FormattedActivity['color']> = {
@@ -36,6 +50,7 @@ const entityLabels: Record<string, string> = {
   note: 'note',
   project_member: 'project',
   team_member: 'team',
+  post: 'post',
 }
 
 const actionMessages: Record<
@@ -68,10 +83,62 @@ function timeAgo(date: Date): string {
   return new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric' }).format(date)
 }
 
-export const format = (log: ActivityLog): FormattedActivity => {
+const emptyNavigationContext: NavigationContext = {
+  taskTargets: new Map(),
+  noteOwners: new Map(),
+  postTargets: new Map(),
+}
+
+const getActivityHref = (
+  log: ActivityLog,
+  viewer?: ActivityViewer,
+  navigationContext: NavigationContext = emptyNavigationContext
+) => {
+  if (log.action === 'deleted') return null
+
+  if (log.entity_type === 'project' || log.entity_type === 'project_member') {
+    return `/projects/${log.entity_id}`
+  }
+
+  if (log.entity_type === 'employee') return `/employees/${log.entity_id}`
+
+  if (log.entity_type === 'team' || log.entity_type === 'team_member') {
+    return `/teams/${log.entity_id}`
+  }
+
+  if (log.entity_type === 'task') {
+    const taskTarget = navigationContext.taskTargets.get(log.entity_id)
+    if (!taskTarget || !viewer) return null
+    if (taskTarget.assignedTo === viewer.id) {
+      return `/my/tasks?task=${log.entity_id}`
+    }
+    return taskTarget.projectId ? `/projects/${taskTarget.projectId}` : null
+  }
+
+  if (log.entity_type === 'note') {
+    const ownerId = navigationContext.noteOwners.get(log.entity_id)
+    if (!ownerId || !viewer || ownerId !== viewer.id) return null
+    return `/my/notes?note=${log.entity_id}`
+  }
+
+  if (log.entity_type === 'post') {
+    const postTarget = navigationContext.postTargets.get(log.entity_id)
+    if (!postTarget) return '/content/blog'
+    return postTarget.status === 'published' ? `/blog/${postTarget.slug}` : '/content/blog'
+  }
+
+  return null
+}
+
+export const format = (
+  log: ActivityLog,
+  viewer?: ActivityViewer,
+  navigationContext: NavigationContext = emptyNavigationContext
+): FormattedActivity => {
   const entityLabel = entityLabels[log.entity_type] ?? log.entity_type
   const entityName = log.entity_name ? `${entityLabel} "${log.entity_name}"` : entityLabel
   const messageFn = actionMessages[log.action]
+  const href = getActivityHref(log, viewer, navigationContext)
 
   return {
     id: log.id,
@@ -84,9 +151,62 @@ export const format = (log: ActivityLog): FormattedActivity => {
     entity_name: log.entity_name,
     action: log.action,
     color: actionColors[log.action] ?? 'blue',
+    href,
+    is_navigable: Boolean(href),
     created_at: log.created_at.toISOString(),
     time_ago: timeAgo(new Date(log.created_at)),
   }
 }
 
-export const formatMany = (logs: ActivityLog[]): FormattedActivity[] => logs.map(format)
+const buildNavigationContext = async (logs: ActivityLog[]): Promise<NavigationContext> => {
+  const taskIds = logs.filter((log) => log.entity_type === 'task').map((log) => log.entity_id)
+  const noteIds = logs.filter((log) => log.entity_type === 'note').map((log) => log.entity_id)
+  const postIds = logs.filter((log) => log.entity_type === 'post').map((log) => log.entity_id)
+
+  const [tasks, notes, posts] = await Promise.all([
+    taskIds.length > 0
+      ? AppDataSource.manager.query(
+          'SELECT id, assigned_to AS "assignedTo", project_id AS "projectId" FROM tasks WHERE id = ANY($1::uuid[])',
+          [taskIds]
+        )
+      : [],
+    noteIds.length > 0
+      ? AppDataSource.manager.query(
+          'SELECT id, user_id AS "ownerId" FROM notes WHERE id = ANY($1::uuid[])',
+          [noteIds]
+        )
+      : [],
+    postIds.length > 0
+      ? AppDataSource.manager.query(
+          'SELECT id, slug, status FROM posts WHERE id = ANY($1::uuid[])',
+          [postIds]
+        )
+      : [],
+  ])
+
+  return {
+    taskTargets: new Map(
+      tasks.map((task: { id: string; assignedTo: string; projectId: string | null }) => [
+        task.id,
+        { assignedTo: task.assignedTo, projectId: task.projectId },
+      ])
+    ),
+    noteOwners: new Map(
+      notes.map((note: { id: string; ownerId: string }) => [note.id, note.ownerId])
+    ),
+    postTargets: new Map(
+      posts.map((post: { id: string; slug: string; status: string }) => [
+        post.id,
+        { slug: post.slug, status: post.status },
+      ])
+    ),
+  }
+}
+
+export const formatMany = async (
+  logs: ActivityLog[],
+  viewer?: ActivityViewer
+): Promise<FormattedActivity[]> => {
+  const navigationContext = await buildNavigationContext(logs)
+  return logs.map((log) => format(log, viewer, navigationContext))
+}

@@ -1,4 +1,4 @@
-import { Request, Response } from 'express'
+import { Response } from 'express'
 import { AuthRequest } from '../middleware/auth'
 import * as ActivityService from '../services/activity.service'
 import { formatMany } from '../utils/activity.formatter'
@@ -9,7 +9,7 @@ const sendServerError = (res: Response, message: string) => {
   res.status(500).json({ message })
 }
 
-export const getGlobalFeed = async (req: Request, res: Response): Promise<void> => {
+export const getGlobalFeed = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const page = Number.parseInt(String(req.query.page || '1'), 10)
     const limit = Number.parseInt(String(req.query.limit || '20'), 10)
@@ -20,13 +20,13 @@ export const getGlobalFeed = async (req: Request, res: Response): Promise<void> 
       entity_id: req.query.entity_id as string | undefined,
       actor_id: req.query.actor_id as string | undefined,
     })
-    res.json({ ...result, data: formatMany(result.data) })
+    res.json({ ...result, data: await formatMany(result.data, req.user) })
   } catch {
     sendServerError(res, 'Failed to fetch activity feed')
   }
 }
 
-export const getEntityFeed = async (req: Request, res: Response): Promise<void> => {
+export const getEntityFeed = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const limit = Number.parseInt(String(req.query.limit || '20'), 10)
     const logs = await ActivityService.getEntityActivity(
@@ -34,16 +34,16 @@ export const getEntityFeed = async (req: Request, res: Response): Promise<void> 
       routeParam(req.params.entity_id),
       Number.isNaN(limit) ? 20 : Math.min(limit, 100)
     )
-    res.json(formatMany(logs))
+    res.json(await formatMany(logs, req.user))
   } catch {
     sendServerError(res, 'Failed to fetch entity activity')
   }
 }
 
-export const getRecentFeed = async (_req: Request, res: Response): Promise<void> => {
+export const getRecentFeed = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const logs = await ActivityService.getRecentGlobal(10)
-    res.json(formatMany(logs))
+    res.json(await formatMany(logs, req.user))
   } catch {
     sendServerError(res, 'Failed to fetch recent activity')
   }

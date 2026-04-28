@@ -11,21 +11,8 @@ interface ActivityFeedItemProps {
   onSelect?: () => void
 }
 
-const entityHref = (item: ActivityItem) => {
-  if (item.entity_type === 'project' || item.entity_type === 'project_member') {
-    return `/projects/${item.entity_id}`
-  }
-  if (item.entity_type === 'employee') return `/employees/${item.entity_id}`
-  if (item.entity_type === 'team' || item.entity_type === 'team_member') {
-    return `/teams/${item.entity_id}`
-  }
-  if (item.entity_type === 'task') return `/my/tasks?task=${item.entity_id}`
-  if (item.entity_type === 'note') return `/my/notes?note=${item.entity_id}`
-  return null
-}
-
 export function ActivityFeedItem({ item, compact = false, onSelect }: ActivityFeedItemProps) {
-  const href = entityHref(item)
+  const href = item.href
   const content = (
     <>
       <span className={`activity-dot-${item.color} mt-2 h-2 w-2 shrink-0 rounded-full ring-4 ring-current/10`} />
@@ -52,24 +39,27 @@ export function ActivityFeedItem({ item, compact = false, onSelect }: ActivityFe
     </>
   )
 
-  const className = `flex w-full gap-3 rounded-lg border-b border-gray-50 px-3 py-3 text-left transition-all hover:bg-[color:var(--color-surface-low)] hover:shadow-[0_10px_24px_-22px_rgba(30,41,59,0.7)] focus:outline-none focus:ring-2 focus:ring-[color:var(--color-primary)]/20 ${
+  const baseClassName = `flex w-full gap-3 rounded-lg border-b border-gray-50 px-3 py-3 text-left ${
     compact ? 'items-start text-sm' : 'items-start'
   }`
+  const interactiveClassName =
+    'transition-all hover:bg-[color:var(--color-surface-low)] hover:shadow-[0_10px_24px_-22px_rgba(30,41,59,0.7)] focus:outline-none focus:ring-2 focus:ring-[color:var(--color-primary)]/20'
+  const passiveClassName = 'cursor-default'
 
   if (!href) {
     if (onSelect) {
       return (
-        <button type="button" onClick={onSelect} className={className}>
+        <button type="button" onClick={onSelect} className={`${baseClassName} ${interactiveClassName}`}>
           {content}
         </button>
       )
     }
 
-    return <div className={className}>{content}</div>
+    return <div className={`${baseClassName} ${passiveClassName}`}>{content}</div>
   }
 
   return (
-    <Link href={href} onClick={onSelect} className={className}>
+    <Link href={href} onClick={onSelect} className={`${baseClassName} ${interactiveClassName}`}>
       {content}
     </Link>
   )

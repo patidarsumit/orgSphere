@@ -27,7 +27,7 @@ export const getStats = async (req: AuthRequest, res: Response): Promise<void> =
       totalEmployees,
       activeTeams,
       myOpenTasks,
-      recentActivity: formatMany(recentActivity),
+      recentActivity: await formatMany(recentActivity, req.user),
     })
   } catch {
     res.status(500).json({ message: 'Failed to fetch stats' })

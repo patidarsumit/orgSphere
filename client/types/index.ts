@@ -129,6 +129,8 @@ export interface ActivityItem {
   entity_name: string | null
   action: string
   color: ActivityColor
+  href: string | null
+  is_navigable: boolean
   created_at: string
   time_ago: string
 }
