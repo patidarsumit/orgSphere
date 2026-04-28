@@ -3,6 +3,7 @@ import { ZodError, z } from 'zod'
 import { projectQuerySchema } from '@orgsphere/schemas'
 import { AuthRequest } from '../middleware/auth'
 import * as InsightsService from '../services/insights.service'
+import * as ProjectHealthService from '../services/project-health.service'
 import * as ProjectService from '../services/project.service'
 import { routeParam } from '../utils/request'
 
@@ -88,6 +89,28 @@ export const getProjectInsights = async (req: AuthRequest, res: Response): Promi
     res.json(insights)
   } catch {
     sendServerError(res, 'Failed to fetch project insights')
+  }
+}
+
+export const getHealth = async (_req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    const health = await ProjectHealthService.getProjectsHealth()
+    res.json(health)
+  } catch {
+    sendServerError(res, 'Failed to fetch project health')
+  }
+}
+
+export const getProjectHealth = async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    const health = await ProjectHealthService.getProjectHealth(routeParam(req.params.id))
+    if (!health) {
+      res.status(404).json({ message: 'Project not found' })
+      return
+    }
+    res.json(health)
+  } catch {
+    sendServerError(res, 'Failed to fetch project health')
   }
 }
 

@@ -5,8 +5,10 @@ import {
   getAll,
   getByTeam,
   getByUser,
+  getHealth,
   getInsights,
   getOne,
+  getProjectHealth,
   getProjectInsights,
   getRecent,
   remove,
@@ -24,11 +26,13 @@ const router = Router()
 router.use(authMiddleware)
 
 router.get('/recent', getRecent)
+router.get('/health', getHealth)
 router.get('/insights', getInsights)
 router.get('/user/:userId', getByUser)
 router.get('/team/:teamId', getByTeam)
 
 router.get('/', getAll)
+router.get('/:id/health', getProjectHealth)
 router.get('/:id/insights', getProjectInsights)
 router.get('/:id', getOne)
 router.post('/', canCreateProject, validate(createProjectSchema), create)

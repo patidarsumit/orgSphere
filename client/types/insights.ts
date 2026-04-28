@@ -80,3 +80,30 @@ export interface MyTaskInsights {
   dueSoon: ActivityTrendInsight[]
   projectLoad: ProjectOpenTasksInsight[]
 }
+
+export type ProjectHealthStatus = 'healthy' | 'attention' | 'at_risk'
+
+export interface ProjectHealthSignal {
+  projectId: string
+  projectName: string
+  status: ProjectHealthStatus
+  score: number
+  completionPercent: number
+  totalTasks: number
+  openTasks: number
+  overdueTasks: number
+  highPriorityOpenTasks: number
+  staleDays: number | null
+  missingOwnership: string[]
+  reasons: string[]
+}
+
+export interface ProjectsHealth {
+  summary: {
+    healthy: number
+    attention: number
+    atRisk: number
+    total: number
+  }
+  projects: ProjectHealthSignal[]
+}

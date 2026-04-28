@@ -6,6 +6,8 @@ import {
   DashboardInsights,
   MyTaskInsights,
   ProjectDetailInsights,
+  ProjectHealthSignal,
+  ProjectsHealth,
   ProjectsInsights,
 } from '@/types/insights'
 
@@ -37,6 +39,29 @@ export function useProjectDetailInsights(projectId: string) {
     enabled: Boolean(projectId),
     queryFn: async () => {
       const { data } = await api.get<ProjectDetailInsights>(`/projects/${projectId}/insights`)
+      return data
+    },
+    staleTime: 30_000,
+  })
+}
+
+export function useProjectsHealth() {
+  return useQuery<ProjectsHealth>({
+    queryKey: ['projects-health'],
+    queryFn: async () => {
+      const { data } = await api.get<ProjectsHealth>('/projects/health')
+      return data
+    },
+    staleTime: 30_000,
+  })
+}
+
+export function useProjectHealth(projectId: string) {
+  return useQuery<ProjectHealthSignal>({
+    queryKey: ['project-health', projectId],
+    enabled: Boolean(projectId),
+    queryFn: async () => {
+      const { data } = await api.get<ProjectHealthSignal>(`/projects/${projectId}/health`)
       return data
     },
     staleTime: 30_000,

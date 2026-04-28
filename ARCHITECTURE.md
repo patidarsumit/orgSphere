@@ -644,6 +644,12 @@ Task workflow rules:
 - Project Tasks is scoped to the active project and keeps task create/edit flows locked to that project.
 - Task summary cards should use the currently visible task collection and avoid extra API calls unless the page needs cross-filter totals.
 
+Project health rules:
+- Health signals are derived from existing project, task, ownership, and movement data.
+- Health APIs are additive: `/api/projects/health` and `/api/projects/:id/health`.
+- Health scoring must return plain-language reasons so users can understand why a project needs attention.
+- Completed and archived projects should not be penalized for normal inactivity.
+
 ---
 
 ## 13. Local Development

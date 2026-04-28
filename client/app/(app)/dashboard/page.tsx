@@ -14,6 +14,7 @@ import {
   Users,
 } from 'lucide-react'
 import { ActivityFeed } from '@/components/activity/ActivityFeed'
+import { ProjectHealthDashboardCard } from '@/components/insights/ProjectHealthDashboardCard'
 import { InsightsGridSkeleton } from '@/components/insights/InsightsGridSkeleton'
 import { AvatarStack } from '@/components/shared/AvatarStack'
 import { EmptyState } from '@/components/shared/EmptyState'
@@ -237,6 +238,8 @@ export default function DashboardPage() {
             icon={CheckSquare}
           />
         </div>
+
+        <ProjectHealthDashboardCard />
 
         <DashboardInsightsSection />
 
