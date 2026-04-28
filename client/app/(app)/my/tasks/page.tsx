@@ -14,6 +14,7 @@ import {
 } from 'lucide-react'
 import { useSelector } from 'react-redux'
 import { TaskFormModal } from '@/components/tasks/TaskFormModal'
+import { TaskWorkflowSummary } from '@/components/tasks/TaskWorkflowSummary'
 import {
   formatTaskDueDate,
   getDueTone,
@@ -285,6 +286,7 @@ export default function MyTasksPage() {
   )
   const activeTask = selectedTask || editingTask
   const taskModalOpen = modalOpen || Boolean(selectedTask)
+  const hasFilters = Boolean(status || priority)
 
   const openAdd = (nextStatus: TaskStatus = 'todo') => {
     setDefaultStatus(nextStatus)
@@ -294,6 +296,7 @@ export default function MyTasksPage() {
 
   const closeTaskModal = () => {
     setModalOpen(false)
+    setEditingTask(null)
     if (selectedTaskId) void setSelectedTaskId('')
   }
 
@@ -397,9 +400,23 @@ export default function MyTasksPage() {
               <span className="inline-flex items-center gap-1"><span className="h-2 w-2 rounded-full bg-amber-500" /> Medium</span>
               <span className="inline-flex items-center gap-1"><span className="h-2 w-2 rounded-full bg-gray-400" /> Low</span>
             </div>
+            {hasFilters ? (
+              <button
+                type="button"
+                onClick={() => {
+                  void setStatus('')
+                  void setPriority('')
+                }}
+                className="rounded-lg px-3 py-2 text-sm font-bold text-[color:var(--color-primary)] hover:bg-[color:var(--color-primary-light)]"
+              >
+                Clear filters
+              </button>
+            ) : null}
           </div>
         </div>
       </section>
+
+      {!isLoading ? <div className="mb-5"><TaskWorkflowSummary tasks={tasks} /></div> : null}
 
       {isLoading || isPending ? (
         <div className="space-y-3">

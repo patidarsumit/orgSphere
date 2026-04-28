@@ -639,6 +639,11 @@ Graph and chart boundary:
 - Heavy graph/chart surfaces should be dynamically loaded when they are not needed for the first page shell.
 - Recharts primitives should render inside measured containers so charts never mount with invalid dimensions.
 
+Task workflow rules:
+- My Tasks supports personal tasks and optional project linkage.
+- Project Tasks is scoped to the active project and keeps task create/edit flows locked to that project.
+- Task summary cards should use the currently visible task collection and avoid extra API calls unless the page needs cross-filter totals.
+
 ---
 
 ## 13. Local Development

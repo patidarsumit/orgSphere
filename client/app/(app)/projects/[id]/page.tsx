@@ -8,6 +8,7 @@ import {
   ArrowLeft,
   CalendarDays,
   CheckSquare,
+  Edit3,
   FileText,
   FolderKanban,
   Mail,
@@ -15,6 +16,7 @@ import {
   Plus,
   Share2,
   StickyNote,
+  Trash2,
   UserPlus,
   UsersRound,
 } from 'lucide-react'
@@ -26,10 +28,12 @@ import { ProjectFormModal } from '@/components/projects/ProjectFormModal'
 import { ProjectHierarchyTab } from '@/components/projects/hierarchy/ProjectHierarchyTab'
 import { formatProjectDate } from '@/components/projects/projectUtils'
 import { Avatar } from '@/components/shared/Avatar'
+import { ConfirmDialog } from '@/components/shared/ConfirmDialog'
 import { EmptyState } from '@/components/shared/EmptyState'
 import { StatusBadge } from '@/components/shared/StatusBadge'
 import { TechStackChip } from '@/components/shared/TechStackChip'
 import { TaskFormModal } from '@/components/tasks/TaskFormModal'
+import { TaskWorkflowSummary } from '@/components/tasks/TaskWorkflowSummary'
 import { formatTaskDueDate } from '@/components/tasks/taskUtils'
 import { useEntityActivity } from '@/hooks/useActivity'
 import { useCreateNote, useNotes } from '@/hooks/useNotes'
@@ -39,9 +43,9 @@ import {
   useRemoveProjectMember,
   useUpdateProjectMemberRole,
 } from '@/hooks/useProjects'
-import { useProjectTasks, useUpdateTask } from '@/hooks/useTasks'
+import { useDeleteTask, useProjectTasks, useUpdateTask } from '@/hooks/useTasks'
 import { appToast, getToastErrorMessage } from '@/lib/toast'
-import { Project, ProjectMember, TaskStatus } from '@/types'
+import { Project, ProjectMember, Task, TaskStatus } from '@/types'
 
 const ProjectHealthInsights = dynamic(
   () => import('@/components/insights/ProjectHealthInsights').then((mod) => mod.ProjectHealthInsights),
@@ -439,8 +443,11 @@ function ProjectTasksTab({ project }: { project: Project }) {
   const { can } = usePermissions()
   const [filter, setFilter] = useState<TaskStatus | ''>('')
   const [modalOpen, setModalOpen] = useState(false)
+  const [editingTask, setEditingTask] = useState<Task | null>(null)
+  const [deleteTarget, setDeleteTarget] = useState<Task | null>(null)
   const { data, isLoading } = useProjectTasks(projectId, { status: filter, limit: 100 })
   const updateTask = useUpdateTask()
+  const deleteTask = useDeleteTask()
   const tasks = data?.data || []
 
   const toggleTaskStatus = async (taskId: string, isDone: boolean) => {
@@ -449,6 +456,33 @@ function ProjectTasksTab({ project }: { project: Project }) {
       appToast.success(isDone ? 'Task reopened' : 'Task marked done')
     } catch (error) {
       appToast.error(getToastErrorMessage(error, 'Unable to update task'))
+    }
+  }
+
+  const openAddTask = () => {
+    setEditingTask(null)
+    setModalOpen(true)
+  }
+
+  const openEditTask = (task: Task) => {
+    setEditingTask(task)
+    setModalOpen(true)
+  }
+
+  const closeTaskModal = () => {
+    setModalOpen(false)
+    setEditingTask(null)
+  }
+
+  const confirmDelete = async () => {
+    if (!deleteTarget) return
+
+    try {
+      await deleteTask.mutateAsync(deleteTarget.id)
+      appToast.success('Task deleted')
+      setDeleteTarget(null)
+    } catch (error) {
+      appToast.error(getToastErrorMessage(error, 'Unable to delete task'))
     }
   }
 
@@ -465,13 +499,15 @@ function ProjectTasksTab({ project }: { project: Project }) {
         </div>
         <button
           type="button"
-          onClick={() => setModalOpen(true)}
+          onClick={openAddTask}
           className="primary-gradient inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-bold text-white"
         >
           <Plus size={16} />
           Add Task
         </button>
       </div>
+
+      {!isLoading ? <div className="mb-5"><TaskWorkflowSummary tasks={tasks} /></div> : null}
 
       <div className="mb-4 flex flex-wrap gap-2">
         {[
@@ -519,9 +555,13 @@ function ProjectTasksTab({ project }: { project: Project }) {
                 />
               )}
               <div className="min-w-[220px] flex-1">
-                <p className={`text-sm font-semibold text-[color:var(--color-text-primary)] ${task.status === 'done' ? 'line-through opacity-60' : ''}`}>
+                <button
+                  type="button"
+                  onClick={() => openEditTask(task)}
+                  className={`block max-w-full text-left text-sm font-semibold text-[color:var(--color-text-primary)] hover:text-[color:var(--color-primary)] ${task.status === 'done' ? 'line-through opacity-60' : ''}`}
+                >
                   {task.title}
-                </p>
+                </button>
                 <p className="text-xs text-[color:var(--color-text-tertiary)]">
                   {task.assignee?.name || 'Assigned member'}
                 </p>
@@ -533,6 +573,26 @@ function ProjectTasksTab({ project }: { project: Project }) {
               <span className="text-xs font-semibold text-[color:var(--color-text-tertiary)]">
                 {formatTaskDueDate(task.due_date)}
               </span>
+              {can.manageTask(task) ? (
+                <div className="ml-auto flex items-center gap-1">
+                  <button
+                    type="button"
+                    onClick={() => openEditTask(task)}
+                    className="rounded-lg p-2 text-[color:var(--color-text-tertiary)] hover:bg-white hover:text-[color:var(--color-primary)]"
+                    aria-label="Edit task"
+                  >
+                    <Edit3 size={15} />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setDeleteTarget(task)}
+                    className="rounded-lg p-2 text-[color:var(--color-text-tertiary)] hover:bg-red-50 hover:text-red-600"
+                    aria-label="Delete task"
+                  >
+                    <Trash2 size={15} />
+                  </button>
+                </div>
+              ) : null}
             </div>
           ))}
         </div>
@@ -541,16 +601,25 @@ function ProjectTasksTab({ project }: { project: Project }) {
           icon={CheckSquare}
           title="No tasks linked yet"
           description="Add a project task to connect execution with this workspace."
-          action={{ label: '+ Add Task', onClick: () => setModalOpen(true) }}
+          action={{ label: '+ Add Task', onClick: openAddTask }}
         />
       )}
 
       <TaskFormModal
         open={modalOpen}
-        onClose={() => setModalOpen(false)}
+        onClose={closeTaskModal}
+        task={editingTask}
         defaults={{ project_id: projectId }}
         projectContext={{ id: projectId, name: project.name }}
         lockProject
+      />
+      <ConfirmDialog
+        open={Boolean(deleteTarget)}
+        title="Delete task?"
+        description="This task will be removed from the project workspace."
+        dangerous
+        onCancel={() => setDeleteTarget(null)}
+        onConfirm={() => void confirmDelete()}
       />
     </section>
   )
