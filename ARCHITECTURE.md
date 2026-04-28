@@ -656,7 +656,13 @@ Activity navigation rules:
 - Task activity links to the personal task view only when the task is assigned to the viewer.
 - Private note activity links only for the note owner.
 - Deleted entity activity should not link to deleted detail pages.
-- The header bell currently uses activity as a notification-like stream; a dedicated notification model should replace that before comments and mentions.
+
+Notification rules:
+- The header bell uses `/api/notifications`, not the global activity feed.
+- Notifications are user-specific and scoped by `recipient_id`.
+- Opening the bell does not mark notifications read; users mark read explicitly or by selecting an item.
+- Activity remains the historical timeline. Notifications are actionable inbox items.
+- Current notification triggers include task assignment, project membership changes, and project ownership changes.
 
 ---
 

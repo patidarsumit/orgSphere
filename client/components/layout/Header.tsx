@@ -5,11 +5,16 @@ import axios from 'axios'
 import Link from 'next/link'
 import { useDispatch, useSelector } from 'react-redux'
 import { Bell, BookOpen, ChevronDown, Home, LogOut, PanelLeft, Search, UserCircle } from 'lucide-react'
-import { ActivityFeedItem } from '@/components/activity/ActivityFeedItem'
 import { Breadcrumb } from '@/components/layout/Breadcrumb'
+import { NotificationFeedItem } from '@/components/layout/NotificationFeedItem'
 import { GlobalSearch } from '@/components/search/GlobalSearch'
 import { Avatar } from '@/components/shared/Avatar'
-import { useActivityFeed, useMarkAllRead, useUnreadCount } from '@/hooks/useActivity'
+import {
+  useMarkNotificationRead,
+  useMarkNotificationsRead,
+  useNotificationUnreadCount,
+  useNotifications,
+} from '@/hooks/useNotifications'
 import { appToast } from '@/lib/toast'
 import { RootState } from '@/store'
 import { clearAuth } from '@/store/slices/authSlice'
@@ -25,9 +30,10 @@ export function Header() {
   const [searchOpen, setSearchOpen] = useState(false)
   const bellRef = useRef<HTMLDivElement>(null)
   const accountRef = useRef<HTMLDivElement>(null)
-  const { data: unreadData } = useUnreadCount()
-  const { data: feed } = useActivityFeed(1, 8)
-  const markAllRead = useMarkAllRead()
+  const { data: unreadData } = useNotificationUnreadCount()
+  const { data: feed } = useNotifications(1, 8)
+  const markAllRead = useMarkNotificationsRead()
+  const markOneRead = useMarkNotificationRead()
   const unreadCount = unreadData?.count ?? 0
   const notifications = feed?.data || []
 
@@ -58,13 +64,7 @@ export function Header() {
   }, [])
 
   const toggleNotifications = () => {
-    setBellOpen((current) => {
-      const next = !current
-      if (next && unreadCount > 0) {
-        markAllRead.mutate()
-      }
-      return next
-    })
+    setBellOpen((current) => !current)
   }
 
   const markReadAndClose = () => {
@@ -137,7 +137,7 @@ export function Header() {
                 <div>
                   <h2 className="text-sm font-black text-gray-900">Notifications</h2>
                   <p className="mt-1 text-xs text-gray-500">
-                    Latest workspace activity
+                    Actionable updates for you
                   </p>
                 </div>
                 {unreadCount > 0 ? (
@@ -153,18 +153,20 @@ export function Header() {
               <div className="max-h-[420px] overflow-y-auto p-3">
                 {notifications.length > 0 ? (
                   notifications.map((item) => (
-                    <ActivityFeedItem
+                    <NotificationFeedItem
                       key={item.id}
-                      item={item}
-                      compact
-                      onSelect={() => setBellOpen(false)}
+                      notification={item}
+                      onSelect={() => {
+                        if (!item.read_at) markOneRead.mutate(item.id)
+                        setBellOpen(false)
+                      }}
                     />
                   ))
                 ) : (
                   <div className="rounded-lg bg-gray-50 p-6 text-center">
                     <p className="text-sm font-bold text-gray-900">No notifications yet</p>
                     <p className="mt-1 text-xs leading-5 text-gray-500">
-                      Activity from the workspace will appear here.
+                      Personal task, project, and ownership updates will appear here.
                     </p>
                   </div>
                 )}
@@ -179,11 +181,11 @@ export function Header() {
                     Mark all read
                   </button>
                   <Link
-                    href="/dashboard"
+                    href="/my/dashboard"
                     onClick={() => setBellOpen(false)}
                     className="rounded-lg bg-gray-900 px-3 py-2 text-xs font-bold text-white hover:bg-gray-800"
                   >
-                    Open dashboard
+                    My dashboard
                   </Link>
                 </div>
               ) : null}

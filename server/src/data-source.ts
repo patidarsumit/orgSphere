@@ -3,6 +3,7 @@ import dotenv from 'dotenv'
 import { DataSource } from 'typeorm'
 import { ActivityLog } from './entities/ActivityLog'
 import { Note } from './entities/Note'
+import { Notification } from './entities/Notification'
 import { Post } from './entities/Post'
 import { Project } from './entities/Project'
 import { ProjectMember } from './entities/ProjectMember'
@@ -21,7 +22,7 @@ export const AppDataSource = new DataSource({
   database: process.env.DB_NAME || 'orgsphere_db',
   synchronize: false,
   logging: process.env.NODE_ENV === 'development',
-  entities: [User, Team, Project, ProjectMember, Task, Note, ActivityLog, Post],
+  entities: [User, Team, Project, ProjectMember, Task, Note, ActivityLog, Post, Notification],
   migrations: ['src/migrations/*.ts'],
   subscribers: [],
 })

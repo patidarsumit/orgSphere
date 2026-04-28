@@ -9,6 +9,7 @@ import { Project } from '../entities/Project'
 import { ProjectMember } from '../entities/ProjectMember'
 import { User } from '../entities/User'
 import * as ActivityService from './activity.service'
+import * as NotificationService from './notification.service'
 
 const repo = () => AppDataSource.getRepository(Project)
 const pmRepo = () => AppDataSource.getRepository(ProjectMember)
@@ -223,6 +224,8 @@ export const update = async (
   ensureCanManageProject(project, actorId, actorRole)
 
   const oldStatus = project.status
+  const oldManagerId = project.manager_id
+  const oldTechLeadId = project.tech_lead_id
   Object.assign(project, input)
   const saved = await repo().save(project)
   await ActivityService.log({
@@ -236,6 +239,32 @@ export const update = async (
         ? { old_status: oldStatus, new_status: input.status }
         : {},
   })
+  const ownershipNotifications = [
+    input.manager_id && input.manager_id !== oldManagerId
+      ? {
+          recipient_id: input.manager_id,
+          type: 'project_owner_changed' as const,
+          title: 'Project ownership updated',
+          message: `You are now manager for ${saved.name}`,
+          target_url: `/projects/${saved.id}`,
+          metadata: { project_id: saved.id, role: 'manager' },
+        }
+      : null,
+    input.tech_lead_id && input.tech_lead_id !== oldTechLeadId
+      ? {
+          recipient_id: input.tech_lead_id,
+          type: 'project_owner_changed' as const,
+          title: 'Project ownership updated',
+          message: `You are now tech lead for ${saved.name}`,
+          target_url: `/projects/${saved.id}`,
+          metadata: { project_id: saved.id, role: 'tech_lead' },
+        }
+      : null,
+  ].filter((notification): notification is NonNullable<typeof notification> => Boolean(notification))
+
+  await NotificationService.createMany(
+    ownershipNotifications.filter((notification) => notification.recipient_id !== actorId)
+  )
   return findById(saved.id)
 }
 
@@ -288,6 +317,16 @@ export const addMember = async (
     actor_id: actorId,
     metadata: { member_name: user.name, member_id: input.user_id, role: input.role },
   })
+  if (input.user_id !== actorId) {
+    await NotificationService.create({
+      recipient_id: input.user_id,
+      type: 'project_member_added',
+      title: 'Added to project',
+      message: `You were added to ${project.name}`,
+      target_url: `/projects/${projectId}`,
+      metadata: { project_id: projectId, role: input.role },
+    })
+  }
   return findById(projectId)
 }
 
@@ -315,6 +354,16 @@ export const removeMember = async (
     actor_id: actorId,
     metadata: { member_name: user?.name ?? 'a member', member_id: userId },
   })
+  if (userId !== actorId) {
+    await NotificationService.create({
+      recipient_id: userId,
+      type: 'project_member_removed',
+      title: 'Removed from project',
+      message: `You were removed from ${project.name}`,
+      target_url: null,
+      metadata: { project_id: projectId },
+    })
+  }
 }
 
 export const updateMemberRole = async (

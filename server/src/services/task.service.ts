@@ -2,6 +2,7 @@ import { CreateTaskInput, TaskQuery, UpdateTaskInput } from '@orgsphere/schemas'
 import { AppDataSource } from '../data-source'
 import { Task } from '../entities/Task'
 import * as ActivityService from './activity.service'
+import * as NotificationService from './notification.service'
 
 const repo = () => AppDataSource.getRepository(Task)
 
@@ -131,6 +132,20 @@ export const create = async (input: CreateTaskInput, userId: string) => {
     entity_name: saved.title,
     actor_id: userId,
   })
+  if (saved.assigned_to !== userId) {
+    await NotificationService.create({
+      recipient_id: saved.assigned_to,
+      type: 'task_assigned',
+      title: 'Task assigned',
+      message: `You have a new task: ${saved.title}`,
+      target_url: `/my/tasks?task=${saved.id}`,
+      metadata: {
+        task_id: saved.id,
+        project_id: saved.project_id,
+        created_by: userId,
+      },
+    })
+  }
   return findById(saved.id, userId)
 }
 

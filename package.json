@@ -19,6 +19,7 @@
     "typecheck": "npm run typecheck --workspace=server && npm run typecheck --workspace=client"
   },
   "devDependencies": {
-    "concurrently": "^8.2.2"
+    "concurrently": "^8.2.2",
+    "ts-node": "^10.9.2"
   }
 }
